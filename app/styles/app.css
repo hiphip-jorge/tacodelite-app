@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --color-primary-main: #43B64F;
+    --color-primary-light: #ccffdd; 
+    --color-primary-dark: #297031;
+    --color-dark: #444;
+    --color-light: #eee;
+}
+
+.header {
+    @apply flex items-center w-full gap-1 sm:h-24  justify-center md:gap-8 md:px-24 lg:h-28;
+}

@@ -10,16 +10,26 @@ import {
 } from "@remix-run/react";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
+let acierBatStyleSheetUrl = "https://use.typekit.net/kui8jtg.css";
+let secularOneStyleSheetUrl =
+  "https://fonts.googleapis.com/css2?family=Secular+One&display=swap";
+import tacoDeliteFavicon from "./assets/td-logo_2021.png";
 import { getUser } from "./session.server";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
+  return [
+    { rel: "icon", href: tacoDeliteFavicon },
+    { rel: "stylesheet", href: acierBatStyleSheetUrl },
+    { rel: "stylesheet", href: secularOneStyleSheetUrl },
+    { rel: "stylesheet", href: tailwindStylesheetUrl },
+  ];
 };
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "Remix Notes",
+  title: "Taco Delite | 15th Street",
   viewport: "width=device-width,initial-scale=1",
+  keywords: "Tacos,Plano,Richardson,Best,Fresh",
 });
 
 export async function loader({ request }: LoaderArgs) {
