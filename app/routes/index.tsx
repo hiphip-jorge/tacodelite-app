@@ -1,13 +1,11 @@
-import { Link } from "@remix-run/react";
-
 // utils
-import { useOptionalUser } from "~/utils";
+// import { useOptionalUser } from "~/utils";
 
 // assets
 import taco_delite from "~/assets/td-logo_2021.png";
 
 export default function Index() {
-  const user = useOptionalUser();
+  // const user = useOptionalUser();
   return (
     <>
     <header className="header border-b-2 border-green-light" role="banner">

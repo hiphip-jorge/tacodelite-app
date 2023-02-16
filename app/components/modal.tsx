@@ -1,4 +1,4 @@
-import { link } from "fs";
+// import { link } from "fs";
 import { useEffect, useState } from "react";
 // import { modalContent } from "~/routes";
 // import { buttons, links } from "~/utilities/components/modals.utils";
@@ -36,7 +36,7 @@ const Modal = ({
         document.querySelector(".modalMask")?.classList.add("hidden");
       }, 350);
     }
-  }, [isOpen]);
+  }, [isOpen, fadeOut]);
 
   return (
     <aside
