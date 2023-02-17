@@ -1,0 +1,492 @@
+{
+    "foodItems": 
+        [
+            {
+            "name": "breakfast taco",
+            "description": "",
+            "price": "2.50",
+            "categoryId": 1
+            },
+            {
+            "name": "breakfast burrito",
+            "description": "",
+            "price": "4.50",
+            "categoryId": 1
+            },
+            {
+            "name": "breakfast bowl",
+            "description": "",
+            "price": "4.50",
+            "categoryId": 1
+            },
+            {
+            "name": "side of bacon",
+            "description": "",
+            "price": "2.00",
+            "categoryId": 1
+            },
+            {
+            "name": "side of potato",
+            "description": "",
+            "price": "2.00",
+            "categoryId": 1
+            },
+            {
+                "name": "taco",
+                "description": "",
+                "price": "2.09",
+                "categoryId": 2
+            },
+            {
+                "name": "supreme taco",
+                "description": "",
+                "price": "2.29",
+                "categoryId": 2
+            },
+            {
+                "name": "soft taco",
+                "description": "",
+                "price": "2.19",
+                "categoryId": 2
+            },
+            {
+                "name": "soft taco supreme",
+                "description": "",
+                "price": "2.49",
+                "categoryId": 2
+            },
+            {
+                "name": "fajita soft taco",
+                "description": "",
+                "price": "2.99",
+                "categoryId": 2
+            },
+            {
+                "name": "taco delite",
+                "description": "",
+                "price": "2.49",
+                "categoryId": 2
+            },
+            {
+                "name": "taco delite supreme",
+                "description": "",
+                "price": "3.25",
+                "categoryId": 2
+            },
+            {
+                "name": "taco delite w/ queso",
+                "description": "",
+                "price": "2.89",
+                "categoryId": 2
+            },
+            {
+                "name": "taco delite w/ guac",
+                "description": "",
+                "price": "3.50",
+                "categoryId": 2
+            },
+            {
+                "name": "bean burrito",
+                "description": "",
+                "price": "2.69",
+                "categoryId": 3
+            },
+            {
+                "name": "meat burrito",
+                "description": "",
+                "price": "4.69",
+                "categoryId": 3
+            },
+            {
+                "name": "combo burrito",
+                "description": "",
+                "price": "5.25",
+                "categoryId": 3
+            },
+            {
+                "name": "super burrito",
+                "description": "",
+                "price": "5.75",
+                "categoryId": 3
+            },
+            {
+                "name": "fajita burrito",
+                "description": "",
+                "price": "6.00",
+                "categoryId": 3
+            },
+            {
+                "name": "melt burrito",
+                "description": "",
+                "price": "6.99",
+                "categoryId": 3
+            },
+            {
+                "name": "cheese nachos",
+                "description": "",
+                "price": "6.50",
+                "categoryId": 4
+            },
+            {
+                "name": "bean nachos",
+                "description": "",
+                "price": "7.00",
+                "categoryId": 4
+            },
+            {
+                "name": "meat nachos",
+                "description": "",
+                "price": "7.99",
+                "categoryId": 4
+            },
+            {
+                "name": "combo nachos",
+                "description": "",
+                "price": "8.50",
+                "categoryId": 4
+            },
+            {
+                "name": "super nachos",
+                "description": "",
+                "price": "8.99",
+                "categoryId": 4
+            },
+            {
+                "name": "fajita nachos",
+                "description": "",
+                "price": "9.50",
+                "categoryId": 4
+            },
+            {
+                "name": "super salad",
+                "description": "",
+                "price": "8.99",
+                "categoryId": 5
+            },
+            {
+                "name": "salad supreme",
+                "description": "",
+                "price": "8.99",
+                "categoryId": 5
+            },
+            {
+                "name": "fajita salad",
+                "description": "",
+                "price": "9.50",
+                "categoryId": 5
+            },
+            {
+                "name": "single cheese quesadilla",
+                "description": "",
+                "price": "4.99",
+                "categoryId": 6
+            },
+            {
+                "name": "cheese quesadilla",
+                "description": "",
+                "price": "7.50",
+                "categoryId": 6
+            },
+            {
+                "name": "bean quesadilla",
+                "description": "",
+                "price": "7.75",
+                "categoryId": 6
+            },
+            {
+                "name": "meat quesadilla",
+                "description": "",
+                "price": "8.75",
+                "categoryId": 6
+            },
+            {
+                "name": "fajita quesadilla",
+                "description": "",
+                "price": "9.75",
+                "categoryId": 6
+            },
+            {
+                "name": "bean tostada",
+                "description": "",
+                "price": "4.50",
+                "categoryId": 7
+            },
+            {
+                "name": "guac tostada",
+                "description": "",
+                "price": "5.99",
+                "categoryId": 7
+            },
+            {
+                "name": "super tostada",
+                "description": "",
+                "price": "6.25",
+                "categoryId": 7
+            },
+            {
+                "name": "pico de gallo",
+                "description": "",
+                "price": "2.00",
+                "categoryId": 8
+            },
+            {
+                "name": "scoop of guac",
+                "description": "",
+                "price": "2.50",
+                "categoryId": 8
+            },
+            {
+                "name": "salsa",
+                "description": "",
+                "price": "1.75",
+                "categoryId": 8
+            },
+            {
+                "name": "rice",
+                "description": "",
+                "price": "2.25",
+                "categoryId": 8
+            },
+            {
+                "name": "frijoles",
+                "description": "",
+                "price": "2.25",
+                "categoryId": 8
+            },
+            {
+                "name": "bag of chips",
+                "description": "",
+                "price": "4.50",
+                "categoryId": 8
+            },
+            {
+                "name": "single chicken taquito",
+                "description": "",
+                "price": "1.25",
+                "categoryId": 9
+            },
+            {
+                "name": "single tamale",
+                "description": "",
+                "price": "1.50",
+                "categoryId": 9
+            },
+            {
+                "name": "single enchilada",
+                "description": "",
+                "price": "3.50",
+                "categoryId": 9
+            },
+            {
+                "name": "taco burger",
+                "description": "",
+                "price": "1.50",
+                "categoryId": 9
+            },
+            {
+                "name": "tortilla soup",
+                "description": "",
+                "price": "5.50",
+                "categoryId": 9
+            },
+            {
+                "name": "Frito Pie",
+                "description": "",
+                "price": "5.00",
+                "categoryId": 9
+            },
+            {
+                "name": "chips and salsa",
+                "description": "",
+                "price": "4.50",
+                "categoryId": 10
+            },
+            {
+                "name": "chips and queso",
+                "description": "",
+                "price": "6.50",
+                "categoryId": 10
+            },
+            {
+                "name": "chips and guac",
+                "description": "",
+                "price": "6.99",
+                "categoryId": 10
+            },
+            {
+                "name": "chips and dip",
+                "description": "",
+                "price": "6.99",
+                "categoryId": 10
+            },
+            {
+                "name": "taco plate",
+                "description": "",
+                "price": "8.99",
+                "categoryId": 11
+            },
+            {
+                "name": "burrito plate",
+                "description": "",
+                "price": "10.99",
+                "categoryId": 11
+            },
+            {
+                "name": "enchilada plate",
+                "description": "",
+                "price": "10.99",
+                "categoryId": 11
+            },
+            {
+                "name": "fajita plate",
+                "description": "",
+                "price": "10.99",
+                "categoryId": 11
+            },
+            {
+                "name": "tamale plate",
+                "description": "",
+                "price": "10.99",
+                "categoryId": 11
+            },
+            {
+                "name": "taquito plate",
+                "description": "",
+                "price": "10.99",
+                "categoryId": 11
+            },
+            {
+                "name": "quesadilla plate",
+                "description": "",
+                "price": "10.99",
+                "categoryId": 11
+            },
+            {
+                "name": "10 pack of tacos",
+                "description": "",
+                "price": "18.99",
+                "categoryId": 12
+            },
+            {
+                "name": "dozen tamales",
+                "description": "",
+                "price": "18.99",
+                "categoryId": 12
+            },
+            {
+                "name": "gallon of regular tea",
+                "description": "",
+                "price": "5.99",
+                "categoryId": 12
+            },
+            {
+                "name": "gallon of peach tea",
+                "description": "",
+                "price": "5.99",
+                "categoryId": 12
+            },
+            {
+                "name": "bag of pebble ice",
+                "description": "",
+                "price": "2.99",
+                "categoryId": 12
+            },
+            {
+                "name": "chocolate chip cookies",
+                "description": "",
+                "price": "0.90",
+                "categoryId": 13
+            },
+            {
+                "name": "cinnamon chips",
+                "description": "",
+                "price": "1.99",
+                "categoryId": 13
+            },
+            {
+                "name": "cinnamon roll",
+                "description": "",
+                "price": "2.50",
+                "categoryId": 13
+            },
+            {
+                "name": "bottled mexican coke",
+                "description": "",
+                "price": "3.00",
+                "categoryId": 14
+            },
+            {
+                "name": "pepsi",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "diet pepsi",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "dr. pepper",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "diet dr. pepper",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "Mountain Dew",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "Mug Rootbeer",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "tropicana lemonade",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "tropicana fruit punch",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "brisk strawberry melon",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "horchata",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "sweet/unsweet tea",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            },
+            {
+                "name": "sweet/unsweet peach tea",
+                "description": "",
+                "price": "1.89",
+                "categoryId": 14
+            }
+        ]
+}
+

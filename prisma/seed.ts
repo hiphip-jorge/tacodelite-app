@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { getUsers, getCategory, getAnnouncement } from "./seed-utils";
+import tacodelite from './tacodelite.menu.json'
 
 const prisma = new PrismaClient();
 
@@ -24,21 +26,15 @@ async function seed() {
     },
   });
 
-  await prisma.note.create({
-    data: {
-      title: "My first note",
-      body: "Hello, world!",
-      userId: user.id,
-    },
-  });
-
-  await prisma.note.create({
-    data: {
-      title: "My second note",
-      body: "Hello, world!",
-      userId: user.id,
-    },
-  });
+  await Promise.all(
+    [...getAnnouncement().map((announcement) => {
+      return prisma.announcement.create({ data: announcement });
+    }), ...getCategory().map((category) => {
+      return prisma.category.create({data: category})
+    }), ...tacodelite.foodItems.map((foodItem) => {
+      return prisma.foodItem.create({data: foodItem})
+    })]
+  );
 
   console.log(`Database has been seeded. 🌱`);
 }
