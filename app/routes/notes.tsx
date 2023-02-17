@@ -8,7 +8,7 @@ import { getNoteListItems } from "~/models/note.server";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await requireUserId(request);
-  const noteListItems = await getNoteListItems({ userId });
+  const noteListItems = await getNoteListItems();
   return json({ noteListItems });
 }
 
