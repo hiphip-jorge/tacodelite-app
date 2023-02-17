@@ -1,6 +1,148 @@
+@import "../../node_modules/react-datepicker/dist/react-datepicker.css";
+
+/* tailwind css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.header {
+    @apply flex items-center w-full gap-1 sm:h-24  sm:justify-center md:gap-8 md:px-24 lg:h-28;
+}
+
+.menuSectionHeader {
+    @apply ml-20 mt-8 w-fit font-secondary-secular text-4xl text-dark md:ml-36 lg:ml-24
+}
+
+.subtle-underline {
+    @apply after:absolute after:left-1/2 after:h-[2px] after:w-5/6 after:-translate-x-1/2 after:translate-y-8 after:md:translate-y-10 after:rounded-sm after:bg-green-100 after:last:content-none;
+}
+
+/* Sizes */
+/**/
+
+/* button  */
+
+/* .button-lg {
+    @apply lg:
+} */
+
+@layer components {
+    .card {
+        @apply border-green-light my-6  mx-auto flex flex-col justify-between w-[260px] gap-2
+             border rounded-3xl border-solid p-6 bg-[#F4FBF5] shadow-lg
+    }
+
+    .button {
+        @apply font-primary-solid shadow-xl h-12 w-32 rounded-[14px];
+    }
+
+    .button-primary {
+        @apply button bg-green-primary  text-white duration-300 hover:bg-green-light hover:text-green-dark
+    }
+
+    .button-secondary {
+        @apply button border-2 border-green-primary bg-white text-green-primary duration-300 hover:border-0 hover:bg-green-dark hover:text-white
+    }
+
+    .modalMask {
+        @apply fixed h-full w-full top-0 bottom-0 left-0 right-0 bg-[#f4fbf5dd] backdrop-blur-sm z-20 overflow-auto;
+    }
+
+    .accordionHeader {
+        @apply h-full w-full rounded-2xl px-4 py-3 pl-0 text-2xl;
+    }
+
+    .modalContainer {
+        @apply absolute top-1/2 left-1/2 h-fit w-3/4 -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white shadow-lg outline outline-1 outline-green-light md:w-1/2 xl:w-1/5;
+    }
+
+    .iconButton {
+        @apply sticky top-32 right-full left-4 z-10 float-left flex w-fit flex-col gap-2 lg:hidden
+    }
+}
+
+@layer utilities {
+    .hero-h2 {
+        @apply font-primary-solid text-[2rem] leading-9 md:text-5xl
+    }
+
+    .skew-backdrop {
+        @apply before:absolute before:-inset-1 before:top-5 before:block before:h-3/4 before:-skew-y-6 
+            lg:before:w-[115%] lg:before:-left-12 lg:before:top-9 before:shadow-2xl before:shadow-dark 
+            before:bg-gradient-to-br before:from-green-light before:to-[#8FD69B];
+    }
+}
+
+@layer animations {
+    .animate-grow-n-shrink {
+        animation: grow-n-shrink 1.25s infinite;
+    }
+    
+    .animate-grow-n-shrink-subtle {
+        animation: grow-n-shrink-subtle 1.25s infinite;
+    }
+
+    .sideMenu-fadeIn {
+        animation-name: fadeIn;
+        animation-duration: 350ms;
+    }
+    
+    .sideMenu-fadeOut {
+        animation-name: fadeOut;
+        animation-duration: 350ms;
+    }
+
+    .slideInUp {
+        animation-name: slideInUp;
+        animation-duration: 0.5s;
+    }
+    
+    @keyframes grow-n-shrink {
+        0% {transform: scale(1);}
+        50% {transform: scale(1.25);}
+        100% {transform: scale(1);}
+    }
+    
+    @keyframes grow-n-shrink-subtle {
+        0% {transform: scale(1);}
+        50% {transform: scale(1.1);}
+        100% {transform: scale(1);}
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+    
+        to {
+            opacity: 1;
+        }
+    } 
+    
+    @keyframes fadeOut {
+        from {
+            opacity: 1;
+        }
+    
+        to {
+            opacity: 0;
+        }
+    }   
+    
+    @keyframes slideInUp {
+        from {
+          transform: translate3d(0, 100%, 0);
+          visibility: visible;
+        }
+      
+        to {
+          transform: translate3d(0, 0, 0);
+        }
+    } 
+}
+
+/* general css */
 
 :root {
     --color-primary-main: #43B64F;
@@ -10,6 +152,72 @@
     --color-light: #eee;
 }
 
-.header {
-    @apply flex items-center w-full gap-1 sm:h-24  justify-center md:gap-8 md:px-24 lg:h-28;
+*, html {
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+.open {
+    transform: rotate(-180deg);
+    transition: all 300ms ease-in-out;
+}
+
+.close {
+    transform: rotate(0deg);
+    transition: all 300ms ease-in-out;
+}
+
+button:hover .accordionIcon {
+    fill: var(--color-primary-dark);
+}
+
+button:hover .accordionHeader {
+    color: var(--color-primary-dark);
+}
+
+.underline-effect {
+    position: relative;
+}
+
+.underline-effect::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 0.75rem;
+    background-color: var(--color-primary-main);
+    opacity: 0.75;
+    width: 0;
+    transition: width 0.8s ease-in-out;
+    animation-delay: 2s;
+}
+
+.in--view::before {
+    width: 100%;
+}
+
+.in--hover:hover:before {
+    height: 0.5rem;
+    width: 100%;
+}
+
+.cancel {
+    width: 100%;
+    height: 100%;
+}
+
+.cancel:before, .cancel:after {
+    position: absolute;
+    content: '';
+    height: 50%;
+    width: 4px;
+    top: 25%;
+    background-color: var(--color-primary-light);
+}
+.cancel:before {
+    transform: rotate(45deg);
+}
+.cancel:after {
+    background-color: var(--color-primary-light);
+    transform: rotate(-45deg);
 }

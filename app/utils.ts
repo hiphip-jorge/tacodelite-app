@@ -69,3 +69,11 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+// index.tsx
+
+export let aboutUs_p = `Taco Delite West Plano opened in Feburary of 1989 and is located at
+the Prairie Creek Village Shopping Center. Since then, Taco Delite has
+earned 4 "Food Safety and Excellence" nominations and continues to
+claim the best customers, separating itself as a prestige fast food
+restaurant in one of the most competitive cities in Texas.`;
