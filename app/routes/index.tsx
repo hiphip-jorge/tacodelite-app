@@ -1,8 +1,15 @@
+import { useState } from "react";
+import { useLoaderData } from "@remix-run/react";
+import { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
+
 // utils
 import { useOptionalUser, aboutUs_p } from "~/utils";
 
+// Prisma Imports
+import { prisma } from "~/db.server";
+import { FoodItem, Announcement } from "@prisma/client";
+
 // assets
-import { useState } from "react";
 import catering from "~/assets/catering.png";
 import taco_delite from "~/assets/td-logo_2021.png";
 import td_building from "~/assets/taco_delite.jpeg";
@@ -14,12 +21,29 @@ import Section from "~/components/section";
 import IconButton from "~/components/iconButton";
 
 // Types
-// export type category = { name: string; foodItems: Array<FoodItem> };
+export type category = { name: string; foodItems: Array<FoodItem> };
 export type modalContent = { name: string; url: string };
-// export type LoaderTypes = {
-//   categories: category[];
-//   // announcements: Announcement[];
-// };
+export type LoaderTypes = {
+  categories: category[];
+  announcements: Announcement[];
+};
+
+// Constants
+const doordash = { name: "doordash", url: "https://www.doordash.com" };
+const ubereats = { name: "ubereats", url: "https://www.ubereats.com" };
+
+// Remix Data Loader Function
+export const loader: LoaderFunction = async () => {
+  // let announcements = await prisma.announcement.findMany();
+  let categories = await prisma.category.findMany({
+    select: {
+      name: true,
+      foodItems: true,
+    },
+  });
+
+  return { categories };
+};
 
 export default function Index() {
   // const user = useOptionalUser();
@@ -29,24 +53,28 @@ export default function Index() {
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
   const [constentType, setContentType] = useState("links");
 
+  // custom hooks
+  const { categories } = useLoaderData<LoaderTypes>();
+  console.log("categories", categories);
+
   const handleToggle = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     setIsOpen((prevState) => !prevState);
   };
 
-  // const handleMenu = () => {
-  //   setContentType("buttons");
-  //   setCurrentContent(
-  //     categories.map((category) => {
-  //       return { name: category.name, url: "#" + category.name };
-  //     })
-  //   );
-  // };
+  const handleMenu = () => {
+    setContentType("buttons");
+    setCurrentContent(
+      categories.map((category) => {
+        return { name: category.name, url: "#" + category.name };
+      })
+    );
+  };
 
-  // const handleOrder = () => {
-  //   setContentType("links");
-  //   setCurrentContent([doordash, ubereats]);
-  // };
+  const handleOrder = () => {
+    setContentType("links");
+    setCurrentContent([doordash, ubereats]);
+  };
 
   return (
     <div className="bg-white">
@@ -84,7 +112,7 @@ export default function Index() {
             </h2>
           </div>
           <div className="mx-auto flex w-fit gap-4">
-            {/* <Button
+            <Button
               className=""
               handleClick={(e) => {
                 handleMenu();
@@ -102,7 +130,7 @@ export default function Index() {
               primary
             >
               Order
-            </Button> */}
+            </Button>
           </div>
         </Section>
 
@@ -111,7 +139,7 @@ export default function Index() {
           <IconButton
             iconSVG={car("hover:fill-[#43B64Fdd] fill-[#297031]")}
             handleClick={(e) => {
-              // handleOrder();
+              handleOrder();
               handleToggle(e);
             }}
           />
@@ -119,7 +147,7 @@ export default function Index() {
           <IconButton
             iconSVG={utensils("hover:fill-[#43B64Fdd] fill-[#297031]")}
             handleClick={(e) => {
-              // handleMenu();
+              handleMenu();
               handleToggle(e);
             }}
           />
