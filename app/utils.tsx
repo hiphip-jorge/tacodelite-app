@@ -2,7 +2,7 @@ import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
-import { modalContent } from "./routes";
+import type { modalContent } from "./routes";
 
 const DEFAULT_REDIRECT = "/";
 

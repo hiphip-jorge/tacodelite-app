@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { getUsers, getCategory, getAnnouncement } from "./seed-utils";
+import { getCategory, getAnnouncement } from "./seed-utils";
 import tacodelite from './tacodelite.menu.json'
 
 const prisma = new PrismaClient();
@@ -15,7 +15,7 @@ async function seed() {
 
   const hashedPassword = await bcrypt.hash("racheliscool", 10);
 
-  const user = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email,
       password: {

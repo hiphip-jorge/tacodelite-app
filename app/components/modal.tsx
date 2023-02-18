@@ -1,6 +1,6 @@
 // import { link } from "fs";
 import { useEffect, useState } from "react";
-import { modalContent } from "~/routes";
+import type { modalContent } from "~/routes";
 import { buttons, links } from "~/utils";
 
 type Props = {

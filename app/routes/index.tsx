@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useLoaderData } from "@remix-run/react";
-import { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
+import { type LoaderFunction } from "@remix-run/server-runtime";
+import { useInView } from "react-intersection-observer";
 
 // utils
-import { useOptionalUser, aboutUs_p, scrollTo } from "~/utils";
+import { aboutUs_p, scrollTo } from "~/utils";
 
 // Prisma Imports
 import { prisma } from "~/db.server";
@@ -21,7 +22,6 @@ import Card from "~/components/card";
 import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
-import { useInView } from "react-intersection-observer";
 import AnnouncementBar from "~/components/announcementBar";
 
 // Types
@@ -61,21 +61,20 @@ export default function Index() {
 
   // custom hooks
   const { announcements, categories } = useLoaderData<LoaderTypes>();
+  const [ref, inview, entry] = useInView({
+    threshold: 1,
+    rootMargin: "-50px 0px -100px 0px",
+  });
   const categoryRefs = categories.map(() => {
-    const thisCategory = useInView({
-      threshold: 1,
-      rootMargin: "-50px 0px -100px 0px",
-    });
-
     // if category is inview and there no other is in view, flip flag to true; else, return false
-    if (thisCategory.inView && !hasInView) {
+    if (inview && !hasInView) {
       hasInView = true;
-      return thisCategory;
+      return { ref, inview };
     } else {
       return {
-        ref: thisCategory.ref,
+        ref: ref,
         inView: false,
-        entry: thisCategory.entry,
+        entry: entry,
       };
     }
   });
@@ -107,13 +106,11 @@ export default function Index() {
         <p className="font-primary-gris text-4xl text-green-primary md:text-6xl">
           Taco
         </p>
-        <figure>
-          <img
-            src={taco_delite}
-            alt="taco delite logo"
-            className="hidden w-14 md:inline"
-          />
-        </figure>
+        <img
+          src={taco_delite}
+          alt="taco delite logo"
+          className="hidden w-14 md:inline"
+        />
         <p className="font-primary-gris text-4xl text-green-primary md:text-6xl">
           Delite
         </p>
@@ -126,9 +123,9 @@ export default function Index() {
           height="h-[calc(100vh-5rem)] lg:h-[calc(100vh-7em)]"
           sectionClass="flex flex-col items-center justify-around py-10"
         >
-          <picture className="skew-backdrop relative flex flex-col items-center lg:w-[30rem]">
+          <div className="skew-backdrop relative flex flex-col items-center lg:w-[30rem]">
             <img className="z-10" src={catering} alt="plate 1 image" />
-          </picture>
+          </div>
           <div className="px-12 md:px-28">
             <h2 className="hero-h2 text-green-primary">Real Ingredients.</h2>
             <h2 className="hero-h2 text-end text-green-dark">
@@ -180,13 +177,13 @@ export default function Index() {
         {/* About Us Section */}
         <Section header="About Us">
           <div className="flex flex-col items-center gap-4 px-16 pl-[calc(4rem-1rem)] md:px-12 xl:my-10 xl:flex-row xl:gap-0">
-            <figure className="flex justify-center md:px-8 xl:px-0">
+            <div className="flex justify-center md:px-8 xl:px-0">
               <img
                 src={td_building}
                 className="my-4 rounded-3xl shadow-lg md:w-3/4"
                 alt=""
               />
-            </figure>
+            </div>
             <p className="h-fit font-secondary-secular text-lg text-green-dark md:px-20 md:text-2xl xl:px-0">
               {aboutUs_p}
             </p>
@@ -321,9 +318,9 @@ export default function Index() {
           </div>
         </div>
         <div className="flex w-full items-center justify-center gap-2">
-          <figure className="flex h-8 w-8 items-end justify-start">
+          <div className="flex h-8 w-8 items-end justify-start">
             <img src={taco_delite} alt="taco delite logo" className="w-8" />
-          </figure>
+          </div>
           <p className="font-secondary-secular text-green-dark ">
             CJN Inc. All right reserved.
           </p>
