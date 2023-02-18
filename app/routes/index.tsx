@@ -100,7 +100,7 @@ export default function Index() {
 
   return (
     <div className="bg-white">
-      <AnnouncementBar message={announcements[0].message} />
+      {/* <AnnouncementBar message={announcements[0].message} /> */}
       {/* Taco Delite Header */}
       <header className="header border-b-2 border-green-light" role="banner">
         <p className="font-primary-gris text-4xl text-green-primary md:text-6xl">
