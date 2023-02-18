@@ -3,7 +3,7 @@ import { useLoaderData } from "@remix-run/react";
 import { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 
 // utils
-import { useOptionalUser, aboutUs_p } from "~/utils";
+import { useOptionalUser, aboutUs_p, scrollTo } from "~/utils";
 
 // Prisma Imports
 import { prisma } from "~/db.server";
@@ -17,9 +17,11 @@ import { car, utensils } from "~/assets/svg";
 
 // components
 import Button from "~/components/button";
+import Card from "~/components/card";
 import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
+import { useInView } from "react-intersection-observer";
 
 // Types
 export type category = { name: string; foodItems: Array<FoodItem> };
@@ -33,7 +35,7 @@ export type LoaderTypes = {
 const doordash = { name: "doordash", url: "https://www.doordash.com" };
 const ubereats = { name: "ubereats", url: "https://www.ubereats.com" };
 
-// Remix Data Loader Function
+// Remix Data Loader eFunction
 export const loader: LoaderFunction = async () => {
   // let announcements = await prisma.announcement.findMany();
   let categories = await prisma.category.findMany({
@@ -48,6 +50,8 @@ export const loader: LoaderFunction = async () => {
 
 export default function Index() {
   // const user = useOptionalUser();
+  // flag for categories in view
+  let hasInView = false;
 
   // states
   const [isOpen, setIsOpen] = useState(false);
@@ -56,7 +60,24 @@ export default function Index() {
 
   // custom hooks
   const { categories } = useLoaderData<LoaderTypes>();
-  console.log("categories", categories);
+  const categoryRefs = categories.map(() => {
+    const thisCategory = useInView({
+      threshold: 1,
+      rootMargin: "-50px 0px -100px 0px",
+    });
+
+    // if category is inview and there no other is in view, flip flag to true; else, return false
+    if (thisCategory.inView && !hasInView) {
+      hasInView = true;
+      return thisCategory;
+    } else {
+      return {
+        ref: thisCategory.ref,
+        inView: false,
+        entry: thisCategory.entry,
+      };
+    }
+  });
 
   const handleToggle = (e: React.SyntheticEvent) => {
     e.stopPropagation();
@@ -169,7 +190,69 @@ export default function Index() {
             </p>
           </div>
         </Section>
+
+        {/* Menu Section  */}
+        <Section header="Menu">
+          <div className="lg:my-8 lg:flex lg:gap-2 xl:my-16">
+            {/* Side nav */}
+            <aside className="sticky top-4 left-10 hidden h-fit lg:inline lg:w-1/4">
+              <ul>
+                {categories.map((category, idx) => {
+                  return (
+                    <li
+                      key={idx}
+                      className="flex justify-center p-2 text-green-light"
+                    >
+                      <button
+                        className={`h-full w-full font-primary-solid text-3xl duration-500 ease-in-out xl:text-left ${
+                          categoryRefs[idx].inView && "text-green-dark"
+                        }`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          scrollTo(category.name);
+                        }}
+                      >
+                        {category.name}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </aside>
+            {/* Menu cards  */}
+            <div className="px-2 md:px-6 lg:w-3/4 lg:px-0">
+              {categories.map((category, idx) => (
+                <div
+                  id={category.name.toLowerCase()}
+                  key={category.name}
+                  className="xl:mb-24"
+                >
+                  <h1
+                    id={category.name}
+                    ref={categoryRefs[idx].ref}
+                    className={`menuSectionHeader underline-effect ${
+                      categoryRefs[idx].inView && "in--view"
+                    }`}
+                  >
+                    {category.name}
+                  </h1>
+                  <div className="flex flex-wrap justify-start gap-4 px-12 md:px-16 lg:px-4 xl:gap-8 xl:px-8">
+                    {category.foodItems.map((item, idx) => (
+                      <Card
+                        id={item.name.replaceAll(" ", "-")}
+                        key={idx}
+                        item={item}
+                        className="md: sm:w-56"
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
       </main>
+
       <footer className="flex flex-col justify-center gap-10 bg-green-50 p-10">
         <div className="grid grid-flow-col grid-rows-4 items-center justify-center gap-4 md:grid-rows-2 md:gap-8 lg:flex-row lg:flex-wrap xl:grid-rows-1">
           <div className="w-fit">
