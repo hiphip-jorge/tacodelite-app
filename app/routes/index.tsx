@@ -22,6 +22,7 @@ import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
 import { useInView } from "react-intersection-observer";
+import AnnouncementBar from "~/components/announcementBar";
 
 // Types
 export type category = { name: string; foodItems: Array<FoodItem> };
@@ -37,7 +38,7 @@ const ubereats = { name: "ubereats", url: "https://www.ubereats.com" };
 
 // Remix Data Loader eFunction
 export const loader: LoaderFunction = async () => {
-  // let announcements = await prisma.announcement.findMany();
+  let announcements = await prisma.announcement.findMany();
   let categories = await prisma.category.findMany({
     select: {
       name: true,
@@ -45,7 +46,7 @@ export const loader: LoaderFunction = async () => {
     },
   });
 
-  return { categories };
+  return { announcements, categories };
 };
 
 export default function Index() {
@@ -59,7 +60,7 @@ export default function Index() {
   const [constentType, setContentType] = useState("links");
 
   // custom hooks
-  const { categories } = useLoaderData<LoaderTypes>();
+  const { announcements, categories } = useLoaderData<LoaderTypes>();
   const categoryRefs = categories.map(() => {
     const thisCategory = useInView({
       threshold: 1,
@@ -100,6 +101,7 @@ export default function Index() {
 
   return (
     <div className="bg-white">
+      <AnnouncementBar message={announcements[0].message} />
       {/* Taco Delite Header */}
       <header className="header border-b-2 border-green-light" role="banner">
         <p className="font-primary-gris text-4xl text-green-primary md:text-6xl">
