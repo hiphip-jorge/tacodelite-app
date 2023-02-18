@@ -17,8 +17,9 @@ import { car, utensils } from "~/assets/svg";
 
 // components
 import Button from "~/components/button";
-import Section from "~/components/section";
 import IconButton from "~/components/iconButton";
+import Modal from "~/components/modal";
+import Section from "~/components/section";
 
 // Types
 export type category = { name: string; foodItems: Array<FoodItem> };
@@ -100,9 +101,9 @@ export default function Index() {
         <Section
           header="15th Street"
           height="h-[calc(100vh-6rem)] lg:h-[calc(100vh-7em)]"
-          sectionClass="flex flex-col items-center justify-around py-10 lg:py-16"
+          sectionClass="flex flex-col items-center justify-around py-10"
         >
-          <picture className="skew-backdrop relative flex flex-col items-center lg:w-[36rem]">
+          <picture className="skew-backdrop relative flex flex-col items-center lg:w-[30rem]">
             <img className="z-10" src={catering} alt="plate 1 image" />
           </picture>
           <div className="px-12 md:px-28">
@@ -243,6 +244,12 @@ export default function Index() {
           </p>
         </div>
       </footer>
+      <Modal
+        contentList={currentContent}
+        isOpen={isOpen}
+        handleClose={handleToggle}
+        isButtons={constentType === "buttons"}
+      />
     </div>
   );
 }

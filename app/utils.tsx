@@ -2,6 +2,7 @@ import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
 
 import type { User } from "~/models/user.server";
+import { modalContent } from "./routes";
 
 const DEFAULT_REDIRECT = "/";
 
@@ -77,3 +78,33 @@ the Prairie Creek Village Shopping Center. Since then, Taco Delite has
 earned 4 "Food Safety and Excellence" nominations and continues to
 claim the best customers, separating itself as a prestige fast food
 restaurant in one of the most competitive cities in Texas.`;
+
+// components/modal.tsx 
+
+export const buttons = (item: modalContent, handleClose: Function | undefined) => {
+  return (
+      <button
+          className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
+          onClick={(e) => {
+              handleClose && handleClose(e);
+              scrollTo(item.name);
+          }}
+      >
+          {item.name}
+      </button>
+  );
+}
+
+export const links = (item: modalContent) => (
+<a
+  className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
+  href={item.url}
+>
+  {item.name}
+</a>
+);
+
+export const scrollTo = (id: string) => {
+  const getMeTo = document.getElementById(id);
+  getMeTo && getMeTo.scrollIntoView({behavior: 'smooth',block: 'center'});
+}

@@ -64,12 +64,12 @@
 
 @layer utilities {
     .hero-h2 {
-        @apply font-primary-solid text-[2rem] leading-9 md:text-5xl
+        @apply font-primary-solid text-[2rem] leading-9 md:text-3xl
     }
 
     .skew-backdrop {
         @apply before:absolute before:-inset-1 before:top-5 before:block before:h-3/4 before:-skew-y-6 
-            lg:before:w-[115%] lg:before:-left-12 lg:before:top-9 before:shadow-2xl before:shadow-dark 
+            lg:before:w-[115%] lg:before:-left-12 lg:before:top-[1.85rem] before:shadow-2xl before:shadow-dark 
             before:bg-gradient-to-br before:from-green-light before:to-[#8FD69B];
     }
 }

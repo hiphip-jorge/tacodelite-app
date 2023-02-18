@@ -1,18 +1,18 @@
 // import { link } from "fs";
 import { useEffect, useState } from "react";
-// import { modalContent } from "~/routes";
-// import { buttons, links } from "~/utilities/components/modals.utils";
+import { modalContent } from "~/routes";
+import { buttons, links } from "~/utils";
 
 type Props = {
   isOpen: boolean;
-  // contentList?: modalContent[];
+  contentList?: modalContent[];
   handleClose?: React.MouseEventHandler<HTMLButtonElement>;
   isButtons?: boolean;
 };
 
 const Modal = ({
   isOpen,
-  // contentList,
+  contentList,
   handleClose,
   isButtons = false,
 }: Props) => {
@@ -53,7 +53,7 @@ const Modal = ({
           </div>
         </button>
         <ul className="flex flex-col">
-          {/* {contentList?.map((item, idx) => {
+          {contentList?.map((item, idx) => {
             return (
               <li
                 key={idx}
@@ -62,7 +62,7 @@ const Modal = ({
                 {isButtons ? buttons(item, handleClose) : links(item)}
               </li>
             );
-          })} */}
+          })}
         </ul>
       </div>
     </aside>

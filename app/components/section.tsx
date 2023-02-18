@@ -24,7 +24,7 @@ const Section = (props: Props) => {
   return (
     <section className={sectionClass}>
       <h1
-        className={`mx-auto w-fit text-6xl text-green-primary md:text-7xl ${
+        className={`mx-auto w-fit text-6xl text-green-primary ${
           props.hClass ? props.hClass : ""
         } ${
           props.alt
