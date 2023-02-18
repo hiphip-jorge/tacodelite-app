@@ -7,7 +7,7 @@
 @tailwind utilities;
 
 .header {
-    @apply flex items-center w-full gap-1 sm:h-24  sm:justify-center md:gap-8 md:px-24 lg:h-28;
+    @apply flex items-center w-full gap-1 h-20  justify-center md:gap-8 md:px-24 lg:h-28;
 }
 
 .menuSectionHeader {

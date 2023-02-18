@@ -121,7 +121,7 @@ export default function Index() {
         {/* Hero Section */}
         <Section
           header="15th Street"
-          height="h-[calc(100vh-6rem)] lg:h-[calc(100vh-7em)]"
+          height="h-[calc(100vh-5rem)] lg:h-[calc(100vh-7em)]"
           sectionClass="flex flex-col items-center justify-around py-10"
         >
           <picture className="skew-backdrop relative flex flex-col items-center lg:w-[30rem]">
