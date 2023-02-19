@@ -124,7 +124,11 @@ export default function Index() {
           sectionClass="flex flex-col items-center justify-around py-10"
         >
           <div className="skew-backdrop relative flex flex-col items-center lg:w-[30rem]">
-            <img className="z-10" src={catering} alt="Fajitas and bottles of Coke" />
+            <img
+              className="z-10"
+              src={catering}
+              alt="Fajitas and bottles of Coke"
+            />
           </div>
           <div className="px-12 md:px-28">
             <h2 className="hero-h2 text-green-primary">Real Ingredients.</h2>
