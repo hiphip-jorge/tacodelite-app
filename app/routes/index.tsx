@@ -158,7 +158,7 @@ export default function Index() {
         {/* Quick Icon Buttons  */}
         <aside className="iconButton">
           <IconButton
-            iconSVG={car("hover:fill-[#43B64Fdd] fill-[#297031]")}
+            iconSVG={car("hover:fill-[#43B64Fdd]", "#297031")}
             handleClick={(e) => {
               handleOrder();
               handleToggle(e);
@@ -166,7 +166,7 @@ export default function Index() {
           />
           <div className="h-1 w-full rounded-lg bg-green-light" />
           <IconButton
-            iconSVG={utensils("hover:fill-[#43B64Fdd] fill-[#297031]")}
+            iconSVG={utensils("hover:fill-[#43B64Fdd]", "#297031")}
             handleClick={(e) => {
               handleMenu();
               handleToggle(e);
@@ -253,7 +253,7 @@ export default function Index() {
       </main>
 
       <footer className="flex flex-col justify-center gap-10 bg-green-50 p-10">
-        <div className="grid grid-flow-col grid-rows-4 items-center justify-center gap-4 md:items-start md:grid-rows-2 md:gap-8 lg:flex-row lg:flex-wrap xl:grid-rows-1">
+        <div className="grid grid-flow-col grid-rows-4 items-center justify-center gap-4 md:grid-rows-2 md:items-start md:gap-8 lg:flex-row lg:flex-wrap xl:grid-rows-1">
           <div className="w-fit">
             <h1 className="font-primary-solid text-xl text-green-primary">
               Location
