@@ -52,7 +52,7 @@ const Modal = ({
             {isOpen && <span className="cancel"></span>}
           </div>
         </button>
-        <ul className="flex flex-col  rounded-3xl bg-white outline-1 outline-green-light outline">
+        <ul className="flex flex-col">
           {contentList?.map((item, idx) => {
             return (
               <li
