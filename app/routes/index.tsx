@@ -267,6 +267,7 @@ export default function Index() {
                 <a
                   href="https://www.google.com/maps/place/Taco+Delite/@33.0210912,-97.0304499,11z/data=!4m10!1m2!2m1!1staco+delite!3m6!1s0x864c22779cbdf961:0x122a03406b2f3e01!8m2!3d33.0210912!4d-96.7502985!15sCgt0YWNvIGRlbGl0ZVoNIgt0YWNvIGRlbGl0ZZIBEm1leGljYW5fcmVzdGF1cmFudOABAA!16s%2Fg%2F1tfw3fm8"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
+                  target="_blank"
                 >
                   2957 W 15th Street, Plano, TX, 75075
                 </a>
@@ -290,6 +291,7 @@ export default function Index() {
                 <a
                   href="mailto:tacodelitewestplano@gmail.com"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
+                  target="_blank"
                 >
                   tacodelitewestplano@gmail.com
                 </a>
@@ -305,6 +307,7 @@ export default function Index() {
                 <a
                   href="https://www.facebook.com/TacoDeliteWestPlano"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
+                  target="_blank"
                 >
                   Facebook @ Taco Delite West Plano
                 </a>
