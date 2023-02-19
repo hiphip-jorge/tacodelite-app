@@ -6,14 +6,14 @@ import tacodelite from './tacodelite.menu.json'
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "rachel@remix.run";
+  const email = "jorgeperez.inbox@gmail.com";
 
   // cleanup the existing database
   await prisma.user.delete({ where: { email } }).catch(() => {
     // no worries if it doesn't exist yet
   });
 
-  const hashedPassword = await bcrypt.hash("racheliscool", 10);
+  const hashedPassword = await bcrypt.hash("jorgeiscool", 10);
 
   await prisma.user.create({
     data: {

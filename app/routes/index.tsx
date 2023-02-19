@@ -253,7 +253,7 @@ export default function Index() {
       </main>
 
       <footer className="flex flex-col justify-center gap-10 bg-green-50 p-10">
-        <div className="grid grid-flow-col grid-rows-4 items-center justify-center gap-4 md:grid-rows-2 md:gap-8 lg:flex-row lg:flex-wrap xl:grid-rows-1">
+        <div className="grid grid-flow-col grid-rows-4 items-center justify-center gap-4 md:items-start md:grid-rows-2 md:gap-8 lg:flex-row lg:flex-wrap xl:grid-rows-1">
           <div className="w-fit">
             <h1 className="font-primary-solid text-xl text-green-primary">
               Location
@@ -261,7 +261,7 @@ export default function Index() {
             <ul className="flex flex-col font-secondary-secular">
               <li>
                 <a
-                  href="https://www.google.com/maps/dir/''/Taco+Delite,+West+15th+Street,+Plano,+TX/@33.0210863,-96.7853179,13z/data=!3m2!4b1!5s0x864c22c760f8bec1:0x153e7787779c5cc6!4m8!4m7!1m0!1m5!1m1!1s0x864c22779cbdf961:0x122a03406b2f3e01!2m2!1d-96.7503414!2d33.0210227"
+                  href="https://www.google.com/maps/place/Taco+Delite/@33.0210912,-97.0304499,11z/data=!4m10!1m2!2m1!1staco+delite!3m6!1s0x864c22779cbdf961:0x122a03406b2f3e01!8m2!3d33.0210912!4d-96.7502985!15sCgt0YWNvIGRlbGl0ZVoNIgt0YWNvIGRlbGl0ZZIBEm1leGljYW5fcmVzdGF1cmFudOABAA!16s%2Fg%2F1tfw3fm8"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
                 >
                   2957 W 15th Street, Plano, TX, 75075

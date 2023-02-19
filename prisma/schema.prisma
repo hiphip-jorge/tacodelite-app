@@ -33,6 +33,7 @@ model FoodItem {
   price       String
   img         String?
   alt         String?
+  vegetarian  Boolean   @default(false)
   active      Boolean   @default(true)
 }
 
