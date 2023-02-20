@@ -22,7 +22,7 @@ const Card = ({ item, id, className }: Props) => {
       id={id}
       className={
         (className ? className + " " : "") +
-        (isOpen ? "w-[280px] shadow-2xl " : "") +
+        (isOpen ? "w-[280px] shadow-2xl " : "h-44 ") +
         "card"
       }
       layout

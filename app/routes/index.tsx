@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { type LoaderFunction } from "@remix-run/server-runtime";
 
 // utils
-import { aboutUs_p, useCategoryInView, scrollTo } from "~/utils";
+import { aboutUs_p, useCategoryInView, scrollTo, useWindowSize } from "~/utils";
 
 // Prisma Imports
 import { prisma } from "~/db.server";
@@ -13,7 +13,7 @@ import type { FoodItem, Announcement } from "@prisma/client";
 import catering from "~/assets/catering.png";
 import taco_delite from "~/assets/td-logo_2021.png";
 import td_building from "~/assets/taco_delite.jpeg";
-import { car, utensils } from "~/assets/svg";
+import { car, home, utensils } from "~/assets/svg";
 
 // components
 import Button from "~/components/button";
@@ -51,13 +51,21 @@ export const loader: LoaderFunction = async () => {
 export default function Index() {
   // states
   const [isOpen, setIsOpen] = useState(false);
+
   // const [currentIdxInView, setCurrentIdxInView] = useState(-1);
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
   const [constentType, setContentType] = useState("links");
 
   // custom hooks
-  let { inView, categoryRefs } = useCategoryInView();
   const { categories } = useLoaderData<LoaderTypes>();
+  let { inView, categoryRefs } = useCategoryInView();
+  let { width } = useWindowSize();
+
+  useEffect(() => {
+    if (width >= 812) {
+      setIsOpen(false);
+    }
+  }, [width, isOpen]);
 
   // handler functions
   const handleToggle = (e: React.SyntheticEvent) => {
@@ -83,7 +91,11 @@ export default function Index() {
     <div className="bg-white">
       {/* <AnnouncementBar message={announcements[0].message} /> */}
       {/* Taco Delite Header */}
-      <header className="header border-b-2 border-green-light" role="banner">
+      <header
+        id="header"
+        className="header border-b-2 border-green-light"
+        role="banner"
+      >
         <p className="font-primary-gris text-4xl text-green-primary md:text-6xl">
           Taco
         </p>
@@ -119,16 +131,18 @@ export default function Index() {
           </div>
           <div className="mx-auto flex w-fit gap-4">
             <Button
-              className=""
               handleClick={(e) => {
-                handleMenu();
-                handleToggle(e);
+                if (width >= 812) {
+                  scrollTo("menu", "start");
+                } else {
+                  handleMenu();
+                  handleToggle(e);
+                }
               }}
             >
               Menu
             </Button>
             <Button
-              className=""
               handleClick={(e) => {
                 handleOrder();
                 handleToggle(e);
@@ -142,6 +156,14 @@ export default function Index() {
 
         {/* Quick Icon Buttons  */}
         <aside className="iconButton">
+          <IconButton
+            iconSVG={home("hover:fill-[#43B64Fdd]", "#297031")}
+            handleClick={(e) => {
+              e.stopPropagation();
+              scrollTo("header");
+            }}
+          />
+          <div className="h-1 w-full rounded-lg bg-green-light" />
           <IconButton
             iconSVG={car("hover:fill-[#43B64Fdd]", "#297031")}
             handleClick={(e) => {
@@ -176,11 +198,22 @@ export default function Index() {
         </Section>
 
         {/* Menu Section  */}
-        <Section header="Menu">
+        <Section id="menu" header="Menu">
           <div className="lg:my-8 lg:flex lg:gap-2 xl:my-16">
             {/* Side nav */}
             <aside className="sticky top-4 left-10 hidden h-fit lg:inline lg:w-1/4">
               <ul>
+                <li className="flex justify-center p-2 text-green-light">
+                  <button
+                    className="h-full w-full font-primary-solid text-3xl duration-500 ease-in-out xl:text-left"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      scrollTo("header", "start");
+                    }}
+                  >
+                    home
+                  </button>
+                </li>
                 {categories.map((category, idx) => {
                   return (
                     <li
@@ -193,7 +226,7 @@ export default function Index() {
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
-                          scrollTo(category.name);
+                          scrollTo(category.name, "start");
                         }}
                       >
                         {category.name}

@@ -2,6 +2,7 @@ import React from "react";
 
 type Props = {
   header: string;
+  id?: string;
   sectionClass?: string;
   hClass?: string;
   subHeader?: string;
@@ -22,9 +23,9 @@ const Section = (props: Props) => {
   sectionClass += props.alt ? " bg-dark" : "";
 
   return (
-    <section className={sectionClass}>
+    <section id={props.id} className={sectionClass}>
       <h1
-        className={`mx-auto w-fit text-5xl sm:text-6xl text-green-primary ${
+        className={`mx-auto w-fit text-5xl text-green-primary sm:text-6xl ${
           props.hClass ? props.hClass : ""
         } ${
           props.alt

@@ -30,11 +30,11 @@
 @layer components {
     .card {
         @apply border-green-light my-6  mx-auto flex flex-col justify-between w-[260px] gap-2
-             border rounded-3xl border-solid p-6 bg-[#F4FBF5] shadow-lg h-fit
+             border rounded-3xl border-solid p-6 bg-[#F4FBF5] shadow-lg
     }
 
     .button {
-        @apply font-primary-solid shadow-xl h-12 w-32 rounded-[14px];
+        @apply font-primary-solid shadow-md h-12 w-32 rounded-[14px];
     }
 
     .button-primary {
