@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useLoaderData } from "@remix-run/react";
 import { type LoaderFunction } from "@remix-run/server-runtime";
-import { useInView } from "react-intersection-observer";
 
 // utils
-import { aboutUs_p, scrollTo } from "~/utils";
+import { aboutUs_p, useCategoryInView, scrollTo } from "~/utils";
 
 // Prisma Imports
 import { prisma } from "~/db.server";
-import { FoodItem, Announcement } from "@prisma/client";
+import type { FoodItem, Announcement } from "@prisma/client";
 
 // assets
 import catering from "~/assets/catering.png";
@@ -22,7 +21,7 @@ import Card from "~/components/card";
 import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
-import AnnouncementBar from "~/components/announcementBar";
+// import AnnouncementBar from "~/components/announcementBar";
 
 // Types
 export type category = { name: string; foodItems: Array<FoodItem> };
@@ -50,35 +49,17 @@ export const loader: LoaderFunction = async () => {
 };
 
 export default function Index() {
-  // const user = useOptionalUser();
-  // flag for categories in view
-  let hasInView = false;
-
   // states
   const [isOpen, setIsOpen] = useState(false);
+  // const [currentIdxInView, setCurrentIdxInView] = useState(-1);
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
   const [constentType, setContentType] = useState("links");
 
   // custom hooks
-  const { announcements, categories } = useLoaderData<LoaderTypes>();
-  const [ref, inview, entry] = useInView({
-    threshold: 1,
-    rootMargin: "-50px 0px -100px 0px",
-  });
-  const categoryRefs = categories.map(() => {
-    // if category is inview and there no other is in view, flip flag to true; else, return false
-    if (inview && !hasInView) {
-      hasInView = true;
-      return { ref, inview };
-    } else {
-      return {
-        ref: ref,
-        inView: false,
-        entry: entry,
-      };
-    }
-  });
+  let { inView, categoryRefs } = useCategoryInView();
+  const { categories } = useLoaderData<LoaderTypes>();
 
+  // handler functions
   const handleToggle = (e: React.SyntheticEvent) => {
     e.stopPropagation();
     setIsOpen((prevState) => !prevState);
@@ -208,7 +189,7 @@ export default function Index() {
                     >
                       <button
                         className={`h-full w-full font-primary-solid text-3xl duration-500 ease-in-out xl:text-left ${
-                          categoryRefs[idx].inView && "text-green-dark"
+                          inView[idx] && "text-green-dark"
                         }`}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -222,6 +203,7 @@ export default function Index() {
                 })}
               </ul>
             </aside>
+
             {/* Menu cards  */}
             <div className="px-2 md:px-6 lg:w-3/4 lg:px-0">
               {categories.map((category, idx) => (
@@ -234,7 +216,7 @@ export default function Index() {
                     id={category.name}
                     ref={categoryRefs[idx].ref}
                     className={`menuSectionHeader underline-effect ${
-                      categoryRefs[idx].inView && "in--view"
+                      inView[idx] && "in--view"
                     }`}
                   >
                     {category.name}
@@ -268,6 +250,7 @@ export default function Index() {
                   href="https://www.google.com/maps/place/Taco+Delite/@33.0210912,-97.0304499,11z/data=!4m10!1m2!2m1!1staco+delite!3m6!1s0x864c22779cbdf961:0x122a03406b2f3e01!8m2!3d33.0210912!4d-96.7502985!15sCgt0YWNvIGRlbGl0ZVoNIgt0YWNvIGRlbGl0ZZIBEm1leGljYW5fcmVzdGF1cmFudOABAA!16s%2Fg%2F1tfw3fm8"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   2957 W 15th Street, Plano, TX, 75075
                 </a>
@@ -292,6 +275,7 @@ export default function Index() {
                   href="mailto:tacodelitewestplano@gmail.com"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   tacodelitewestplano@gmail.com
                 </a>
@@ -308,6 +292,7 @@ export default function Index() {
                   href="https://www.facebook.com/TacoDeliteWestPlano"
                   className="underline-effect in--hover text-green-dark duration-300 hover:text-dark"
                   target="_blank"
+                  rel="noreferrer"
                 >
                   Facebook @ Taco Delite West Plano
                 </a>

@@ -1,5 +1,6 @@
 import { useMatches } from "@remix-run/react";
 import { useMemo } from "react";
+import { useInView } from "react-intersection-observer";
 
 import type { User } from "~/models/user.server";
 import type { modalContent } from "./routes";
@@ -79,32 +80,83 @@ earned 4 "Food Safety and Excellence" nominations and continues to
 claim the best customers, separating itself as a prestige fast food
 restaurant in one of the most competitive cities in Texas.`;
 
-// components/modal.tsx 
+// components/modal.tsx
 
-export const buttons = (item: modalContent, handleClose: Function | undefined) => {
+export const buttons = (
+  item: modalContent,
+  handleClose: Function | undefined
+) => {
   return (
-      <button
-          className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
-          onClick={(e) => {
-              handleClose && handleClose(e);
-              scrollTo(item.name);
-          }}
-      >
-          {item.name}
-      </button>
+    <button
+      className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
+      onClick={(e) => {
+        handleClose && handleClose(e);
+        scrollTo(item.name);
+      }}
+    >
+      {item.name}
+    </button>
   );
-}
+};
 
 export const links = (item: modalContent) => (
-<a
-  className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
-  href={item.url}
->
-  {item.name}
-</a>
+  <a
+    className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
+    href={item.url}
+  >
+    {item.name}
+  </a>
 );
 
 export const scrollTo = (id: string) => {
   const getMeTo = document.getElementById(id);
-  getMeTo && getMeTo.scrollIntoView({behavior: 'smooth',block: 'center'});
-}
+  getMeTo && getMeTo.scrollIntoView({ behavior: "smooth", block: "center" });
+};
+
+export const useCategoryInView = () => {
+  let inView = [];
+  let hasInView = false;
+
+  const breakfastInView = useInView();
+  const tacosInView = useInView();
+  const burritosInView = useInView();
+  const nachosInView = useInView();
+  const saladsInView = useInView();
+  const quesadillasInView = useInView();
+  const tostadasInView = useInView();
+  const sidesInView = useInView();
+  const extrasInView = useInView();
+  const chipsNstuffInView = useInView();
+  const dinnersInView = useInView();
+  const familyInView = useInView();
+  const dessertsInView = useInView();
+  const drinksInView = useInView();
+
+  let categoryRefs = [
+    breakfastInView,
+    tacosInView,
+    burritosInView,
+    nachosInView,
+    saladsInView,
+    quesadillasInView,
+    tostadasInView,
+    sidesInView,
+    extrasInView,
+    chipsNstuffInView,
+    dinnersInView,
+    familyInView,
+    dessertsInView,
+    drinksInView,
+  ];
+
+  for (let i = categoryRefs.length - 1; i >= 0; i--) {
+    if (categoryRefs[i].inView && !hasInView) {
+      hasInView = true;
+      inView.push(true);
+    } else {
+      inView.push(false);
+    }
+  }
+
+  return { inView: inView.reverse(), categoryRefs };
+};
