@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { menu_arrow } from "~/assets/svg";
+import { leaf_icon, menu_arrow } from "~/assets/svg";
 
 type item = {
   name: string;
@@ -12,9 +12,10 @@ type Props = {
   item: item;
   id: string;
   className?: string;
+  vegetarian: boolean;
 };
 
-const Card = ({ item, id, className }: Props) => {
+const Card = ({ item, id, className, vegetarian }: Props) => {
   const [isOpen, setOpen] = useState(false);
 
   return (
@@ -50,9 +51,12 @@ const Card = ({ item, id, className }: Props) => {
           {item.description}
         </motion.p>
       )}
-      <p className="font-secondary-secular text-2xl text-green-primary">
-        {"$" + item.price}
-      </p>
+      <div className="w-full flex justify-between items-center">
+        <p className="font-secondary-secular text-2xl text-green-primary">
+          {"$" + item.price}
+        </p>
+        {vegetarian && <div className="w-6">{leaf_icon}</div>}
+      </div>
     </motion.button>
   );
 };

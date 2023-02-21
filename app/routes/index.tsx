@@ -255,14 +255,18 @@ export default function Index() {
                     {category.name}
                   </h1>
                   <div className="flex flex-wrap justify-start gap-4 px-12 md:px-16 lg:px-4 xl:gap-8 xl:px-8">
-                    {category.foodItems.map((item, idx) => (
-                      <Card
-                        id={item.name.replaceAll(" ", "-")}
-                        key={idx}
-                        item={item}
-                        className="md: sm:w-56"
-                      />
-                    ))}
+                    {category.foodItems.map(
+                      (item, idx) =>
+                        item.active && (
+                          <Card
+                            id={item.name.replaceAll(" ", "-")}
+                            key={idx}
+                            item={item}
+                            className="md: sm:w-56"
+                            vegetarian={item.vegetarian}
+                          />
+                        )
+                    )}
                   </div>
                 </div>
               ))}

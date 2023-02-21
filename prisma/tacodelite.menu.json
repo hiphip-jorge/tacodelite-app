@@ -427,73 +427,73 @@
             },
             {
                 "name": "pepsi",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "diet pepsi",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "dr. pepper",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "diet dr. pepper",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "Mountain Dew",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "Mug Rootbeer",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "tropicana lemonade",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "tropicana fruit punch",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "brisk strawberry melon",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "horchata",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "sweet or unsweet tea",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             },
             {
                 "name": "sweet or unsweet peach tea",
-                "description": "lg (32oz): +$0.25 | super giant (44oz): +$0.50",
+                "description": "sm (20oz) | lg (32oz): +$0.25 | super giant (44oz): +$0.50",
                 "price": "1.89",
                 "categoryId": 14
             }
