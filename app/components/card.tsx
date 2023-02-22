@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { leaf_icon, menu_arrow } from "~/assets/svg";
 
@@ -43,15 +43,17 @@ const Card = ({ item, id, className, vegetarian }: Props) => {
       </motion.div>
       {isOpen && (
         <motion.p
-          className="text-left  font-secondary-secular"
+          className={`text-left  font-secondary-secular ${
+            item.description.includes("|") && " whitespace-pre"
+          }`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          {item.description}
+          {item.description.replaceAll("| ", "\n")}
         </motion.p>
       )}
-      <div className="w-full flex justify-between items-center">
+      <div className="flex w-full items-center justify-between">
         <p className="font-secondary-secular text-2xl text-green-primary">
           {"$" + item.price}
         </p>
