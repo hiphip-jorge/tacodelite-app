@@ -396,7 +396,7 @@ export default function Index() {
             <img src={taco_delite} alt="taco delite logo" className="w-8" />
           </div>
           <p className="font-secondary-secular text-green-dark ">
-            CJN Inc. All right reserved.
+            CJN Inc. All rights reserved.
           </p>
         </div>
       </footer>
