@@ -32,8 +32,14 @@ export type LoaderTypes = {
 };
 
 // Constants
-const doordash = { name: "doordash", url: "https://www.doordash.com" };
-const ubereats = { name: "ubereats", url: "https://www.ubereats.com" };
+const doordash = {
+  name: "doordash",
+  url: "https://order.online/store/taco-delite-plano-303257/?hideModal=true&https://order.online/online-ordering/business/taco-delite-72799=&pickup=true",
+};
+const ubereats = {
+  name: "ubereats",
+  url: "https://www.ubereats.com/store/taco-delite/yePg7_z7WKyrpiNL8V1J6w?diningMode=PICKUP&",
+};
 
 // Remix Data Loader eFunction
 export const loader: LoaderFunction = async () => {
@@ -51,10 +57,11 @@ export const loader: LoaderFunction = async () => {
 export default function Index() {
   // states
   const [isOpen, setIsOpen] = useState(false);
+  const [isOrderClicked, setIsOrderClicked] = useState(false);
 
   // const [currentIdxInView, setCurrentIdxInView] = useState(-1);
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
-  const [constentType, setContentType] = useState("links");
+  const [contentType, setContentType] = useState("links");
 
   // custom hooks
   const { categories } = useLoaderData<LoaderTypes>();
@@ -62,10 +69,16 @@ export default function Index() {
   let { width } = useWindowSize();
 
   useEffect(() => {
-    if (width >= 812) {
+    if (width >= 812 && isOpen) {
       setIsOpen(false);
+      setIsOrderClicked(true);
     }
-  }, [width, isOpen]);
+
+    if (width < 812 && isOrderClicked) {
+      setIsOrderClicked(false);
+      setIsOpen(true);
+    }
+  }, [width, isOpen, isOrderClicked]);
 
   // handler functions
   const handleToggle = (e: React.SyntheticEvent) => {
@@ -131,8 +144,9 @@ export default function Index() {
           </div>
           <div className="mx-auto flex w-fit gap-4">
             <Button
+              className={isOrderClicked ? "ubereats-btn" : ""}
               handleClick={(e) => {
-                if (width >= 812) {
+                if (width >= 812 && !isOrderClicked) {
                   scrollTo("menu", "start");
                 } else {
                   handleMenu();
@@ -140,17 +154,48 @@ export default function Index() {
                 }
               }}
             >
-              Menu
+              {isOrderClicked ? (
+                <a
+                  className="flex h-full w-full items-center justify-center"
+                  href={ubereats.url}
+                >
+                  <span className="text-white hover:text-white">Uber</span>Eats
+                </a>
+              ) : (
+                "menu"
+              )}
             </Button>
             <Button
+              className={isOrderClicked ? "doordash-btn" : ""}
               handleClick={(e) => {
+                if (width >= 812) {
+                  setIsOrderClicked(true);
+                } else {
+                  handleToggle(e);
+                }
                 handleOrder();
-                handleToggle(e);
               }}
               primary
             >
-              Order
+              {isOrderClicked ? (
+                <a
+                  className="flex h-full w-full items-center justify-center"
+                  href={doordash.url}
+                >
+                  DoorDash
+                </a>
+              ) : (
+                "order"
+              )}
             </Button>
+            {isOrderClicked && (
+              <button
+                className="h-12 w-12 rounded-full bg-black font-primary-solid text-white hover:bg-gray-700"
+                onClick={() => setIsOrderClicked(false)}
+              >
+                X
+              </button>
+            )}
           </div>
         </Section>
 
@@ -359,7 +404,7 @@ export default function Index() {
         contentList={currentContent}
         isOpen={isOpen}
         handleClose={handleToggle}
-        isButtons={constentType === "buttons"}
+        isButtons={contentType === "buttons"}
       />
     </div>
   );

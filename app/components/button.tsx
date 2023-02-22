@@ -1,20 +1,19 @@
+import type { ReactNode } from "react";
+
 type Props = {
-  children: string;
+  children: ReactNode | string;
   className?: string;
   handleClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
   primary?: boolean;
 };
 
 const Button = (props: Props) => {
+  const className = props.primary
+    ? "button-primary " + props.className
+    : "button-secondary " + props.className;
+
   return (
-    <button
-      className={
-        (props.primary
-          ? "button-primary " + props.className
-          : "button-secondary ") + props.className
-      }
-      onClick={props.handleClick}
-    >
+    <button className={className} onClick={props.handleClick}>
       {props.children}
     </button>
   );

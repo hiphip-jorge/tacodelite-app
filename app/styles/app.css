@@ -45,6 +45,14 @@
         @apply button border-2 border-green-primary bg-white text-green-primary duration-300 hover:border-0 hover:bg-green-dark hover:text-white
     }
 
+    .doordash-btn {
+        @apply button bg-doordash-red text-white hover:bg-red-700 hover:text-white
+    }
+
+    .ubereats-btn {
+        @apply button bg-ubereats-green text-black hover:bg-green-600 hover:text-black
+    }
+
     .modalMask {
         @apply fixed h-full w-full top-0 bottom-0 left-0 right-0 bg-[#f4fbf5dd] backdrop-blur-sm z-20 overflow-auto;
     }
@@ -150,6 +158,9 @@
     --color-primary-dark: #297031;
     --color-dark: #444;
     --color-light: #eee;
+
+    --doordash-red: #FF3008;
+    --ubereats-green: #06C167;
 }
 
 *, html {
@@ -173,6 +184,14 @@ button:hover .accordionIcon {
 
 button:hover .accordionHeader {
     color: var(--color-primary-dark);
+}
+
+.bg-ubereats-green {
+    background: var(--ubereats-green);
+}
+
+.bg-doordash-red {
+    background: var(--doordash-red);
 }
 
 .underline-effect {

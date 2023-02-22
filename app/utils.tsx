@@ -88,7 +88,7 @@ export const buttons = (
 ) => {
   return (
     <button
-      className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
+      className="h-full w-full text-center font-primary-solid text-lg md:text-2xl"
       onClick={(e) => {
         handleClose && handleClose(e);
         scrollTo(item.name);
@@ -101,7 +101,7 @@ export const buttons = (
 
 export const links = (item: modalContent) => (
   <a
-    className="h-full w-full text-center font-primary-solid text-lg md:text-3xl"
+    className="h-full w-full text-center font-primary-solid text-lg md:text-2xl"
     href={item.url}
   >
     {item.name}
