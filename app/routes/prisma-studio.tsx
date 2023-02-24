@@ -1,6 +1,6 @@
 import { spawn } from "child_process";
 import type { DataFunctionArgs } from "@remix-run/node";
-import { getUser } from "~/session.server";
+import { requireAdminUser } from "~/session.server";
 
 declare global {
   // avoids issues with the purgeCache
@@ -27,7 +27,7 @@ async function ensurePrismaStudioIsRunning() {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-  await getUser(request);
+  await requireAdminUser(request);
   console.log("loader: ", request);
   if (new URL(request.url).searchParams.has("close")) {
     if (global.__prismaSubprocess) {

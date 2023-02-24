@@ -42,6 +42,19 @@ export async function getUser(request: Request) {
   throw await logout(request);
 }
 
+export async function requireAdminUser(request: Request): Promise<User> {
+  const user = await getUser(request)
+  if (!user) {
+    console.log('Not a user')
+    throw await logout(request);
+  }
+  if (user.role !== 'ADMIN') {
+    console.log('Not an admin.')
+    throw redirect('/')
+  }
+  return user
+}
+
 export async function requireUserId(
   request: Request,
   redirectTo: string = new URL(request.url).pathname

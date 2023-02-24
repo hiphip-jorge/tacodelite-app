@@ -1,8 +1,8 @@
 import type { DataFunctionArgs } from "@remix-run/node";
-import { getUser } from "~/session.server";
+import { requireAdminUser } from "~/session.server";
 
 export async function loader({ request }: DataFunctionArgs) {
-  await getUser(request);
+  await requireAdminUser(request);
   const { pathname } = new URL(request.url);
   const url = `http://localhost:5555${pathname.replace("/prisma-studio", "")}`;
   return fetch(url, {
@@ -11,7 +11,7 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 export async function action({ request }: DataFunctionArgs) {
-  await getUser(request);
+  await requireAdminUser(request);
   const { pathname } = new URL(request.url);
   const url = `http://localhost:5555${pathname.replace("/prisma-studio", "")}`;
   return fetch(url, {
