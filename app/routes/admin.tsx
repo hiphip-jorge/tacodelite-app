@@ -14,11 +14,15 @@ export default function NotesPage() {
   const { foodItemList } = useLoaderData<typeof loader>();
   const user = useUser();
 
+  const activeClassName = "rounded-xl bg-green-300 p-2 px-6 shadow-sm";
+  const nonActiveClassName =
+    "rounded-xl bg-green-200 p-2 px-6 shadow-sm hover:bg-green-300";
+
   return (
     <div className="flex h-full min-h-screen flex-col">
       <header className="flex items-center justify-between bg-dark p-4 px-8 text-white">
         <h1 className="text-3xl font-bold">
-          <Link className="flex justify-center items-center gap-4" to=".">
+          <Link className="flex items-center justify-center gap-4" to=".">
             Admin
           </Link>
         </h1>
@@ -26,11 +30,32 @@ export default function NotesPage() {
         <Form action="/logout" method="post">
           <button
             type="submit"
-            className="rounded bg-green-primary py-2 px-4 text-blue-100 font-semibold hover:bg-green-dark active:bg-green-800"
+            className="rounded bg-green-primary py-2 px-4 font-semibold text-blue-100 hover:bg-green-dark active:bg-green-800"
           >
             Logout
           </button>
         </Form>
+      </header>
+
+      {/* sub-header  */}
+      <header className="bg-green-light p-4">
+        <ul className="mx-auto flex w-3/4 items-center justify-around font-bold text-green-dark">
+          <li>
+            <Link to="." className={nonActiveClassName}>
+              Users
+            </Link>
+          </li>
+          <li>
+            <Link className={nonActiveClassName} to=".">
+              Food Items
+            </Link>
+          </li>
+          <li>
+            <Link className={nonActiveClassName} to=".">
+              Announcements
+            </Link>
+          </li>
+        </ul>
       </header>
 
       <main className="flex bg-white">
