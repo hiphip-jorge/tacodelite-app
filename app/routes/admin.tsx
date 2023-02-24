@@ -14,7 +14,7 @@ export default function NotesPage() {
   const { foodItemList } = useLoaderData<typeof loader>();
   const user = useUser();
 
-  const activeClassName = "rounded-xl bg-green-300 p-2 px-6 shadow-sm";
+//   const activeClassName = "rounded-xl bg-green-300 p-2 px-6 shadow-sm";
   const nonActiveClassName =
     "rounded-xl bg-green-200 p-2 px-6 shadow-sm hover:bg-green-300";
 

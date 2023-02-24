@@ -2,9 +2,9 @@ import type { FoodItem } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
-export type {FoodItem} from "@prisma/client";
-
 import {getCategory} from "../../prisma/seed-utils"
+
+export type {FoodItem} from "@prisma/client";
 
 export function getFoodItem({id}:Pick<FoodItem, "id">) {
     return prisma.foodItem.findFirst({where: {id: id}});
