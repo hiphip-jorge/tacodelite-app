@@ -27,6 +27,15 @@ export function createFoodItem({name, description, price, category} : Pick<FoodI
     })
 }
 
+export function updateFoodItem({name, description, price, categoryId, active, vegetarian, id} : Pick<FoodItem, "name" | "description" | "price" | "categoryId" | "active" | "vegetarian" > & Pick<FoodItem, "id">){
+    return prisma.foodItem.update({
+        where: {
+            id,
+          },
+          data: {name, description, price, categoryId, active, vegetarian},
+    })
+}
+
 export function deleteFoodItem({id}:Pick<FoodItem, "id">){
     return prisma.foodItem.delete({where: {id}})
 }
