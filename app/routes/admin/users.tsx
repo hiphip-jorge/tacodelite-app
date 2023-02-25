@@ -15,9 +15,9 @@ const UsersPage = () => {
       <div className="h-full w-80 border-r bg-gray-50">
         <Link
           to="new"
-          className="block bg-gray-100 p-4 text-xl text-green-primary hover:bg-green-light"
+          className="block bg-gray-100 p-4 text-xl text-blue-500 hover:bg-blue-200"
         >
-          + New Food Item
+          + New User
         </Link>
 
         <hr />
@@ -26,15 +26,15 @@ const UsersPage = () => {
           <p className="p-4">No food yet.</p>
         ) : (
           <ol>
-            {userList.map((item, idx) => (
+            {userList.map((user, idx) => (
               <li key={idx}>
                 <NavLink
                   className={({ isActive }) =>
                     `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
                   }
-                  to={item.id.toString()}
+                  to={user.id.toString()}
                 >
-                  {item.name}
+                  {user.name}
                 </NavLink>
               </li>
             ))}

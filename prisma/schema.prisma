@@ -46,7 +46,8 @@ model Category {
 }
 
 model Announcement {
-  startDate DateTime @id
+  id        String   @id @default(cuid())
+  startDate DateTime
   endDate   DateTime
   message   String
 }
