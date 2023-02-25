@@ -3,6 +3,7 @@ import { redirect } from "@remix-run/node";
 import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
+import { edit_icon } from "~/assets/svg";
 import { deleteAnnouncement, getAnnouncementById } from "~/models/announcement.server";
 import { getUserById, updateUser } from "~/models/user.server";
 
