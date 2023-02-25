@@ -1,5 +1,4 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { json } from "@remix-run/node";
 import { Link, NavLink } from "react-router-dom";
 import { getFoodItemList } from "~/models/foodItem.server";
 

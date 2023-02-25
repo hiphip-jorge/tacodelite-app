@@ -1,6 +1,6 @@
-import { LoaderArgs, redirect } from "@remix-run/node";
+import { type LoaderArgs, redirect } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { Form, Link, NavLink, Outlet } from "@remix-run/react";
 
 import { useUser } from "~/utils";
 import { getFoodItemList } from "~/models/foodItem.server";
@@ -79,42 +79,4 @@ export default function AdminPage() {
       <Outlet />
     </div>
   );
-}
-
-{
-  /* <main className="flex bg-white">
-<div className="h-full w-80 border-r bg-gray-50">
-  <Link
-    to="new"
-    className="block bg-gray-100 p-4 text-xl text-green-primary hover:bg-green-light"
-  >
-    + New Food Item
-  </Link>
-
-  <hr />
-
-  {foodItemList.length === 0 ? (
-    <p className="p-4">No food yet.</p>
-  ) : (
-    <ol>
-      {foodItemList.map((item, idx) => (
-        <li key={idx}>
-          <NavLink
-            className={({ isActive }) =>
-              `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
-            }
-            to={item.id.toString()}
-          >
-            {item.name}
-          </NavLink>
-        </li>
-      ))}
-    </ol>
-  )}
-</div>
-
-<div className="flex-1 p-6">
-  <Outlet />
-</div>
-</main> */
 }
