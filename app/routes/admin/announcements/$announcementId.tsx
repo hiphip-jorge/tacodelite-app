@@ -8,7 +8,7 @@ import {
   deleteAnnouncement,
   getAnnouncementById,
 } from "~/models/announcement.server";
-import { getUserById, updateUser } from "~/models/user.server";
+import { getUserById } from "~/models/user.server";
 
 export async function loader({ params }: LoaderArgs) {
   const announcement = await getAnnouncementById(params.announcementId);
@@ -37,7 +37,7 @@ export async function action({ request, params }: ActionArgs) {
     let name = values.name ? String(values.name) : user?.name;
     let email = values.email ? String(values.email) : user?.email;
 
-    await updateUser(params.userId, name, email, user?.role);
+    // await updateUser(params.userId, name, email, user.role);
   }
 
   return redirect(`/admin/users/${params.userId}`);
