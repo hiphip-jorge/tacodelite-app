@@ -4,7 +4,10 @@ import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { edit_icon } from "~/assets/svg";
-import { deleteAnnouncement, getAnnouncementById } from "~/models/announcement.server";
+import {
+  deleteAnnouncement,
+  getAnnouncementById,
+} from "~/models/announcement.server";
 import { getUserById, updateUser } from "~/models/user.server";
 
 export async function loader({ params }: LoaderArgs) {
@@ -25,7 +28,7 @@ export async function action({ request, params }: ActionArgs) {
   invariant(params.announcementId, "announcementId not found");
 
   if (_action === "delete") {
-    await deleteAnnouncement({id: params.announcementId});
+    await deleteAnnouncement({ id: params.announcementId });
 
     return redirect("/admin/announcements");
   } else {
@@ -34,7 +37,7 @@ export async function action({ request, params }: ActionArgs) {
     let name = values.name ? String(values.name) : user?.name;
     let email = values.email ? String(values.email) : user?.email;
 
-    await updateUser(params.userId, name, email);
+    await updateUser(params.userId, name, email, user?.role);
   }
 
   return redirect(`/admin/users/${params.userId}`);
