@@ -1,11 +1,11 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { DataFunctionArgs, redirect } from "@remix-run/node";
+import type { DataFunctionArgs } from "@remix-run/node";
 import { Link, NavLink } from "react-router-dom";
 import { getUserList } from "~/models/user.server";
 import { requireAdminUser } from "~/session.server";
 
 export async function loader({ request }: DataFunctionArgs) {
-  let user = await requireAdminUser(request, "/admin");
+  await requireAdminUser(request, "/admin");
 
   const userList = await getUserList();
   return userList;
