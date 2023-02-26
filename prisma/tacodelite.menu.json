@@ -1,21 +1,21 @@
 {
-    "foodItems": 
+    "foodItems":
         [
             {
             "name": "breakfast taco",
-            "description": "A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.75",
+            "description": "A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99",
             "price": "3.00",
             "categoryId": 1
             },
             {
             "name": "breakfast burrito",
-            "description": "A soft 10in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.75",
+            "description": "A soft 10in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99",
             "price": "5.00",
             "categoryId": 1
             },
             {
             "name": "breakfast bowl",
-            "description": "A bowl of your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.75",
+            "description": "A bowl of your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99",
             "price": "5.00",
             "categoryId": 1
             },
@@ -59,7 +59,7 @@
             {
                 "name": "fajita soft taco",
                 "description": "Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese",
-                "price": "2.99",
+                "price": "3.25",
                 "categoryId": 2
             },
             {
@@ -151,31 +151,31 @@
             },
             {
                 "name": "super nachos",
-                "description": "Chips, our special queso, homemade beans, ground beef, letuce, tomatoes, sour cream, and jalapenos",
+                "description": "Chips, our special queso, homemade beans, ground beef, lettuce, tomatoes, sour cream, and jalapenos",
                 "price": "8.99",
                 "categoryId": 4
             },
             {
                 "name": "fajita nachos",
-                "description": "Chips, our special queso, homemade beans, marinated fajitas (steak or chicken), sauteed bell peppers and onions, letuce, tomatoes, sour cream, and jalapenos",
+                "description": "Chips, our special queso, homemade beans, marinated fajitas (steak or chicken), sauteed bell peppers and onions, lettuce, tomatoes, sour cream, our guacamole made from scratch, and jalapenos",
                 "price": "9.99",
                 "categoryId": 4
             },
             {
                 "name": "super salad",
-                "description": "Letuce, homemade beans, ground beef, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all on a bed of chips",
+                "description": "Lettuce, homemade beans, ground beef, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all on a bed of chips",
                 "price": "8.99",
                 "categoryId": 5
             },
             {
                 "name": "salad supreme",
-                "description": "Letuce, homemade beans, ground beef, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all in a edible salad bowl",
+                "description": "Lettuce, homemade beans, ground beef, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all in a edible salad bowl",
                 "price": "8.99",
                 "categoryId": 5
             },
             {
                 "name": "fajita salad",
-                "description": "Letuce, homemade beans, marinated fajitas (steak or chicken), sauteed bell peppers and onions, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all in a edible salad bowl",
+                "description": "Lettuce, homemade beans, marinated fajitas (steak or chicken), sauteed bell peppers and onions, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all in a edible salad bowl",
                 "price": "9.99",
                 "categoryId": 5
             },
@@ -234,31 +234,31 @@
             },
             {
                 "name": "pico de gallo",
-                "description": "4oz of our homemade pico de gallo",
+                "description": "4 oz of our homemade pico de gallo",
                 "price": "2.00",
                 "categoryId": 8
             },
             {
                 "name": "scoop of guac",
-                "description": "4oz of our homemade guac",
+                "description": "4 oz of our homemade guac",
                 "price": "2.50",
                 "categoryId": 8
             },
             {
                 "name": "salsa",
-                "description": "8oz of our homemade salsa",
+                "description": "8 oz of our homemade salsa",
                 "price": "1.75",
                 "categoryId": 8
             },
             {
                 "name": "rice",
-                "description": "8oz of our homemade rice",
+                "description": "8 oz of our homemade rice",
                 "price": "2.25",
                 "categoryId": 8
             },
             {
                 "name": "frijoles",
-                "description": "8oz of our homemade beans",
+                "description": "8 oz of our homemade beans",
                 "price": "2.25",
                 "categoryId": 8
             },
@@ -277,7 +277,7 @@
             {
                 "name": "single tamale",
                 "description": "A pork or beef tamale",
-                "price": "1.50",
+                "price": "1.75",
                 "categoryId": 9
             },
             {
@@ -288,26 +288,26 @@
             },
             {
                 "name": "taco burger",
-                "description": "A seasame seed bun, lettuce, ground beef, shredded cheese, and our special sauce",
-                "price": "3.50",
+                "description": "A sesame seed bun, lettuce, ground beef, shredded cheese, and our special sauce",
+                "price": "4.25",
                 "categoryId": 9
             },
             {
                 "name": "chicken tortilla soup",
-                "description": "12oz of our chicken tortilla soup topped with fried tortilla strips, shredded cheese, and a sliced avocado",
+                "description": "12 oz of our chicken tortilla soup topped with fried tortilla strips, shredded cheese, and a sliced avocado",
                 "price": "5.50",
                 "categoryId": 9
             },
             {
                 "name": "frito Pie",
-                "description": "12oz of our frito pie topped with shredded cheese",
+                "description": "12 oz of our frito pie topped with shredded cheese",
                 "price": "5.00",
                 "categoryId": 9
             },
             {
                 "name": "chips and salsa",
                 "description": "Our fresh chips and 8oz of our homemade salsa",
-                "price": "4.50",
+                "price": "7.99",
                 "categoryId": 10
             },
             {
@@ -391,12 +391,12 @@
             {
                 "name": "gallon of peach tea",
                 "description": "Some of our fresh peach tea (sweet or unsweet)",
-                "price": "6.99",
+                "price": "7.99",
                 "categoryId": 12
             },
             {
                 "name": "bag of pebble ice",
-                "description": "A 5lbs of the best ice",
+                "description": "A 8lbs of the best ice",
                 "price": "2.99",
                 "categoryId": 12
             },
@@ -498,5 +498,12 @@
                 "categoryId": 14
             }
         ]
-}
-
+ }
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

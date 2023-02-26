@@ -47,8 +47,8 @@ export async function action({ request, params }: ActionArgs) {
     description = String(description) || "unknown description";
     let price = values.price ? values.price : item?.price;
     price = String(price) || "0.00";
-    const active = values.active === "true";
-    const vegetarian = values.vegetarian === "true";
+    const active = values.active === "on";
+    const vegetarian = values.vegetarian === "on";
 
     await updateFoodItem({
       name,
@@ -89,11 +89,10 @@ export default function FoodItemDetailsPage() {
           </div>
           <div className="my-4 flex flex-col">
             <label className="text-green-800">Category:</label>
-
             <select
-              className="rounded-lg border-2 border-gray-100 p-2"
+              className="select appearance-none rounded-lg border-2 border-gray-100 p-2"
               name="categoryId"
-              id="category"
+              id="categoryId"
             >
               {getCategory().map((category, idx) => {
                 return (
@@ -124,60 +123,41 @@ export default function FoodItemDetailsPage() {
               />
             </div>
           </div>
-          <fieldset className="my-4 flex flex-col">
-            <legend className="text-green-800">Currently Active:</legend>
 
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                id="true"
-                name="active"
-                value="true"
-                checked={data.item.active}
-                readOnly
-              />
-              <label className="self-end">True</label>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                id="false"
-                name="active"
-                value="false"
-                checked={!data.item.active}
-                readOnly
-              />
-              <label className="self-end">False</label>
-            </div>
-          </fieldset>
-          <fieldset className="my-4 flex flex-col">
-            <legend className="text-green-800">Vegetarian:</legend>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                id="true"
-                name="vegetarian"
-                value="true"
-                checked={data.item.vegetarian}
-                readOnly
-              />
-              <label className="self-end">True</label>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input
-                type="radio"
-                id="false"
-                name="vegetarian"
-                value="false"
-                checked={!data.item.vegetarian}
-                readOnly
-              />
-              <label className="self-end">False</label>
-            </div>
-          </fieldset>
+          <div className="flex gap-4">
+            <label
+              htmlFor="active"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Active:
+            </label>
+            <input
+              id="active"
+              type="checkbox"
+              autoFocus={true}
+              name="active"
+              defaultChecked={data.item.active}
+              aria-describedby="active-error"
+              className="rounded border border-gray-500 px-2 py-1 text-lg"
+            />
+          </div>
+          <div className="flex gap-4">
+            <label
+              htmlFor="vegetarian"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Vegetarian:
+            </label>
+            <input
+              id="vegetarian"
+              type="checkbox"
+              autoFocus={true}
+              name="vegetarian"
+              defaultChecked={data.item.vegetarian}
+              aria-describedby="vegetarian-error"
+              className="rounded border border-gray-500 px-2 py-1 text-lg"
+            />
+          </div>
 
           <hr className="my-4" />
 

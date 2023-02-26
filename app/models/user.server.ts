@@ -17,7 +17,7 @@ export async function getUserByEmail(email: User["email"]) {
   return prisma.user.findUnique({ where: { email } });
 }
 
-export async function createUser(name:string, email: User["email"], password: string) {
+export async function createUser(name:string, email: User["email"], password: string, role='MEMBER') {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   return prisma.user.create({
@@ -28,17 +28,18 @@ export async function createUser(name:string, email: User["email"], password: st
         create: {
           hash: hashedPassword,
         },
-      }
+      },
+      role
     },
   });
 }
 
-export async function updateUser(id: User["id"] | undefined, name: User["name"] | undefined, email: User["email"] | undefined) {
+export async function updateUser(id: User["id"] | undefined, name: User["name"] | undefined, email: User["email"] | undefined, role: User["role"]) {
   return prisma.user.update({
     where: {
       id,
     },
-    data: {name, email}
+    data: {name, email, role}
   })
 }
 

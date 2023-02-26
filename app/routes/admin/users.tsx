@@ -1,8 +1,12 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
+import { DataFunctionArgs, redirect } from "@remix-run/node";
 import { Link, NavLink } from "react-router-dom";
 import { getUserList } from "~/models/user.server";
+import { requireAdminUser } from "~/session.server";
 
-export async function loader() {
+export async function loader({ request }: DataFunctionArgs) {
+  let user = await requireAdminUser(request, "/admin");
+
   const userList = await getUserList();
   return userList;
 }
@@ -11,8 +15,8 @@ const UsersPage = () => {
   const userList = useLoaderData<typeof loader>();
 
   return (
-    <main className="flex bg-white">
-      <div className="h-full w-80 border-r bg-gray-50">
+    <main className="flex h-full bg-white">
+      <div className="h-full w-80 overflow-scroll border-r bg-gray-50">
         <Link
           to="new"
           className="block bg-gray-100 p-4 text-xl text-blue-500 hover:bg-blue-200"
@@ -30,7 +34,9 @@ const UsersPage = () => {
               <li key={idx}>
                 <NavLink
                   className={({ isActive }) =>
-                    `block border-b p-4 text-xl ${isActive ? "bg-white" : ""}`
+                    `block border-b p-4 text-xl capitalize ${
+                      isActive ? "bg-white" : ""
+                    }`
                   }
                   to={user.id.toString()}
                 >

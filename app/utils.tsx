@@ -72,8 +72,32 @@ export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
 
-// index.tsx
+// ./routes/admin/foodItems/new
+export function validatePrice(price: unknown): price is string {
+  if (typeof price === "string" && price.length >= 4 && price.length < 6) {
+    if (!Number(price.at(0)) && price.at(0) !== "0") {
+      return false;
+    }
+    if (!Number(price.at(1)) && price.at(1) !== "0" && price.at(1) !== ".") {
+      return false;
+    }
+    if (!Number(price.at(2)) && price.at(2) !== "0" && price.at(2) !== ".") {
+      return false;
+    }
+    if (!Number(price.at(3)) && price.at(3) !== "0") {
+      return false;
+    }
+    if (price.length === 5 && !Number(price.at(4)) && price.at(4) !== "0") {
+      return false;
+    }
+  } else {
+    return false;
+  }
 
+  return true;
+}
+
+// index.tsx
 export let aboutUs_p = `Taco Delite West Plano opened in Feburary of 1989 and is located at
 the Prairie Creek Village Shopping Center. Since then, Taco Delite has
 earned 4 "Food Safety and Excellence" nominations and continues to

@@ -42,7 +42,7 @@ export async function getUser(request: Request) {
   throw await logout(request);
 }
 
-export async function requireAdminUser(request: Request): Promise<User> {
+export async function requireAdminUser(request: Request, redirectTo='/'): Promise<User> {
   const user = await getUser(request)
   if (!user) {
     console.log('Not a user')
@@ -50,7 +50,7 @@ export async function requireAdminUser(request: Request): Promise<User> {
   }
   if (user.role !== 'ADMIN') {
     console.log('Not an admin.')
-    throw redirect('/')
+    throw redirect(redirectTo)
   }
   return user
 }

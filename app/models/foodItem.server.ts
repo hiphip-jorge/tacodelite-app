@@ -14,7 +14,7 @@ export function getFoodItemList() {
     return prisma.foodItem.findMany({orderBy: {id: "asc"}})
 }
 
-export function createFoodItem({name, description, price, category} : Pick<FoodItem, "name" | "description" | "price"> & {category: string}) {
+export function createFoodItem({name, description, price, active=true, vegetarian=false, category} : Pick<FoodItem, "name" | "description" | "price" | "active" | "vegetarian"> & {category: string}) {
     const categoryId = getCategory().find(item => item.name.toLowerCase() === category.toLowerCase());
 
     return prisma.foodItem.create({
@@ -22,7 +22,9 @@ export function createFoodItem({name, description, price, category} : Pick<FoodI
             name,
             description,
             price,
-            categoryId: categoryId?.id
+            categoryId: categoryId?.id,
+            active,
+            vegetarian
         }
     })
 }

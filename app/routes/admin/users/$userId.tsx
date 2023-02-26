@@ -4,11 +4,7 @@ import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
-import {
-  deleteUserById,
-  getUserById,
-  updateUser,
-} from "~/models/user.server";
+import { deleteUserById, getUserById, updateUser } from "~/models/user.server";
 
 export async function loader({ params }: LoaderArgs) {
   const user = await getUserById(params.userId);
@@ -36,8 +32,10 @@ export async function action({ request, params }: ActionArgs) {
 
     let name = values.name ? String(values.name) : user?.name;
     let email = values.email ? String(values.email) : user?.email;
+    let role = String(values.role);
+    console.log("role", role);
 
-    await updateUser(params.userId, name, email);
+    await updateUser(params.userId, name, email, role);
   }
 
   return redirect(`/admin/users/${params.userId}`);
@@ -76,7 +74,15 @@ export default function FoodItemDetailsPage() {
           </div>
           <div className="my-4 flex flex-col">
             <span className="text-green-800">Role:</span>
-            <p>{user.role}</p>
+            <select
+              className="select appearance-none rounded-lg border-2 border-gray-100 p-2"
+              name="role"
+              id="role"
+              defaultValue={user.role}
+            >
+              <option value="MEMBER">MEMBER</option>
+              <option value="ADMIN">ADMIN</option>
+            </select>
           </div>
           <div className="my-4 flex flex-col">
             <span className="text-green-800">User since:</span>
@@ -117,7 +123,7 @@ export default function FoodItemDetailsPage() {
                 {edit_icon}
               </button>
             </div>
-            <div className="my-4 flex flex-col capitalize">
+            <div className="my-4 flex flex-col">
               <span className="text-green-800">Email:</span>
               <p>{user.email}</p>
             </div>

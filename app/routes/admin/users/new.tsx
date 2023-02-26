@@ -1,16 +1,22 @@
-import type { ActionArgs } from "@remix-run/node";
+import type { ActionArgs, DataFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
+import { requireAdminUser } from "~/session.server";
 import { validateEmail } from "~/utils";
+
+export async function loader({ request }: DataFunctionArgs) {
+  return await requireAdminUser(request, "/admin");
+}
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const name = String(formData.get("name"));
   const email = formData.get("email");
   const password = formData.get("password");
+  const role = formData.get("admin") === "on" ? "ADMIN" : "MEMBER";
 
   if (name?.length === 0) {
     return json(
@@ -62,7 +68,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const user = await createUser(name, email, password);
+  const user = await createUser(name, email, password, role);
 
   return redirect(`../${user.id}`);
 }
@@ -162,6 +168,24 @@ export default function NewNotePage() {
               {actionData.errors.password}
             </div>
           )}
+        </div>
+      </div>
+      <div>
+        <div className="flex gap-4">
+          <label
+            htmlFor="admin"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Is this an Admin User?
+          </label>
+          <input
+            id="admin"
+            type="checkbox"
+            autoFocus={true}
+            name="admin"
+            aria-describedby="admin-error"
+            className="rounded border border-gray-500 px-2 py-1 text-lg"
+          />
         </div>
       </div>
 

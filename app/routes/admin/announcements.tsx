@@ -11,8 +11,8 @@ const UsersPage = () => {
   const announcements = useLoaderData<typeof loader>();
 
   return (
-    <main className="flex bg-white">
-      <div className="h-full w-80 border-r bg-gray-50">
+    <main className="flex h-full bg-white">
+      <div className="h-full w-80 overflow-scroll border-r bg-gray-50">
         <Link
           to="new"
           className="block bg-gray-100 p-4 text-xl text-yellow-500 hover:bg-yellow-50"
