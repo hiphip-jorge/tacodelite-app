@@ -6,6 +6,7 @@
 # Learn more: https://community.fly.io/t/sqlite-not-getting-setup-properly/4386
 
 set -ex
-npx prisma migrate deploy
-npx prisma db seed
+# npx prisma migrate deploy
+# npx prisma db seed
+npx prisma migrate reset --force
 npm run start
