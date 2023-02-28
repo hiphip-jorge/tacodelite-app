@@ -43,7 +43,7 @@ const ubereats = {
 
 // Remix Data Loader eFunction
 export const loader: LoaderFunction = async () => {
-  let announcements = await prisma.announcement.findMany();
+  // let announcements = await prisma.announcement.findMany();
   let categories = await prisma.category.findMany({
     select: {
       name: true,
@@ -51,7 +51,7 @@ export const loader: LoaderFunction = async () => {
     },
   });
 
-  return { announcements, categories };
+  return { categories };
 };
 
 export default function Index() {
