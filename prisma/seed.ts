@@ -6,24 +6,45 @@ import tacodelite from './tacodelite.menu.json'
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "jorgeperez.inbox@gmail.com";
+  const emailJorge = "jorgeperez.inbox@gmail.com";
+  const nameJorge = "Jorge"
+  const emailJavier = "tacodelitewestplano@gmail.com"
+  const nameJavier = "Javier"
   const role = "ADMIN"
-  const name = "Jorge"
+
+
 
   // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
+  await prisma.user.delete({ where: { email: emailJavier } }).catch(() => {
     // no worries if it doesn't exist yet
   });
-
-  const hashedPassword = await bcrypt.hash("jorgeiscool", 10);
+  await prisma.user.delete({ where: { email: emailJorge } }).catch(() => {
+    // no worries if it doesn't exist yet
+  });
+  
+  const hashedPasswordJorge = await bcrypt.hash("mygreatTDpw96", 10);
+  const hashedPasswordJavier = await bcrypt.hash("blueHORSE73", 10);
 
   await prisma.user.create({
     data: {
-      email,
-      name,
+      email:nameJavier,
+      name: nameJavier,
       password: {
         create: {
-          hash: hashedPassword,
+          hash: hashedPasswordJavier,
+        },
+      },
+      role  
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      email:nameJorge,
+      name:nameJorge,
+      password: {
+        create: {
+          hash: hashedPasswordJorge,
         },
       },
       role  
