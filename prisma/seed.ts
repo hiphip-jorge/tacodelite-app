@@ -27,7 +27,7 @@ async function seed() {
 
   await prisma.user.create({
     data: {
-      email:nameJavier,
+      email:emailJavier,
       name: nameJavier,
       password: {
         create: {
@@ -40,7 +40,7 @@ async function seed() {
 
   await prisma.user.create({
     data: {
-      email:nameJorge,
+      email:emailJorge,
       name:nameJorge,
       password: {
         create: {
