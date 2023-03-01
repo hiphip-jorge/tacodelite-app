@@ -5,8 +5,7 @@ import { getUserList } from "~/models/user.server";
 import { requireAdminUser } from "~/session.server";
 
 export async function loader({ request }: DataFunctionArgs) {
-  await requireAdminUser(request, "/admin");
-
+  // await requireAdminUser(request, "/admin");
   const userList = await getUserList();
   return userList;
 }

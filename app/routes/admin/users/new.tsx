@@ -7,9 +7,9 @@ import { createUser, getUserByEmail } from "~/models/user.server";
 import { requireAdminUser } from "~/session.server";
 import { validateEmail } from "~/utils";
 
-export async function loader({ request }: DataFunctionArgs) {
-  return await requireAdminUser(request, "/admin");
-}
+// export async function loader({ request }: DataFunctionArgs) {
+//   return await requireAdminUser(request, "/admin");
+// }
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();

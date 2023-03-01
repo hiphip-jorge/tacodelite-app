@@ -27,7 +27,7 @@ async function ensurePrismaStudioIsRunning() {
 }
 
 export async function loader({ request }: DataFunctionArgs) {
-  await requireAdminUser(request);
+  // await requireAdminUser(request);
   console.log("loader: ", request);
   if (new URL(request.url).searchParams.has("close")) {
     if (global.__prismaSubprocess) {
