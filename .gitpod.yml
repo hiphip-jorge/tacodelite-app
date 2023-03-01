@@ -6,6 +6,8 @@ image:
 ports:
   - port: 3000
     onOpen: notify
+  - port: 5555
+    onOpen: notify
 
 tasks:
   - name: Restore .env file
