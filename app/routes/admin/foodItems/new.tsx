@@ -8,16 +8,12 @@ import { validatePrice } from "~/utils";
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
-  let { ...values } = Object.fromEntries(formData);
-
-  const name = String(values.name);
-  const category = String(values.category);
-  const description = String(values.description);
-  const price = String(values.price);
-  const active = values.active == "on" && true;
-  const vegetarian = values.vegetarian == "on" && true;
-
-  let newItem = { name, category, description, price, active, vegetarian };
+  const name = String(formData.get("name"));
+  const category = String(formData.get("category"));
+  const description = String(formData.get("description"));
+  const price = String(formData.get("price"));
+  const active = formData.get("active") == "on" && true;
+  const vegetarian = formData.get("vegetarian") == "on" && true;
 
   if (name?.length === 0) {
     return json(
@@ -58,7 +54,14 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const foodItem = await createFoodItem(newItem);
+  const foodItem = await createFoodItem({
+    name,
+    category,
+    description,
+    price,
+    active,
+    vegetarian,
+  });
 
   return redirect(`../${foodItem.id}`);
 }
