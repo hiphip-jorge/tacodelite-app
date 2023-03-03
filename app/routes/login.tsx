@@ -81,13 +81,13 @@ export default function LoginPage() {
   }, [actionData]);
 
   return (
-    <div className="flex min-h-full flex-col justify-center">
+    <div className="flex min-h-full flex-col items-center justify-center">
       <div className="mx-auto w-full max-w-md px-8">
         <div className="flex justify-center">
           <img src={taco_delite} alt="taco delite logo" className="w-28" />
         </div>
-        <div className="my-4 mt-2 text-center">
-          <p className="font-primary-gris text-5xl text-green-primary">
+        <div className="mx-auto mt-2 mb-8 w-fit text-center">
+          <p className="w-fit font-primary-outline  text-5xl text-green-primary">
             Taco Delite
           </p>
         </div>
