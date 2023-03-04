@@ -26,7 +26,7 @@ export async function action({ request, params }: ActionArgs) {
   if (_action === "delete") {
     await deleteUserById(params.userId);
 
-    return redirect("/admin/users");
+    return redirect("/storeFront/users");
   } else {
     const user = await getUserById(params.userId);
 
@@ -38,7 +38,7 @@ export async function action({ request, params }: ActionArgs) {
     await updateUser(params.userId, name, email, role);
   }
 
-  return redirect(`/admin/users/${params.userId}`);
+  return redirect(`/storeFront/users/${params.userId}`);
 }
 
 export default function FoodItemDetailsPage() {

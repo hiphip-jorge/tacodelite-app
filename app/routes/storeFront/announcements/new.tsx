@@ -9,7 +9,7 @@ import { requireAdminUser } from "~/session.server";
 import { validateEmail } from "~/utils";
 
 // export async function loader({ request }: DataFunctionArgs) {
-//   return await requireAdminUser(request, "/admin");
+//   return await requireAdminUser(request, "/storeFront");
 // }
 
 export async function action({ request }: ActionArgs) {
@@ -17,7 +17,7 @@ export async function action({ request }: ActionArgs) {
   const title = String(formData.get("title"));
   const message = String(formData.get("message"));
 
-  const startDate = new Date()
+  const startDate = new Date();
   const endDate = String(formData.get("endDate"));
 
   if (title?.length === 0) {
@@ -56,8 +56,8 @@ export async function action({ request }: ActionArgs) {
   }
 
   if (Date.parse(endDate) < Date.parse(startDate.toISOString())) {
-    console.log('endDate', Date.parse(endDate))
-    console.log('startDate', Date.parse(startDate.toISOString()))
+    console.log("endDate", Date.parse(endDate));
+    console.log("startDate", Date.parse(startDate.toISOString()));
 
     return json(
       {

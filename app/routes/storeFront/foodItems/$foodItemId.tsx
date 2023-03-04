@@ -31,7 +31,7 @@ export async function action({ request, params }: ActionArgs) {
   if (_action === "delete") {
     await deleteFoodItem({ id: Number(params.foodItemId) });
 
-    return redirect("/admin/foodItems");
+    return redirect("/storeFront/foodItems");
   } else {
     const item = await getFoodItem({ id: Number(params.foodItemId) });
 
@@ -61,7 +61,7 @@ export async function action({ request, params }: ActionArgs) {
     });
   }
 
-  return redirect(`/admin/foodItems/${params.foodItemId}`);
+  return redirect(`/storeFront/foodItems/${params.foodItemId}`);
 }
 
 export default function FoodItemDetailsPage() {

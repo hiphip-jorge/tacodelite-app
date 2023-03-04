@@ -40,7 +40,7 @@ export default function FoodItemIndexPage() {
           ref={categoryRef}
           type="submit"
           onClick={createFoodCategories}
-          className="mt-12 mb-4 rounded-xl bg-green-200 p-4 shadow-md hover:bg-green-100"
+          className="mt-12 mb-4 rounded-xl bg-purple-200 p-4 shadow-md duration-300 hover:bg-purple-100 hover:shadow-xl"
         >
           Create categories
         </button>

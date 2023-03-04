@@ -72,7 +72,6 @@ export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
 
-// ./routes/admin/foodItems/new
 export function validatePrice(price: unknown): price is string {
   if (typeof price === "string" && price.length >= 4 && price.length < 6) {
     if (!Number(price.at(0)) && price.at(0) !== "0") {

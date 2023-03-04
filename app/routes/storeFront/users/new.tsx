@@ -8,7 +8,7 @@ import { requireAdminUser } from "~/session.server";
 import { validateEmail } from "~/utils";
 
 // export async function loader({ request }: DataFunctionArgs) {
-//   return await requireAdminUser(request, "/admin");
+//   return await requireAdminUser(request, "/storeFront");
 // }
 
 export async function action({ request }: ActionArgs) {
