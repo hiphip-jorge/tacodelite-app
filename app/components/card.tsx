@@ -6,6 +6,7 @@ type item = {
   name: string;
   description: string;
   price: string;
+  categoryId: Number | null;
 };
 
 type Props = {
@@ -43,8 +44,8 @@ const Card = ({ item, id, className, vegetarian }: Props) => {
       </motion.div>
       {isOpen && (
         <motion.p
-          className={`text-left  font-secondary-secular ${
-            item.description.includes("|") && " whitespace-pre"
+          className={`self-start  text-left font-secondary-secular tracking-wider ${
+            item.categoryId === 14 && "whitespace-pre"
           }`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
