@@ -1,15 +1,15 @@
+import { useEffect, useRef } from "react";
 import { Link, useActionData } from "@remix-run/react";
+import { Form } from "@remix-run/react";
+import { type ActionArgs, json } from "@remix-run/node";
 import {
   seedCategories,
   seedFoodItems,
   getFoodItemList,
   getCategoryList,
 } from "~/models/foodItem.server";
-import { Form } from "@remix-run/react";
-import { useEffect, useRef } from "react";
-import { ActionArgs, json } from "@remix-run/node";
 
-export async function action({ request, params }: ActionArgs) {
+export async function action({ request }: ActionArgs) {
   let formData = await request.formData();
   let { _action } = Object.fromEntries(formData);
 
