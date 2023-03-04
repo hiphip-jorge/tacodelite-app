@@ -109,7 +109,7 @@ export default function AnnouncementDetailsPage() {
           <section>
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold capitalize text-green-dark">
-                {announcement.startDate}
+                {announcement.title}
               </h3>
               <button
                 className="w-10 rounded-lg border-2 border-green-dark bg-green-light p-2 hover:bg-green-200"
@@ -118,13 +118,13 @@ export default function AnnouncementDetailsPage() {
                 {edit_icon}
               </button>
             </div>
-            <div className="my-4 flex flex-col capitalize">
-              <span className="text-green-800">End Date:</span>
-              <p>{announcement.endDate}</p>
-            </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">Message:</span>
               <p>{announcement.message}</p>
+            </div>
+            <div className="my-4 flex flex-col capitalize">
+              <span className="text-green-800">End Date:</span>
+              <p>{announcement.endDate}</p>
             </div>
           </section>
 

@@ -34,7 +34,7 @@ const UsersPage = () => {
                   }
                   to={announcement.id}
                 >
-                  {announcement.startDate}
+                  {announcement.title}
                 </NavLink>
               </li>
             ))}

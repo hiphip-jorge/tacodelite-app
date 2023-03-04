@@ -1,16 +1,14 @@
 import { type LoaderArgs, redirect } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet } from "@remix-run/react";
+import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
 
 import { useUser } from "~/utils";
-import { getFoodItemList } from "~/models/foodItem.server";
 import { getUserId } from "~/session.server";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
   if (!userId) return redirect("/login");
-  const foodItemList = await getFoodItemList();
-  return json({ foodItemList });
+
+  return null;
 }
 
 export default function AdminPage() {

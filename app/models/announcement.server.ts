@@ -12,9 +12,9 @@ export function getAnnoncementList() {
     return prisma.announcement.findMany({orderBy: {startDate: "desc"}})
 }
 
-export function createAnnouncement({endDate, message} : Pick<Announcement, "endDate" | "message">) {
+export function createAnnouncement({endDate, title, message} : Pick<Announcement, "endDate" | "title" | "message">) {
     const startDate = new Date();
-    return prisma.announcement.create({data: {startDate, endDate, message}});
+    return prisma.announcement.create({data: {startDate, title, endDate, message}});
 }
 
 export function updateAnnouncement({id, endDate, message}:Pick<Announcement,"id" | "endDate" | "message">){

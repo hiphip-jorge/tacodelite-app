@@ -46,10 +46,13 @@ model Category {
 }
 
 model Announcement {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
+
+  title   String @default("untitled")
+  message String
+
   startDate DateTime
   endDate   DateTime
-  message   String
 }
 
 model Note {
