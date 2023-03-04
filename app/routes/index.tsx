@@ -250,7 +250,7 @@ export default function Index() {
               <ul>
                 <li className="flex justify-center p-2 text-green-light">
                   <button
-                    className="h-full w-full font-primary-solid text-3xl duration-500 ease-in-out xl:text-left"
+                    className="h-full w-full font-primary-solid text-2xl xl:text-3xl duration-500 ease-in-out xl:text-left"
                     onClick={(e) => {
                       e.stopPropagation();
                       scrollTo("header", "start");
@@ -263,10 +263,10 @@ export default function Index() {
                   return (
                     <li
                       key={idx}
-                      className="flex justify-center p-2 text-green-light"
+                      className="flex justify-center p-1 text-green-light"
                     >
                       <button
-                        className={`h-full w-full font-primary-solid text-3xl duration-500 ease-in-out xl:text-left ${
+                        className={`h-full w-full font-primary-solid text-2xl xl:text-3xl duration-500 ease-in-out xl:text-left ${
                           inView[idx] && "text-green-dark"
                         }`}
                         onClick={(e) => {
