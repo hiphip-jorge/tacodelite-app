@@ -4,7 +4,7 @@ import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
-import { requireAdminUser } from "~/session.server";
+// import { requireAdminUser } from "~/session.server";
 import { validateEmail } from "~/utils";
 
 // export async function loader({ request }: DataFunctionArgs) {
