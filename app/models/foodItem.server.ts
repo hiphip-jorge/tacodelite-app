@@ -12,7 +12,7 @@ export async function createFoodCategories() {
 
     if (categoryExist.length){ 
         console.log("400: Categories Exist.")
-        return null;
+        return [];
     }
 
     return Promise.all(getCategory().map((category) => {

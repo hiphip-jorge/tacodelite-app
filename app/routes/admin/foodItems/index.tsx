@@ -1,13 +1,32 @@
-import { Link } from "@remix-run/react";
+import { Link, useActionData } from "@remix-run/react";
 import { createFoodCategories } from "~/models/foodItem.server";
 import { Form } from "@remix-run/react";
+import { useEffect, useRef } from "react";
+import { json } from "@remix-run/node";
 
 export async function action() {
-  createFoodCategories();
-  return null;
+  const categories = createFoodCategories();
+
+  if (!(await categories).length) {
+    return json(
+      { errors: { category: "Categories already exist." } },
+      { status: 400 }
+    );
+  }
+
+  return json({ errors: null }, { status: 200 });
 }
 
 export default function FoodItemIndexPage() {
+  const actionData = useActionData<typeof action>();
+  const categoryRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (actionData?.errors?.category) {
+      categoryRef.current?.focus();
+    }
+  }, [actionData]);
+
   return (
     <div>
       <p>
@@ -18,12 +37,18 @@ export default function FoodItemIndexPage() {
       </p>
       <Form method="post">
         <button
+          ref={categoryRef}
           type="submit"
           onClick={createFoodCategories}
-          className="mt-12 rounded-xl bg-green-200 p-4 shadow-md hover:bg-green-100"
+          className="mt-12 mb-4 rounded-xl bg-green-200 p-4 shadow-md hover:bg-green-100"
         >
           Create categories
         </button>
+        {actionData?.errors?.category && (
+          <div className="pt-1 text-red-700" id="category-error">
+            {actionData.errors.category}
+          </div>
+        )}
       </Form>
     </div>
   );
