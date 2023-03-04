@@ -34,8 +34,8 @@ export async function action({ request, params }: ActionArgs) {
   } else {
     const user = await getUserById(params.userId);
 
-    let name = values.name ? String(values.name) : user?.name;
-    let email = values.email ? String(values.email) : user?.email;
+    // let name = values.name ? String(values.name) : user?.name;
+    // let email = values.email ? String(values.email) : user?.email;
 
     // await updateUser(params.userId, name, email, user.role);
   }

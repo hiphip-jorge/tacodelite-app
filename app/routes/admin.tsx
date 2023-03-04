@@ -1,5 +1,5 @@
 import { type LoaderArgs, redirect } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet, useLoaderData } from "@remix-run/react";
+import { Form, Link, NavLink, Outlet } from "@remix-run/react";
 
 import { useUser } from "~/utils";
 import { getUserId } from "~/session.server";

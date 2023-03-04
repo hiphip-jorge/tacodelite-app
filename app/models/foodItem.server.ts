@@ -6,8 +6,6 @@ import {getCategory} from "../../prisma/seed-utils"
 
 export type {FoodItem} from "@prisma/client";
 
-import { redirect } from "@remix-run/node";
-
 
 export async function createFoodCategories() {
     const categoryExist = await prisma.category.findMany({where: {id: 1}});
