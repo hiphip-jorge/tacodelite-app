@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { leaf_icon, menu_arrow } from "~/assets/svg";
+import veggie from "~/assets/vegetarian.png";
 
 type item = {
   name: string;
@@ -58,7 +59,18 @@ const Card = ({ item, id, className, vegetarian }: Props) => {
         <p className="font-secondary-secular text-2xl text-green-primary">
           {"$" + item.price}
         </p>
-        {vegetarian && <div className="w-6">{leaf_icon}</div>}
+        {vegetarian && (
+          <div className="w-6 text-3xl">
+            <img src={veggie} alt="" />
+            <a
+              href="https://www.flaticon.com/free-icons/vegan"
+              className="hidden"
+              title="vegan icons"
+            >
+              Vegan icons created by Smashicons - Flaticon
+            </a>
+          </div>
+        )}
       </div>
     </motion.button>
   );
