@@ -3,7 +3,13 @@ import { useLoaderData } from "@remix-run/react";
 import { type LoaderFunction } from "@remix-run/server-runtime";
 
 // utils
-import { aboutUs_p, useCategoryInView, scrollTo, useWindowSize } from "~/utils";
+import {
+  aboutUs_p,
+  useCategoryInView,
+  scrollTo,
+  useWindowSize,
+  useAnnouncement,
+} from "~/utils";
 
 // Prisma Imports
 import { prisma } from "~/db.server";
@@ -21,7 +27,7 @@ import Card from "~/components/card";
 import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
-// import AnnouncementBar from "~/components/announcementBar";
+import AnnouncementBar from "~/components/announcementBar";
 
 // Types
 export type category = { name: string; foodItems: Array<FoodItem> };
@@ -64,9 +70,10 @@ export default function Index() {
   const [contentType, setContentType] = useState("links");
 
   // custom hooks
-  const { categories } = useLoaderData<LoaderTypes>();
+  const { announcements, categories } = useLoaderData<LoaderTypes>();
   let { inView, categoryRefs } = useCategoryInView();
   let { width } = useWindowSize();
+  const currentAnnouncement = useAnnouncement(announcements);
 
   useEffect(() => {
     if (width >= 812 && isOpen) {
@@ -102,7 +109,9 @@ export default function Index() {
 
   return (
     <div className="bg-white">
-      {/* <AnnouncementBar message={announcements[0].message} /> */}
+      {/* {currentAnnouncement.length && (
+        <AnnouncementBar message={currentAnnouncement[0].message} />
+      )} */}
       {/* Taco Delite Header */}
       <header
         id="header"
@@ -250,7 +259,7 @@ export default function Index() {
               <ul>
                 <li className="flex justify-center p-2 text-green-light">
                   <button
-                    className="h-full w-full font-primary-solid text-2xl xl:text-3xl duration-500 ease-in-out xl:text-left"
+                    className="h-full w-full font-primary-solid text-2xl duration-500 ease-in-out xl:text-left xl:text-3xl"
                     onClick={(e) => {
                       e.stopPropagation();
                       scrollTo("header", "start");
@@ -266,7 +275,7 @@ export default function Index() {
                       className="flex justify-center p-1 text-green-light"
                     >
                       <button
-                        className={`h-full w-full font-primary-solid text-2xl xl:text-3xl duration-500 ease-in-out xl:text-left ${
+                        className={`h-full w-full font-primary-solid text-2xl duration-500 ease-in-out xl:text-left xl:text-3xl ${
                           inView[idx] && "text-green-dark"
                         }`}
                         onClick={(e) => {

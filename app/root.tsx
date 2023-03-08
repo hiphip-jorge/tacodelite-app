@@ -10,7 +10,7 @@ import {
 } from "@remix-run/react";
 
 import tailwindStylesheetUrl from "./styles/tailwind.css";
-import tacoDeliteFavicon from "./assets/td-logo_2021.png";
+import tacoDeliteFavicon from "./assets/td-logo_w-bg.png";
 import { getUser } from "./session.server";
 
 let acierBatStyleSheetUrl = "https://use.typekit.net/kui8jtg.css";

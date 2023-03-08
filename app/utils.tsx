@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useInView } from "react-intersection-observer";
 
 import type { User } from "~/models/user.server";
+import type { Announcement } from "@prisma/client";
 import type { modalContent } from "./routes";
 
 const DEFAULT_REDIRECT = "/";
@@ -209,4 +210,12 @@ export function useWindowSize() {
     return () => window.removeEventListener("resize", handleResize);
   }, []); // Empty array ensures that effect is only run on mount
   return windowSize;
+}
+
+export function useAnnouncement(announcements: any[]) {
+  return announcements.map((announcement) => {
+    if (announcement.endDate > new Date()) {
+      return announcement;
+    }
+  });
 }
