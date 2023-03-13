@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { leaf_icon, menu_arrow } from "~/assets/svg";
+import { menu_arrow } from "~/assets/svg";
 import veggie from "~/assets/vegetarian.png";
 
 type item = {
