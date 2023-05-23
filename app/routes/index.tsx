@@ -18,7 +18,7 @@ import type { FoodItem, Announcement } from "@prisma/client";
 // assets
 import catering from "~/assets/catering.png";
 import taco_delite from "~/assets/td-logo_2021.png";
-import td_building from "~/assets/taco_delite.jpeg";
+import td_building from "~/assets/taco_delite.jpg";
 import { car, home, utensils } from "~/assets/svg";
 
 // components
