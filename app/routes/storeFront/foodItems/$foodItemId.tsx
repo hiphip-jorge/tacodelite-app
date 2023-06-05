@@ -78,7 +78,7 @@ export default function FoodItemDetailsPage() {
             <input
               name="name"
               placeholder={data.item.name}
-              className="rounded-xl border-2 border-gray-100 p-2 text-2xl font-bold capitalize text-green-dark"
+              className="w-3/4 rounded-xl border-2 border-gray-100 p-2 text-sm font-bold capitalize text-green-dark md:w-auto md:text-2xl"
             />
             <button
               className="w-10 rounded-lg border-2 border-red-500 bg-red-300 p-2 hover:bg-red-200"

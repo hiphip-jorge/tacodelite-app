@@ -12,7 +12,7 @@ const FoodItemsPage = () => {
 
   return (
     <main className="flex h-full bg-white">
-      <div className="h-full w-80 overflow-scroll border-r bg-gray-50">
+      <div className="h-full w-1/3 overflow-scroll border-r bg-gray-50 md:w-80">
         <Link
           to="new"
           className="block bg-gray-100 p-4 text-xl text-green-primary hover:bg-green-light"
@@ -42,7 +42,7 @@ const FoodItemsPage = () => {
         )}
       </div>
 
-      <div className="flex-1 p-8">
+      <div className="w-2/3 flex-1 p-8 md:w-auto text-sm md:text-base">
         <Outlet />
       </div>
     </main>
