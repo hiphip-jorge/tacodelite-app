@@ -1,50 +1,59 @@
+# fly.toml app configuration file generated for tacodelite-app-d53a on 2023-08-01T12:35:41-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
 app = "tacodelite-app-d53a"
 kill_signal = "SIGINT"
 kill_timeout = 5
-processes = [ ]
+processes = []
+
+[env]
 
 [experimental]
-allowed_public_ports = [ ]
-auto_rollback = true
-cmd = "start.sh"
-entrypoint = "sh"
+  auto_rollback = true
+  cmd = ["start.sh"]
+  entrypoint = ["sh"]
+  exec = []
 
-[mounts]
-source = "data"
-destination = "/data"
+[[mounts]]
+  destination = "/data"
+  encrypted = false
+  processes = []
+  source = "data"
 
 [[services]]
-internal_port = 8_080
-processes = [ "app" ]
-protocol = "tcp"
-script_checks = [ ]
-
+  internal_port = 8080
+  processes = ["app"]
+  protocol = "tcp"
+  script_checks = []
   [services.concurrency]
-  hard_limit = 25
-  soft_limit = 20
-  type = "connections"
-
-  [[services.ports]]
-  handlers = [ "http" ]
-  port = 80
-  force_https = true
-
-  [[services.ports]]
-  handlers = [ "tls", "http" ]
-  port = 443
-
-  [[services.tcp_checks]]
-  grace_period = "1s"
-  interval = "15s"
-  restart_limit = 0
-  timeout = "2s"
+    hard_limit = 25
+    soft_limit = 20
+    type = "connections"
 
   [[services.http_checks]]
-  interval = "10s"
-  grace_period = "5s"
-  method = "get"
-  path = "/healthcheck"
-  protocol = "http"
-  timeout = "2s"
-  tls_skip_verify = false
-  headers = { }
+    grace_period = "5s"
+    interval = "10s"
+    method = "get"
+    path = "/healthcheck"
+    protocol = "http"
+    restart_limit = 0
+    timeout = "2s"
+    tls_skip_verify = false
+    [services.http_checks.headers]
+
+  [[services.ports]]
+    force_https = true
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [[services.tcp_checks]]
+    grace_period = "1s"
+    interval = "15s"
+    restart_limit = 0
+    timeout = "2s"
