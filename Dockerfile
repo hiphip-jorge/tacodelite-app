@@ -12,8 +12,8 @@ FROM base as deps
 
 WORKDIR /myapp
 
+RUN npm cache clear --force
 ADD package.json package-lock.json .npmrc ./
-RUN npx clear-npx-cache
 RUN npm install --production=false
 
 # Setup production node_modules
