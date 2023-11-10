@@ -8,7 +8,7 @@ import {
 } from "@remix-run/react";
 
 import { announcement_icon, user_icon, utensils } from "~/assets/svg";
-import { createServerClient } from "@supabase/auth-helpers-remix";
+import { SupabaseClient, createServerClient } from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: LoaderArgs) {
   const response = new Response();
@@ -42,7 +42,7 @@ export default function StorePage() {
   const user = { role: "ADMIN", name: profile.name };
   const isAdmin = profile.admin === true;
 
-  const supabase = useOutletContext();
+  const supabase = useOutletContext<SupabaseClient>();
 
   const activeClassName =
     "rounded-xl bg-green-300 p-2 px-6 shadow-md flex justify-center items-center w-16 md:w-fit min-h-[64px]";
