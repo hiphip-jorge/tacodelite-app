@@ -30,7 +30,7 @@ export async function action({ request, params }: ActionArgs) {
   if (_action === "delete") {
     await deleteAnnouncement({ id: params.announcementId });
 
-    return redirect("/storeFront/announcements");
+    return redirect("/store/announcements");
   } else {
     const user = await getUserById(params.userId);
 
@@ -40,7 +40,7 @@ export async function action({ request, params }: ActionArgs) {
     // await updateUser(params.userId, name, email, user.role);
   }
 
-  return redirect(`/storeFront/users/${params.userId}`);
+  return redirect(`/store/users/${params.userId}`);
 }
 
 export default function AnnouncementDetailsPage() {

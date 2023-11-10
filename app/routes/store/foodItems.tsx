@@ -3,6 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 import { getFoodItemList } from "~/models/foodItem.server";
 
 export async function loader() {
+  
   const foodItemList = await getFoodItemList();
   return foodItemList;
 }

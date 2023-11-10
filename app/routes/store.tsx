@@ -1,25 +1,49 @@
-import { type LoaderArgs, redirect } from "@remix-run/node";
-import { Form, Link, NavLink, Outlet } from "@remix-run/react";
-
-import { useUser } from "~/utils";
-import { getUserId } from "~/session.server";
+import { type LoaderArgs, redirect, json } from "@remix-run/node";
 import {
-  announcement_icon,
-  taco_menu_icon,
-  user_icon,
-  utensils,
-} from "~/assets/svg";
+  Link,
+  NavLink,
+  Outlet,
+  useLoaderData,
+  useOutletContext,
+} from "@remix-run/react";
+
+import { announcement_icon, user_icon, utensils } from "~/assets/svg";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await getUserId(request);
-  if (!userId) return redirect("/login");
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
 
-  return null;
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (session?.user) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id);
+
+    return json({ data, error });
+  } else {
+    console.log("not auth'd");
+    return redirect("/signin");
+  }
 }
 
-export default function StoreFrontPage() {
-  const user = useUser();
-  const isAdmin = user.role === "ADMIN";
+export default function StorePage() {
+  const { data } = useLoaderData();
+  const profile = data[0];
+
+  const user = { role: "ADMIN", name: profile.name };
+  const isAdmin = profile.admin === true;
+
+  const supabase = useOutletContext();
+
   const activeClassName =
     "rounded-xl bg-green-300 p-2 px-6 shadow-md flex justify-center items-center w-16 md:w-fit min-h-[64px]";
   const nonActiveClassName =
@@ -35,19 +59,18 @@ export default function StoreFrontPage() {
           >
             <span className="font-primary-solid text-3xl text-green-primary">
               Taco Delite
-            </span>{" "}
-            Store Front
+            </span>
           </Link>
         </h1>
         <p className="text-2xl">Sup, {user.name} 😎</p>
-        <Form action="/logout" method="post">
-          <button
-            type="submit"
-            className="rounded bg-red-700 py-2 px-4 font-semibold text-white duration-300 hover:bg-red-900 active:bg-red-900"
-          >
-            Logout
-          </button>
-        </Form>
+        {/* <Form action="/logout" method="post"> */}
+        <button
+          onClick={async () => await supabase.auth.signOut()}
+          className="rounded bg-red-700 py-2 px-4 font-semibold text-white duration-300 hover:bg-red-900 active:bg-red-900"
+        >
+          Logout
+        </button>
+        {/* </Form> */}
       </header>
 
       {/* sub-header  */}

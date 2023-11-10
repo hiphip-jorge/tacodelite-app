@@ -1,6 +1,7 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { User } from "~/models/user.server";
 import { getUserById } from "~/models/user.server";
 
@@ -62,7 +63,7 @@ export async function requireUserId(
   const userId = await getUserId(request);
   if (!userId) {
     const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(`/login?${searchParams}`);
+    throw redirect(`/signin?${searchParams}`);
   }
   return userId;
 }
@@ -88,7 +89,9 @@ export async function createUserSession({
   redirectTo: string;
 }) {
   const session = await getSession(request);
+
   session.set(USER_SESSION_KEY, userId);
+
   return redirect(redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session, {
@@ -107,4 +110,18 @@ export async function logout(request: Request) {
       "Set-Cookie": await sessionStorage.destroySession(session),
     },
   });
+}
+
+export async function signInWithEmail(client:SupabaseClient, email: string, password: string) {
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password,
+  })
+  
+  console.log('data: ', data)
+  return { data, error };
+}
+
+export const signOut = async (client: SupabaseClient) => {
+  await client.auth.signOut()
 }

@@ -1,25 +1,52 @@
 import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useSearchParams } from "@remix-run/react";
+import { Form, useActionData, useOutletContext } from "@remix-run/react";
 import * as React from "react";
 
-import { createUserSession, getUserId } from "~/session.server";
-import { verifyLogin } from "~/models/user.server";
-import { safeRedirect, validateEmail } from "~/utils";
+import { validateEmail } from "~/utils";
 import taco_delite from "~/assets/td-logo_2021.png";
 
+import {
+  SupabaseClient,
+  createServerClient,
+} from "@supabase/auth-helpers-remix";
+
 export async function loader({ request }: LoaderArgs) {
-  const userId = await getUserId(request);
-  if (userId) return redirect("/");
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (session?.user) {
+    console.log("is authd");
+    redirect("/store", {
+      headers: response.headers,
+    });
+  }
+
   return json({});
 }
 
 export async function action({ request }: ActionArgs) {
+  console.log("starting actions...");
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/storeFront");
-  const remember = formData.get("remember");
+
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
+  console.log("email", email);
 
   if (!validateEmail(email)) {
     return json(
@@ -42,21 +69,19 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const user = await verifyLogin(email, password);
+  if (process.env.VALID_EMAILS?.includes(email)) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  if (!user) {
+    return redirect("/store", { headers: response.headers });
+  } else {
     return json(
-      { errors: { email: "Invalid email or password", password: null } },
-      { status: 400 }
+      { errors: { email: "Invalid email", password: null } },
+      { status: 403 }
     );
   }
-
-  return createUserSession({
-    request,
-    userId: user.id,
-    remember: remember === "on" ? true : false,
-    redirectTo,
-  });
 }
 
 export const meta: MetaFunction = () => {
@@ -66,11 +91,11 @@ export const meta: MetaFunction = () => {
 };
 
 export default function LoginPage() {
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/storeFront";
   const actionData = useActionData<typeof action>();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
+
+  const supabase = useOutletContext<SupabaseClient>();
 
   React.useEffect(() => {
     if (actionData?.errors?.email) {
@@ -86,12 +111,9 @@ export default function LoginPage() {
         <div className="flex justify-center">
           <img src={taco_delite} alt="taco delite logo" className="w-28" />
         </div>
-        <div className="mx-auto mt-2 mb-8 w-fit text-center">
-          <p className="w-fit font-primary-outline  text-5xl text-green-primary">
-            Taco Delite
-          </p>
-        </div>
-        <Form method="post" className="space-y-6">
+        <Form className="flex flex-col gap-2" method="post">
+          {/* <label htmlFor="">email</label>
+        <input className="border" type="email" /> */}
           <div>
             <label
               htmlFor="email"
@@ -146,29 +168,9 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <button
-            type="submit"
-            className="w-full rounded bg-green-500  py-2 px-4 text-white hover:bg-green-600 focus:bg-green-400"
-          >
-            Log in
+          <button type="submit" className="bg-blue-500 p-2 text-white">
+            sign in
           </button>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember"
-                name="remember"
-                type="checkbox"
-                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <label
-                htmlFor="remember"
-                className="ml-2 block text-sm text-gray-900"
-              >
-                Remember me
-              </label>
-            </div>
-          </div>
         </Form>
       </div>
     </div>

@@ -3,18 +3,39 @@ import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
-import { getUserId, createUserSession } from "~/session.server";
+import { createUserSession, getUserId } from "~/session.server";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { safeRedirect, validateEmail } from "~/utils";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: LoaderArgs) {
   const userId = await getUserId(request);
+
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
   if (userId) return redirect("/");
+  if (session) return redirect("/store");
   return json({});
 }
 
 export async function action({ request }: ActionArgs) {
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
   const formData = await request.formData();
   const name = String(formData.get("name"));
   const email = formData.get("email");
@@ -72,14 +93,8 @@ export async function action({ request }: ActionArgs) {
   }
 
   console.log("name", name);
-  const user = await createUser(name, email, password);
 
-  return createUserSession({
-    request,
-    userId: user.id,
-    remember: false,
-    redirectTo,
-  });
+  return redirect(redirectTo);
 }
 
 export const meta: MetaFunction = () => {
@@ -203,7 +218,7 @@ export default function Join() {
               <Link
                 className="text-blue-500 underline"
                 to={{
-                  pathname: "/login",
+                  pathname: "/signin",
                   search: searchParams.toString(),
                 }}
               >
