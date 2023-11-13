@@ -4,36 +4,53 @@ import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import { getCategory } from "prisma/seed-utils";
 import { useState } from "react";
 import invariant from "tiny-invariant";
-import {
-  deleteFoodItem,
-  getFoodItem,
-  updateFoodItem,
-} from "~/models/foodItem.server";
 import { cancel_icon, edit_icon } from "~/assets/svg";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 
-export async function loader({ params }: LoaderArgs) {
-  const item = await getFoodItem({ id: Number(params.foodItemId) });
+export async function loader({ params, request }: LoaderArgs) {
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
   invariant(params.foodItemId, "foodItemId not found");
 
-  if (!item) {
+  const { data } = await supabase
+    .from("menu")
+    .select("*")
+    .eq("id", params.foodItemId);
+
+  if (!data?.at(0).id) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  return json({ item });
+  return json(data?.at(0));
 }
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
   let { _action, ...values } = Object.fromEntries(formData);
 
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
   invariant(params.foodItemId, "foodItemId not found");
 
   if (_action === "delete") {
-    await deleteFoodItem({ id: Number(params.foodItemId) });
-
+    await supabase.from("menu").delete().eq("id", params.foodItemId);
     return redirect("/store/foodItems");
   } else {
-    const item = await getFoodItem({ id: Number(params.foodItemId) });
+    const { data } = await supabase
+      .from("menu")
+      .select("*")
+      .eq("id", params.foodItemId);
+    const item = data?.at(0);
 
     let name = values.name ? values.name : item?.name;
     name = String(name) || "unknown name";
@@ -49,8 +66,7 @@ export async function action({ request, params }: ActionArgs) {
     price = String(price) || "0.00";
     const active = values.active === "on";
     const vegetarian = values.vegetarian === "on";
-
-    await updateFoodItem({
+    const updatedItem = {
       name,
       categoryId,
       description,
@@ -58,16 +74,17 @@ export async function action({ request, params }: ActionArgs) {
       active,
       vegetarian,
       id: Number(params.foodItemId),
-    });
-  }
+    }
+
+    await supabase.from('menu').update(updatedItem).eq('id', params.foodItemId);
 
   return redirect(`/store/foodItems/${params.foodItemId}`);
 }
 
 export default function FoodItemDetailsPage() {
-  const data = useLoaderData<typeof loader>();
+  const item = useLoaderData<typeof loader>();
   const [inEditMode, setInEditMode] = useState(false);
-  const categoryId = data.item.categoryId ? data.item.categoryId - 1 : 0;
+  const categoryId = item.categoryId ? item.categoryId - 1 : 0;
   const category = getCategory()[categoryId].name;
 
   return (
@@ -77,7 +94,7 @@ export default function FoodItemDetailsPage() {
           <div className="flex items-center justify-between">
             <input
               name="name"
-              placeholder={data.item.name}
+              placeholder={item.name}
               className="w-3/4 rounded-xl border-2 border-gray-100 p-2 text-sm font-bold capitalize text-green-dark md:w-auto md:text-2xl"
             />
             <button
@@ -107,7 +124,7 @@ export default function FoodItemDetailsPage() {
             <label className="text-green-800">Description:</label>
             <textarea
               name="description"
-              placeholder={data.item.description}
+              placeholder={item.description}
               className={"rounded-lg border-2 border-gray-100 p-2"}
             />
           </div>
@@ -118,7 +135,7 @@ export default function FoodItemDetailsPage() {
               <input
                 type="text"
                 name="price"
-                placeholder={data.item.price}
+                placeholder={item.price}
                 className={"rounded-lg border-2 border-gray-100 p-2"}
               />
             </div>
@@ -136,7 +153,7 @@ export default function FoodItemDetailsPage() {
               type="checkbox"
               autoFocus={true}
               name="active"
-              defaultChecked={data.item.active}
+              defaultChecked={item.active}
               aria-describedby="active-error"
               className="rounded border border-gray-500 px-2 py-1 text-lg"
             />
@@ -153,7 +170,7 @@ export default function FoodItemDetailsPage() {
               type="checkbox"
               autoFocus={true}
               name="vegetarian"
-              defaultChecked={data.item.vegetarian}
+              defaultChecked={item.vegetarian}
               aria-describedby="vegetarian-error"
               className="rounded border border-gray-500 px-2 py-1 text-lg"
             />
@@ -180,7 +197,7 @@ export default function FoodItemDetailsPage() {
           <section>
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold capitalize text-green-dark">
-                {data.item.name}
+                {item.name}
               </h3>
               <button
                 className="w-10 rounded-lg border-2 border-green-dark bg-green-light p-2 hover:bg-green-200"
@@ -195,19 +212,19 @@ export default function FoodItemDetailsPage() {
             </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">Description:</span>
-              <p>{data.item.description}</p>
+              <p>{item.description}</p>
             </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">Price:</span>
-              <p>${data.item.price}</p>
+              <p>${item.price}</p>
             </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">Currently Active:</span>
-              <p>{data.item.active ? "True" : "False"}</p>
+              <p>{item.active ? "True" : "False"}</p>
             </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">Vegetarian:</span>
-              <p>{data.item.vegetarian ? "True" : "False"}</p>
+              <p>{item.vegetarian ? "True" : "False"}</p>
             </div>
           </section>
 

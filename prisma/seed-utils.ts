@@ -16,20 +16,20 @@ export async function getUsers() {
   
 export function getCategory() {
     return [                    
-        {id: 1, name: "Breakfast", foodItems: {}},   
-        {id: 2, name: "Tacos", foodItems: {}},       
-        {id: 3, name: "Burritos", foodItems: {}},    
-        {id: 4, name: "Nachos", foodItems: {}},      
-        {id: 5, name: "Salads", foodItems: {}},      
-        {id: 6, name: "Quesadillas", foodItems: {}}, 
-        {id: 7, name: "Tostadas", foodItems: {}},    
-        {id: 8, name: "Sides", foodItems: {}},       
-        {id: 9, name: "Extras", foodItems: {}},      
-        {id: 10, name: "Chips-n-Stuff", foodItems: {}},
-        {id: 11, name: "Dinners", foodItems: {}},     
-        {id: 12, name: "Family", foodItems: {}},      
-        {id: 13, name: "Desserts", foodItems: {}},    
-        {id: 14, name: "Drinks", foodItems: {}},    
+        {id: 1, name: "Breakfast", food_items: []},   
+        {id: 2, name: "Tacos", food_items: []},       
+        {id: 3, name: "Burritos", food_items: []},    
+        {id: 4, name: "Nachos", food_items: []},      
+        {id: 5, name: "Salads", food_items: []},      
+        {id: 6, name: "Quesadillas", food_items: []}, 
+        {id: 7, name: "Tostadas", food_items: []},    
+        {id: 8, name: "Sides", food_items: []},       
+        {id: 9, name: "Extras", food_items: []},      
+        {id: 10, name: "Chips-n-Stuff", food_items: []},
+        {id: 11, name: "Dinners", food_items: []},     
+        {id: 12, name: "Family", food_items: []},      
+        {id: 13, name: "Desserts", food_items: []},    
+        {id: 14, name: "Drinks", food_items: []},    
     ]
 }
   
