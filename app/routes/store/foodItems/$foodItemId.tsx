@@ -74,11 +74,12 @@ export async function action({ request, params }: ActionArgs) {
       active,
       vegetarian,
       id: Number(params.foodItemId),
-    }
+    };
 
-    await supabase.from('menu').update(updatedItem).eq('id', params.foodItemId);
+    await supabase.from("menu").update(updatedItem).eq("id", params.foodItemId);
 
-  return redirect(`/store/foodItems/${params.foodItemId}`);
+    return redirect(`/store/foodItems/${params.foodItemId}`);
+  }
 }
 
 export default function FoodItemDetailsPage() {
