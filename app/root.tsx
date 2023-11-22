@@ -26,8 +26,18 @@ let secularOneStyleSheetUrl =
 export const links: LinksFunction = () => {
   return [
     { rel: "icon", type: "image/png", href: tacoDeliteFavicon },
-    { rel: "stylesheet", href: acierBatStyleSheetUrl, as: "style" },
-    { rel: "stylesheet", href: secularOneStyleSheetUrl, as: "style" },
+    {
+      rel: "stylesheet",
+      href: acierBatStyleSheetUrl,
+      as: "font",
+      type: "font/woff",
+    },
+    {
+      rel: "stylesheet",
+      href: secularOneStyleSheetUrl,
+      as: "font",
+      type: "font/woff",
+    },
     { rel: "stylesheet", href: tailwindStylesheetUrl, as: "style" },
   ];
 };
