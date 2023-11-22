@@ -30,13 +30,11 @@ export const links: LinksFunction = () => {
       rel: "stylesheet",
       href: acierBatStyleSheetUrl,
       as: "font",
-      type: "font/woff",
     },
     {
       rel: "stylesheet",
       href: secularOneStyleSheetUrl,
       as: "font",
-      type: "font/woff",
     },
     { rel: "stylesheet", href: tailwindStylesheetUrl, as: "style" },
   ];
