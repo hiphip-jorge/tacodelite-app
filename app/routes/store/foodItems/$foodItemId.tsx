@@ -1,33 +1,11 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
+import type { ActionArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { Form, useCatch, useOutletContext, useParams } from "@remix-run/react";
 import { getCategory } from "prisma/seed-utils";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
 import { createServerClient } from "@supabase/auth-helpers-remix";
-
-export async function loader({ params, request }: LoaderArgs) {
-  const response = new Response();
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
-
-  invariant(params.foodItemId, "foodItemId not found");
-
-  const { data } = await supabase
-    .from("menu")
-    .select("*")
-    .eq("id", params.foodItemId);
-
-  if (!data?.at(0).id) {
-    throw new Response("Not Found", { status: 404 });
-  }
-
-  return json(data?.at(0));
-}
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
@@ -83,10 +61,13 @@ export async function action({ request, params }: ActionArgs) {
 }
 
 export default function FoodItemDetailsPage() {
-  const item = useLoaderData<typeof loader>();
-  const [inEditMode, setInEditMode] = useState(false);
+  const menu = useOutletContext<Array<any>>();
+  const params = useParams();
+  const item = menu[Number(params.foodItemId) - 1];
   const categoryId = item.categoryId ? item.categoryId - 1 : 0;
   const category = getCategory()[categoryId].name;
+
+  const [inEditMode, setInEditMode] = useState(false);
 
   return (
     <main>

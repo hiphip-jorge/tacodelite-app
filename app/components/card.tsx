@@ -2,13 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { menu_arrow } from "~/assets/svg";
 import veggie from "~/assets/vegetarian.png";
-
-type item = {
-  name: string;
-  description: string;
-  price: string;
-  categoryId: Number | null;
-};
+import type { item } from "~/routes";
 
 type Props = {
   item: item;

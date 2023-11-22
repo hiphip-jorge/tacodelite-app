@@ -8,7 +8,10 @@ import {
 } from "@remix-run/react";
 
 import { announcement_icon, user_icon, utensils } from "~/assets/svg";
-import { SupabaseClient, createServerClient } from "@supabase/auth-helpers-remix";
+import {
+  SupabaseClient,
+  createServerClient,
+} from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: LoaderArgs) {
   const response = new Response();
@@ -36,13 +39,9 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export default function StorePage() {
-  const { data } = useLoaderData();
-  const profile = data[0];
-
-  const user = { role: "ADMIN", name: profile.name };
-  const isAdmin = profile.admin === true;
-
   const supabase = useOutletContext<SupabaseClient>();
+  const { data } = useLoaderData();
+  const user = data[0];
 
   const activeClassName =
     "rounded-xl bg-green-300 p-2 px-6 shadow-md flex justify-center items-center w-16 md:w-fit min-h-[64px]";
@@ -62,7 +61,7 @@ export default function StorePage() {
             </span>
           </Link>
         </h1>
-        <p className="text-2xl">Sup, {user.name} 😎</p>
+        <p className="text-2xl">Sup, {user.nickname || user.name} 😎</p>
         {/* <Form action="/logout" method="post"> */}
         <button
           onClick={async () => await supabase.auth.signOut()}
@@ -76,7 +75,7 @@ export default function StorePage() {
       {/* sub-header  */}
       <header className="border-b-2 border-b-gray-700 bg-green-50 p-6 sm:fixed sm:bottom-0 sm:w-full md:static">
         <ul className="mx-auto flex w-3/4 items-center justify-around font-bold text-green-dark ">
-          {isAdmin && (
+          {user.admin && (
             <li>
               <NavLink
                 to="./users"

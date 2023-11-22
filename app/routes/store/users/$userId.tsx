@@ -1,21 +1,15 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  useCatch,
+  useOutletContext,
+  useParams,
+} from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
 import { deleteUserById, getUserById, updateUser } from "~/models/user.server";
-
-export async function loader({ params }: LoaderArgs) {
-  const user = await getUserById(params.userId);
-  invariant(params.userId, "userId not found");
-
-  if (!user) {
-    throw new Response("User Not Found", { status: 404 });
-  }
-
-  return { user };
-}
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
@@ -41,8 +35,11 @@ export async function action({ request, params }: ActionArgs) {
   return redirect(`/store/users/${params.userId}`);
 }
 
-export default function FoodItemDetailsPage() {
-  const { user } = useLoaderData<typeof loader>();
+export default function UserDetailsPage() {
+  const users = useOutletContext<any[]>();
+  const params = useParams();
+  const user = users.filter((user) => user.id === params.userId).at(0);
+
   const [inEditMode, setInEditMode] = useState(false);
 
   return (
@@ -78,7 +75,7 @@ export default function FoodItemDetailsPage() {
               className="select appearance-none rounded-lg border-2 border-gray-100 p-2"
               name="role"
               id="role"
-              defaultValue={user.role}
+              defaultValue={user.admin ? "ADMIN" : "MEMBER"}
             >
               <option value="MEMBER">MEMBER</option>
               <option value="ADMIN">ADMIN</option>
@@ -86,11 +83,11 @@ export default function FoodItemDetailsPage() {
           </div>
           <div className="my-4 flex flex-col">
             <span className="text-green-800">User since:</span>
-            <p>{user.createdAt}</p>
+            <p>{user.created_at}</p>
           </div>
           <div className="my-4 flex flex-col">
             <span className="text-green-800">Last Update:</span>
-            <p>{user.updatedAt}</p>
+            <p>{user.last_updated}</p>
           </div>
 
           <hr className="my-4" />
@@ -124,20 +121,16 @@ export default function FoodItemDetailsPage() {
               </button>
             </div>
             <div className="my-4 flex flex-col">
-              <span className="text-green-800">Email:</span>
-              <p>{user.email}</p>
-            </div>
-            <div className="my-4 flex flex-col">
               <span className="text-green-800">Role:</span>
-              <p>{user.role}</p>
+              <p>{user.admin ? "ADMIN" : "MEMBER"}</p>
             </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">User since:</span>
-              <p>{user.createdAt}</p>
+              <p>{user.created_at}</p>
             </div>
             <div className="my-4 flex flex-col">
               <span className="text-green-800">Last Update:</span>
-              <p>{user.updatedAt}</p>
+              <p>{user.last_updated}</p>
             </div>
           </section>
 

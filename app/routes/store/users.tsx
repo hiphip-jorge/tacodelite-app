@@ -1,17 +1,24 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
-import type { DataFunctionArgs } from "@remix-run/node";
+import { json, type DataFunctionArgs } from "@remix-run/node";
 import { Link, NavLink } from "react-router-dom";
-import { getUserList } from "~/models/user.server";
-import { requireAdminUser } from "~/session.server";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: DataFunctionArgs) {
-  // await requireAdminUser(request, "/storeFront");
-  const userList = await getUserList();
-  return userList;
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
+  const { data, error } = await supabase.from("profiles").select("*");
+
+  return json({ data, error });
 }
 
 const UsersPage = () => {
-  const userList = useLoaderData<typeof loader>();
+  const { data, error } = useLoaderData<typeof loader>();
+  const users = data;
 
   return (
     <main className="flex h-full bg-white">
@@ -25,11 +32,11 @@ const UsersPage = () => {
 
         <hr />
 
-        {userList.length === 0 ? (
+        {users?.length === 0 ? (
           <p className="p-4">No food yet.</p>
         ) : (
           <ol>
-            {userList.map((user, idx) => (
+            {users?.map((user, idx) => (
               <li key={idx}>
                 <NavLink
                   className={({ isActive }) =>
@@ -48,7 +55,7 @@ const UsersPage = () => {
       </div>
 
       <div className="flex-1 p-6">
-        <Outlet />
+        <Outlet context={users}/>
       </div>
     </main>
   );

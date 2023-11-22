@@ -1,15 +1,23 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
+import { LoaderArgs } from "@remix-run/server-runtime";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 import { Link, NavLink } from "react-router-dom";
-import { getFoodItemList } from "~/models/foodItem.server";
 
-export async function loader() {
-  
-  const foodItemList = await getFoodItemList();
-  return foodItemList;
+export async function loader({ request }: LoaderArgs) {
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
+
+  const { data, error } = await supabase.from("menu").select("*").order("id");
+
+  return { data, error };
 }
 
 const FoodItemsPage = () => {
-  const foodItemList = useLoaderData<typeof loader>();
+  const { data, error } = useLoaderData<typeof loader>();
 
   return (
     <main className="flex h-full bg-white">
@@ -23,11 +31,11 @@ const FoodItemsPage = () => {
 
         <hr />
 
-        {foodItemList.length === 0 ? (
+        {data?.length === 0 ? (
           <p className="p-4">No food yet.</p>
         ) : (
           <ol>
-            {foodItemList.map((item, idx) => (
+            {data?.map((item, idx) => (
               <li key={idx}>
                 <NavLink
                   className={({ isActive }) =>
@@ -43,8 +51,8 @@ const FoodItemsPage = () => {
         )}
       </div>
 
-      <div className="w-2/3 flex-1 p-8 md:w-auto text-sm md:text-base">
-        <Outlet />
+      <div className="w-2/3 flex-1 p-8 text-sm md:w-auto md:text-base">
+        <Outlet context={data} />
       </div>
     </main>
   );

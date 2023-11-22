@@ -1,7 +1,6 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { createServerClient } from "@supabase/auth-helpers-remix";
-import { json } from "stream/consumers";
 
 export async function action({ request }: ActionArgs) {
   const response = new Response();

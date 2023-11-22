@@ -11,10 +11,6 @@ import {
   useAnnouncement,
 } from "~/utils";
 
-// Prisma Imports
-import { prisma } from "~/db.server";
-import type { FoodItem, Announcement } from "@prisma/client";
-
 // assets
 import catering from "~/assets/catering.png";
 import taco_delite from "~/assets/td-logo_2021.png";
@@ -28,13 +24,25 @@ import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
 import AnnouncementBar from "~/components/announcementBar";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 
 // Types
-export type category = { name: string; foodItems: Array<FoodItem> };
 export type modalContent = { name: string; url: string };
 export type LoaderTypes = {
   categories: category[];
-  announcements: Announcement[];
+  // announcements: Announcement[];
+};
+
+export type category = { id: number; name: string; food_items: Array<item> };
+export type item = {
+  active: boolean;
+  alt: string | null;
+  category: string;
+  categoryId: Number | null;
+  description: string;
+  name: string;
+  price: string;
+  vegetarian: boolean;
 };
 
 // Constants
@@ -48,20 +56,24 @@ const ubereats = {
 };
 
 // Remix Data Loader eFunction
-export const loader: LoaderFunction = async () => {
-  let announcements = await prisma.announcement.findMany();
-  let categories = await prisma.category.findMany({
-    select: {
-      name: true,
-      foodItems: true,
-    },
-  });
+export const loader: LoaderFunction = async ({ request }) => {
+  const response = new Response();
+  const supabase = createServerClient(
+    process.env.SUPABASE_URL!,
+    process.env.SUPABASE_ANON_KEY!,
+    { request, response }
+  );
 
-  return { announcements, categories };
+  const menu = await supabase.from("menu").select("*").order("id");
+  const menu_categories = await supabase
+    .from("menu_categories")
+    .select("*")
+    .order("id");
+
+  return { menu, menu_categories };
 };
 
 export default function Index() {
-  // states
   const [isOpen, setIsOpen] = useState(false);
   const [isOrderClicked, setIsOrderClicked] = useState(false);
 
@@ -69,11 +81,13 @@ export default function Index() {
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
   const [contentType, setContentType] = useState("links");
 
-  // custom hooks
-  const { announcements, categories } = useLoaderData<LoaderTypes>();
+  const { menu, menu_categories } = useLoaderData();
+  const food_items = menu.data;
+  const categories = menu_categories.data;
+
   let { inView, categoryRefs } = useCategoryInView();
   let { width } = useWindowSize();
-  const currentAnnouncement = useAnnouncement(announcements);
+  // const currentAnnouncement = useAnnouncement(announcements);
 
   useEffect(() => {
     if (width >= 812 && isOpen) {
@@ -96,7 +110,7 @@ export default function Index() {
   const handleMenu = () => {
     setContentType("buttons");
     setCurrentContent(
-      categories.map((category) => {
+      categories.map((category: any) => {
         return { name: category.name, url: "#" + category.name };
       })
     );
@@ -268,7 +282,7 @@ export default function Index() {
                     home
                   </button>
                 </li>
-                {categories.map((category, idx) => {
+                {categories.map((category: category, idx: number) => {
                   return (
                     <li
                       key={idx}
@@ -293,7 +307,7 @@ export default function Index() {
 
             {/* Menu cards  */}
             <div className="px-2 md:px-6 lg:w-3/4 lg:px-0">
-              {categories.map((category, idx) => (
+              {categories.map((category: category, idx: number) => (
                 <div
                   id={category.name.toLowerCase()}
                   key={category.name}
@@ -309,8 +323,8 @@ export default function Index() {
                     {category.name}
                   </h1>
                   <div className="flex flex-wrap justify-start gap-4 px-12 md:px-16 lg:px-4 xl:gap-8 xl:px-8">
-                    {category.foodItems.map(
-                      (item, idx) =>
+                    {category.food_items.map((item: item, idx: number) => {
+                      return (
                         item.active && (
                           <Card
                             id={item.name.replaceAll(" ", "-")}
@@ -320,7 +334,8 @@ export default function Index() {
                             vegetarian={item.vegetarian}
                           />
                         )
-                    )}
+                      );
+                    })}
                   </div>
                 </div>
               ))}
