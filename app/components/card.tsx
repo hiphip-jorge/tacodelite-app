@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { menu_arrow } from "~/assets/svg";
-import veggie from "~/assets/vegetarian.png";
+import veggie from "~/assets/vegetarian.webp";
 import type { item } from "~/routes";
 
 type Props = {

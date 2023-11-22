@@ -4,7 +4,7 @@ import { Form, useActionData, useOutletContext } from "@remix-run/react";
 import * as React from "react";
 
 import { validateEmail } from "~/utils";
-import taco_delite from "~/assets/td-logo_2021.png";
+import taco_delite from "~/assets/td-logo_2021.webp";
 
 import {
   SupabaseClient,

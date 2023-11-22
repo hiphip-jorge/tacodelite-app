@@ -12,9 +12,9 @@ import {
 } from "~/utils";
 
 // assets
-import catering from "~/assets/catering.png";
-import taco_delite from "~/assets/td-logo_2021.png";
-import td_building from "~/assets/taco_delite.jpg";
+import catering from "~/assets/catering.webp";
+import taco_delite from "~/assets/td-logo_2021.webp";
+import td_building from "~/assets/taco_delite.webp";
 import { car, home, utensils } from "~/assets/svg";
 
 // components
