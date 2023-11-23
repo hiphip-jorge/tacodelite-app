@@ -1,5 +1,5 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
-import { LoaderArgs } from "@remix-run/server-runtime";
+import type { LoaderArgs } from "@remix-run/server-runtime";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import { Link, NavLink } from "react-router-dom";
 
@@ -17,7 +17,7 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 const FoodItemsPage = () => {
-  const { data, error } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
 
   return (
     <main className="flex h-full bg-white">

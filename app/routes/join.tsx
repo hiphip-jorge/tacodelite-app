@@ -3,15 +3,10 @@ import { json, redirect } from "@remix-run/node";
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
-import { createUserSession, getUserId } from "~/session.server";
 
-import { createUser, getUserByEmail } from "~/models/user.server";
-import { safeRedirect, validateEmail } from "~/utils";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: LoaderArgs) {
-  const userId = await getUserId(request);
-
   const response = new Response();
   const supabase = createServerClient(
     process.env.SUPABASE_URL!,
@@ -23,24 +18,14 @@ export async function loader({ request }: LoaderArgs) {
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (userId) return redirect("/");
   if (session) return redirect("/store");
   return json({});
 }
 
 export async function action({ request }: ActionArgs) {
-  const response = new Response();
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
-
   const formData = await request.formData();
   const name = String(formData.get("name"));
-  const email = formData.get("email");
   const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
 
   if (name?.length === 0) {
     return json(
@@ -51,13 +36,6 @@ export async function action({ request }: ActionArgs) {
           password: null,
         },
       },
-      { status: 400 }
-    );
-  }
-
-  if (!validateEmail(email)) {
-    return json(
-      { errors: { name: null, email: "Email is invalid", password: null } },
       { status: 400 }
     );
   }
@@ -78,23 +56,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const existingUser = await getUserByEmail(email);
-  if (existingUser) {
-    return json(
-      {
-        errors: {
-          name: null,
-          email: "A user already exists with this email",
-          password: null,
-        },
-      },
-      { status: 400 }
-    );
-  }
-
-  console.log("name", name);
-
-  return redirect(redirectTo);
+  return redirect('/');
 }
 
 export const meta: MetaFunction = () => {

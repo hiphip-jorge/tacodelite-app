@@ -1,12 +1,7 @@
-import type { ActionArgs, DataFunctionArgs } from "@remix-run/node";
+import type { ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
-import { createAnnouncement } from "~/models/announcement.server";
-
-import { createUser, getUserByEmail } from "~/models/user.server";
-import { requireAdminUser } from "~/session.server";
-import { validateEmail } from "~/utils";
 
 // export async function loader({ request }: DataFunctionArgs) {
 //   return await requireAdminUser(request, "/storeFront");
@@ -71,11 +66,13 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const announcement = await createAnnouncement({
+  //  TODO: creation of announcement
+  const announcement = {
+    id: 1,
     endDate: new Date(endDate),
     title,
     message,
-  });
+  };
 
   return redirect(`../${announcement.id}`);
 }

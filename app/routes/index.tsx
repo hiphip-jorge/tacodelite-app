@@ -81,8 +81,7 @@ export default function Index() {
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
   const [contentType, setContentType] = useState("links");
 
-  const { menu, menu_categories } = useLoaderData();
-  const food_items = menu.data;
+  const { menu_categories } = useLoaderData();
   const categories = menu_categories.data;
 
   let { inView, categoryRefs } = useCategoryInView();

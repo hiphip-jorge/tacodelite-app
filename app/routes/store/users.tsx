@@ -17,7 +17,7 @@ export async function loader({ request }: DataFunctionArgs) {
 }
 
 const UsersPage = () => {
-  const { data, error } = useLoaderData<typeof loader>();
+  const { data } = useLoaderData<typeof loader>();
   const users = data;
 
   return (

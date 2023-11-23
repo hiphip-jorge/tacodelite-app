@@ -1,15 +1,12 @@
 import type { ActionArgs, LoaderArgs, MetaFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useOutletContext } from "@remix-run/react";
+import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
 
 import { validateEmail } from "~/utils";
 import taco_delite from "~/assets/td-logo_2021.webp";
 
-import {
-  SupabaseClient,
-  createServerClient,
-} from "@supabase/auth-helpers-remix";
+import { createServerClient } from "@supabase/auth-helpers-remix";
 
 export async function loader({ request }: LoaderArgs) {
   const response = new Response();
@@ -70,7 +67,7 @@ export async function action({ request }: ActionArgs) {
   }
 
   if (process.env.VALID_EMAILS?.includes(email)) {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -94,8 +91,6 @@ export default function LoginPage() {
   const actionData = useActionData<typeof action>();
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
-
-  const supabase = useOutletContext<SupabaseClient>();
 
   React.useEffect(() => {
     if (actionData?.errors?.email) {

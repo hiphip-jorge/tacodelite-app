@@ -9,7 +9,7 @@ import {
 
 import { announcement_icon, user_icon, utensils } from "~/assets/svg";
 import {
-  SupabaseClient,
+  type SupabaseClient,
   createServerClient,
 } from "@supabase/auth-helpers-remix";
 

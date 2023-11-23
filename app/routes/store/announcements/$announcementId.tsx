@@ -4,15 +4,14 @@ import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { edit_icon } from "~/assets/svg";
-import {
-  deleteAnnouncement,
-  getAnnouncementById,
-} from "~/models/announcement.server";
-import { getUserById } from "~/models/user.server";
 
 export async function loader({ params }: LoaderArgs) {
-  const announcement = await getAnnouncementById(params.announcementId);
   invariant(params.announcementId, "announcementId not found");
+  const announcement = {
+    id: 1,
+    title: "default title",
+    message: "default message",
+  };
 
   if (!announcement) {
     throw new Response("Announcement Not Found", { status: 404 });
@@ -23,21 +22,12 @@ export async function loader({ params }: LoaderArgs) {
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
-  let { _action, ...values } = Object.fromEntries(formData);
+  let { _action } = Object.fromEntries(formData);
 
   invariant(params.announcementId, "announcementId not found");
 
   if (_action === "delete") {
-    await deleteAnnouncement({ id: params.announcementId });
-
     return redirect("/store/announcements");
-  } else {
-    const user = await getUserById(params.userId);
-
-    // let name = values.name ? String(values.name) : user?.name;
-    // let email = values.email ? String(values.email) : user?.email;
-
-    // await updateUser(params.userId, name, email, user.role);
   }
 
   return redirect(`/store/users/${params.userId}`);
@@ -124,7 +114,7 @@ export default function AnnouncementDetailsPage() {
             </div>
             <div className="my-4 flex flex-col capitalize">
               <span className="text-green-800">End Date:</span>
-              <p>{announcement.endDate}</p>
+              {/* <p>{announcement.endDate}</p> */}
             </div>
           </section>
 
