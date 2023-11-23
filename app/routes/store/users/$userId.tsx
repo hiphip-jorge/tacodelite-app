@@ -1,15 +1,9 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import {
-  Form,
-  useCatch,
-  useOutletContext,
-  useParams,
-} from "@remix-run/react";
+import { Form, useCatch, useOutletContext, useParams } from "@remix-run/react";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
-import { deleteUserById, getUserById, updateUser } from "~/models/user.server";
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
@@ -18,18 +12,16 @@ export async function action({ request, params }: ActionArgs) {
   invariant(params.userId, "userId not found");
 
   if (_action === "delete") {
-    await deleteUserById(params.userId);
+    // await deleteUserById(params.userId);
 
     return redirect("/store/users");
   } else {
-    const user = await getUserById(params.userId);
-
-    let name = values.name ? String(values.name) : user?.name;
-    let email = values.email ? String(values.email) : user?.email;
-    let role = String(values.role);
-    console.log("role", role);
-
-    await updateUser(params.userId, name, email, role);
+    // const user = await getUserById(params.userId);
+    // let name = values.name ? String(values.name) : user?.name;
+    // let email = values.email ? String(values.email) : user?.email;
+    // let role = String(values.role);
+    // console.log("role", role);
+    // await updateUser(params.userId, name, email, role);
   }
 
   return redirect(`/store/users/${params.userId}`);

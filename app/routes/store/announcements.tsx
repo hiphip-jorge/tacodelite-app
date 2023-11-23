@@ -1,9 +1,8 @@
 import { Outlet, useLoaderData } from "@remix-run/react";
 import { Link, NavLink } from "react-router-dom";
-import { getAnnoncementList } from "~/models/announcement.server";
 
 export async function loader() {
-  const announcements = await getAnnoncementList();
+  const announcements = [{id:"id", title: "default", message: "default"}];
   return announcements;
 }
 

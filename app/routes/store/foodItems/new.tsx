@@ -1,10 +1,8 @@
 import type { ActionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
-import { getCategory } from "prisma/seed-utils";
 import { useEffect, useRef } from "react";
-import { createFoodItem } from "~/models/foodItem.server";
-import { validatePrice } from "~/utils";
+import { validatePrice, getCategory } from "~/utils";
 
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
@@ -54,16 +52,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const foodItem = await createFoodItem({
-    name,
-    category,
-    description,
-    price,
-    active,
-    vegetarian,
-  });
-
-  return redirect(`../${foodItem.id}`);
+  return redirect(`../store/foodItems`);
 }
 
 export default function NewFoodItemPage() {

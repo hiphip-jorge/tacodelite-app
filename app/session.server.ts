@@ -1,9 +1,7 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 import invariant from "tiny-invariant";
 
-import type { SupabaseClient } from "@supabase/supabase-js";
-import type { User } from "~/models/user.server";
-import { getUserById } from "~/models/user.server";
+import type { SupabaseClient } from "@supabase/supabase-js";  
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set");
 
@@ -23,58 +21,6 @@ const USER_SESSION_KEY = "userId";
 export async function getSession(request: Request) {
   const cookie = request.headers.get("Cookie");
   return sessionStorage.getSession(cookie);
-}
-
-export async function getUserId(
-  request: Request
-): Promise<User["id"] | undefined> {
-  const session = await getSession(request);
-  const userId = session.get(USER_SESSION_KEY);
-  return userId;
-}
-
-export async function getUser(request: Request) {
-  const userId = await getUserId(request);
-  if (userId === undefined) return null;
-
-  const user = await getUserById(userId);
-  if (user) return user;
-
-  throw await logout(request);
-}
-
-export async function requireAdminUser(request: Request, redirectTo='/'): Promise<User> {
-  const user = await getUser(request)
-  if (!user) {
-    console.log('Not a user')
-    throw await logout(request);
-  }
-  if (user.role !== 'ADMIN') {
-    console.log('Not an admin.')
-    throw redirect(redirectTo)
-  }
-  return user
-}
-
-export async function requireUserId(
-  request: Request,
-  redirectTo: string = new URL(request.url).pathname
-) {
-  const userId = await getUserId(request);
-  if (!userId) {
-    const searchParams = new URLSearchParams([["redirectTo", redirectTo]]);
-    throw redirect(`/signin?${searchParams}`);
-  }
-  return userId;
-}
-
-export async function requireUser(request: Request) {
-  const userId = await requireUserId(request);
-
-  const user = await getUserById(userId);
-  if (user) return user;
-
-  throw await logout(request);
 }
 
 export async function createUserSession({

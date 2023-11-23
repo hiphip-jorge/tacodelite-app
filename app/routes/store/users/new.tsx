@@ -3,7 +3,6 @@ import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 
-import { createUser, getUserByEmail } from "~/models/user.server";
 // import { requireAdminUser } from "~/session.server";
 import { validateEmail } from "~/utils";
 
@@ -54,7 +53,7 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = true;
   if (existingUser) {
     return json(
       {
@@ -68,9 +67,9 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const user = await createUser(name, email, password, role);
+  // const user = await createUser(name, email, password, role);
 
-  return redirect(`../${user.id}`);
+  return redirect(`../userId`);
 }
 
 export default function NewNotePage() {

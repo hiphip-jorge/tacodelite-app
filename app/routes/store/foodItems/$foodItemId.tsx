@@ -1,11 +1,11 @@
 import type { ActionArgs } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
 import { Form, useCatch, useOutletContext, useParams } from "@remix-run/react";
-import { getCategory } from "prisma/seed-utils";
 import { useState } from "react";
 import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
 import { createServerClient } from "@supabase/auth-helpers-remix";
+import { getCategory } from "~/utils";
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
