@@ -6,6 +6,7 @@ import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import { getCategory } from "~/utils";
+import { category } from "~/routes";
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();
@@ -20,16 +21,40 @@ export async function action({ request, params }: ActionArgs) {
 
   invariant(params.foodItemId, "foodItemId not found");
 
+  const { data } = await supabase
+    .from("menu")
+    .select("*")
+    .eq("id", params.foodItemId);
+  const item = data?.at(0);
+
   if (_action === "delete") {
-    await supabase.from("menu").delete().eq("id", params.foodItemId);
+    const item_deleted = await supabase
+      .from("menu")
+      .delete()
+      .eq("id", params.foodItemId);
+    const update_category = await supabase
+      .from("menu_categories")
+      .select("*")
+      .eq("id", item.categoryId);
+    const food_items_update = await supabase.from("menu_categories").update({
+      food_items: update_category.data
+        ?.at(0)
+        .food_items.filter(
+          (food_item: category) => food_item.id !== item.categoryId
+        ),
+    });
+
+    if (
+      item_deleted.error ||
+      update_category.error ||
+      food_items_update.error
+    ) {
+      console.log("item_deleted.error", item_deleted.error);
+      console.log("update_category.error", update_category.error);
+      console.log("food_items_update.error", food_items_update.error);
+    }
     return redirect("/store/foodItems");
   } else {
-    const { data } = await supabase
-      .from("menu")
-      .select("*")
-      .eq("id", params.foodItemId);
-    const item = data?.at(0);
-
     let name = values.name ? values.name : item?.name;
     name = String(name) || "unknown name";
     let categoryId = values.categoryId
@@ -54,7 +79,40 @@ export async function action({ request, params }: ActionArgs) {
       id: Number(params.foodItemId),
     };
 
-    await supabase.from("menu").update(updatedItem).eq("id", params.foodItemId);
+    const updated_item = await supabase
+      .from("menu")
+      .update(updatedItem)
+      .eq("id", params.foodItemId);
+    const update_category = await supabase
+      .from("menu_categories")
+      .select("*")
+      .eq("id", item.categoryId);
+
+    const food_items_update = await supabase
+      .from("menu_categories")
+      .update({
+        food_items: update_category.data
+          ?.at(0)
+          .food_items.map((food_item: category) => {
+            if (food_item.id == item.id) {
+              return updatedItem;
+            } else {
+              return food_item;
+            }
+          }),
+      })
+      .eq("id", item.categoryId);
+
+    if (
+      food_items_update.error ||
+      update_category.error ||
+      food_items_update.error
+    ) {
+      console.log("updated_itme.error", updated_item.error);
+      console.log("food_items_update.error", food_items_update.error);
+      console.log("update_category.error", update_category.error);
+      console.log("food_items_update.error", food_items_update.error);
+    }
 
     return redirect(`/store/foodItems/${params.foodItemId}`);
   }
@@ -95,7 +153,11 @@ export default function FoodItemDetailsPage() {
             >
               {getCategory().map((category, idx) => {
                 return (
-                  <option key={idx} value={category.id}>
+                  <option
+                    key={idx}
+                    value={category.id}
+                    selected={item.categoryId === category.id}
+                  >
                     {category.name}
                   </option>
                 );
