@@ -15,7 +15,7 @@ import {
 import catering from "~/assets/catering.webp";
 import taco_delite from "~/assets/td-logo_2021.webp";
 import td_building from "~/assets/taco_delite.webp";
-import { car, home, utensils } from "~/assets/svg";
+import { paper_bag, home, utensils } from "~/assets/svg";
 
 // components
 import Button from "~/components/button";
@@ -224,23 +224,21 @@ export default function Index() {
         {/* Quick Icon Buttons  */}
         <aside className="iconButton">
           <IconButton
-            iconSVG={home("hover:fill-[#43B64Fdd]", "#297031")}
+            iconSVG={home("hover:stroke-[#297031dd] iconSvg", "#F4FbF5")}
             handleClick={(e) => {
               e.stopPropagation();
               scrollTo("header");
             }}
           />
-          <div className="h-1 w-full rounded-lg bg-green-light" />
           <IconButton
-            iconSVG={car("hover:fill-[#43B64Fdd]", "#297031")}
+            iconSVG={paper_bag("hover:stroke-[#297031dd] iconSvg", "#F4FbF5")}
             handleClick={(e) => {
               handleOrder();
               handleToggle(e);
             }}
           />
-          <div className="h-1 w-full rounded-lg bg-green-light" />
           <IconButton
-            iconSVG={utensils("hover:fill-[#43B64Fdd]", "#297031")}
+            iconSVG={utensils("hover:stroke-[#297031dd] iconSvg", "#F4FbF5")}
             handleClick={(e) => {
               handleMenu();
               handleToggle(e);

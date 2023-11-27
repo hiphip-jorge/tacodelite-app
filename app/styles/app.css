@@ -29,8 +29,8 @@
 
 @layer components {
     .card {
-        @apply border-green-light my-6  mx-auto flex flex-col justify-between w-[260px] gap-2
-             border rounded-3xl border-solid p-6 bg-[#F4FBF5] shadow-lg
+        @apply border-green-light my-4  mx-auto flex flex-col justify-between w-[260px] gap-2
+             border rounded-xl border-solid p-6 bg-[#F4FBF5] shadow-lg
     }
 
     .button {
@@ -54,7 +54,7 @@
     }
 
     .modalMask {
-        @apply fixed h-full w-full top-0 bottom-0 left-0 right-0 bg-[#f4fbf5dd] backdrop-blur-sm z-20 overflow-auto;
+        @apply fixed h-full w-full top-0 bottom-0 left-0 right-0 bg-[#43B64F11] backdrop-blur-sm z-20 overflow-auto;
     }
 
     .accordionHeader {
@@ -62,11 +62,15 @@
     }
 
     .modalContainer {
-        @apply absolute top-1/2 left-1/2 h-fit w-3/4 -translate-x-1/2 -translate-y-1/2   rounded-3xl bg-white border-2 border-green-light md:w-1/2 xl:w-1/5;
+        @apply absolute top-1/2 left-1/2 h-fit w-2/3 -translate-x-1/2 -translate-y-1/2  rounded-xl bg-light drop-shadow-2xl md:w-1/2 xl:w-1/5 border border-[#43B64F33];
     }
 
     .iconButton {
         @apply sticky top-32 right-full left-4 z-10 float-left flex w-fit flex-col gap-2 lg:hidden
+    }
+
+    .iconSvg {
+        @apply bg-green-dark hover:bg-green-light drop-shadow-sm hover:drop-shadow-md duration-300 p-1 rounded-md w-8 h-8
     }
 }
 

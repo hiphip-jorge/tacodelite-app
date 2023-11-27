@@ -7,11 +7,8 @@ import { validatePrice, getCategory } from "~/utils";
 export async function action({ request }: ActionArgs) {
   const formData = await request.formData();
   const name = String(formData.get("name"));
-  const category = String(formData.get("category"));
   const description = String(formData.get("description"));
   const price = String(formData.get("price"));
-  const active = formData.get("active") == "on" && true;
-  const vegetarian = formData.get("vegetarian") == "on" && true;
 
   if (name?.length === 0) {
     return json(

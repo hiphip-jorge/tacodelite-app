@@ -33,7 +33,7 @@ const Card = ({ item, id, className, vegetarian }: Props) => {
         <h3 className="text-left font-primary-solid text-2xl leading-6 text-green-dark">
           {item.name}
         </h3>
-        <div className={`mt-1 h-fit ${isOpen ? "open" : "close"}`}>
+        <div className={`h-fit ${isOpen ? "open" : "close"}`}>
           {menu_arrow}
         </div>
       </motion.div>

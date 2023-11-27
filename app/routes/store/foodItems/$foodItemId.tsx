@@ -6,7 +6,7 @@ import invariant from "tiny-invariant";
 import { cancel_icon, edit_icon } from "~/assets/svg";
 import { createServerClient } from "@supabase/auth-helpers-remix";
 import { getCategory } from "~/utils";
-import { category } from "~/routes";
+import type { category } from "~/routes";
 
 export async function action({ request, params }: ActionArgs) {
   let formData = await request.formData();

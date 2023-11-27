@@ -95,7 +95,7 @@ export default function StorePage() {
               }
               to="./foodItems"
             >
-              <div className="w-6 md:hidden">{utensils("", "#43B64F")}</div>
+              <div className="w-6 md:hidden">{utensils("")}</div>
               <span className="hidden md:block">Food Items</span>
             </NavLink>
           </li>
