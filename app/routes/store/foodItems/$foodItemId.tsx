@@ -36,13 +36,16 @@ export async function action({ request, params }: ActionArgs) {
       .from("menu_categories")
       .select("*")
       .eq("id", item.categoryId);
-    const food_items_update = await supabase.from("menu_categories").update({
-      food_items: update_category.data
-        ?.at(0)
-        .food_items.filter(
-          (food_item: category) => food_item.id !== item.categoryId
-        ),
-    });
+    const food_items_update = await supabase
+      .from("menu_categories")
+      .update({
+        food_items: update_category.data
+          ?.at(0)
+          .food_items.filter(
+            (food_item: category) => food_item.id !== item.categoryId
+          ),
+      })
+      .eq("id", item.categoryId);
 
     if (
       item_deleted.error ||
