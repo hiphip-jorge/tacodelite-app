@@ -7,22 +7,14 @@ import { validateEmail } from "~/utils";
 import taco_delite from "~/assets/td-logo_2021.webp";
 
 import { createServerClient } from "@supabase/auth-helpers-remix";
+import { isProfileSignedIn } from "~/modules/profiles.server";
 
 export async function loader({ request }: LoaderArgs) {
   const response = new Response();
-  const supabase = createServerClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_ANON_KEY!,
-    { request, response }
-  );
+  const isSignedIn = await isProfileSignedIn(request);
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (session?.user) {
-    console.log("is authd");
-    redirect("/store", {
+  if (isSignedIn) {
+    return redirect("/store", {
       headers: response.headers,
     });
   }
@@ -31,7 +23,6 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export async function action({ request }: ActionArgs) {
-  console.log("starting actions...");
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
@@ -42,9 +33,7 @@ export async function action({ request }: ActionArgs) {
     process.env.SUPABASE_ANON_KEY!,
     { request, response }
   );
-
-  console.log("email", email);
-
+  
   if (!validateEmail(email)) {
     return json(
       { errors: { email: "Email is invalid", password: null } },
@@ -67,12 +56,19 @@ export async function action({ request }: ActionArgs) {
   }
 
   if (process.env.VALID_EMAILS?.includes(email)) {
-    await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    return redirect("/store", { headers: response.headers });
+    if (!error) {
+      return redirect("/store", { headers: response.headers });
+    } else {
+      return json(
+        { errors: { email: null, password: String(error)} },
+        { status: 403 }
+      );
+    }
   } else {
     return json(
       { errors: { email: "Invalid email", password: null } },
@@ -83,7 +79,7 @@ export async function action({ request }: ActionArgs) {
 
 export const meta: MetaFunction = () => {
   return {
-    title: "Login",
+    title: "Taco Delite | Sign in",
   };
 };
 
