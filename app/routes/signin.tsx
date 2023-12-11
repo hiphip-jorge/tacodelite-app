@@ -33,7 +33,7 @@ export async function action({ request }: ActionArgs) {
     process.env.SUPABASE_ANON_KEY!,
     { request, response }
   );
-  
+
   if (!validateEmail(email)) {
     return json(
       { errors: { email: "Email is invalid", password: null } },
@@ -65,7 +65,7 @@ export async function action({ request }: ActionArgs) {
       return redirect("/store", { headers: response.headers });
     } else {
       return json(
-        { errors: { email: null, password: String(error)} },
+        { errors: { email: null, password: String(error) } },
         { status: 403 }
       );
     }
@@ -99,9 +99,9 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-full flex-col items-center justify-center">
       <div className="mx-auto w-full max-w-md px-8">
-        <div className="flex justify-center">
+        <a className="flex justify-center" href="/">
           <img src={taco_delite} alt="taco delite logo" className="w-28" />
-        </div>
+        </a>
         <Form className="flex flex-col gap-2" method="post">
           {/* <label htmlFor="">email</label>
         <input className="border" type="email" /> */}
