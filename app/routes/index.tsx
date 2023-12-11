@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useLoaderData } from "@remix-run/react";
-import { type LoaderFunction } from "@remix-run/server-runtime";
+import { useLoaderData, useOutletContext } from "@remix-run/react";
+import { json, type LoaderFunction } from "@remix-run/server-runtime";
 
 // utils
 import {
@@ -24,7 +24,11 @@ import IconButton from "~/components/iconButton";
 import Modal from "~/components/modal";
 import Section from "~/components/section";
 import AnnouncementBar from "~/components/announcementBar";
-import { createServerClient } from "@supabase/auth-helpers-remix";
+import {
+  SupabaseClient,
+  createServerClient,
+} from "@supabase/auth-helpers-remix";
+import { lastMenuUpdateCookie } from "~/modules/cookie.server";
 
 // Types
 export type modalContent = { name: string; url: string };
@@ -46,17 +50,25 @@ export type item = {
 };
 
 // Constants
-const doordash = {
+const DOORDASH = {
   name: "doordash",
   url: "https://order.online/store/taco-delite-plano-303257/?hideModal=true&https://order.online/online-ordering/business/taco-delite-72799=&pickup=true",
 };
-const ubereats = {
+const UBEREATES = {
   name: "ubereats",
   url: "https://www.ubereats.com/store/taco-delite/yePg7_z7WKyrpiNL8V1J6w?diningMode=PICKUP&",
 };
+const LAST_MENU_UPDATE = "12.10.23";
 
 // Remix Data Loader eFunction
 export const loader: LoaderFunction = async ({ request }) => {
+  const cookieHeader = request.headers.get("Cookie");
+  const cookie = await lastMenuUpdateCookie.parse(cookieHeader);
+
+  if (cookie?.lastMenuUpdate === LAST_MENU_UPDATE) {
+    return json({});
+  }
+
   const response = new Response();
   const supabase = createServerClient(
     process.env.SUPABASE_URL!,
@@ -69,7 +81,16 @@ export const loader: LoaderFunction = async ({ request }) => {
     .select("*")
     .order("id");
 
-  return { menu_categories };
+  return json(
+    { menu_categories },
+    {
+      headers: {
+        "Set-Cookie": await lastMenuUpdateCookie.serialize({
+          lastMenuUpdate: LAST_MENU_UPDATE,
+        }),
+      },
+    }
+  );
 };
 
 export default function Index() {
@@ -79,13 +100,31 @@ export default function Index() {
   // const [currentIdxInView, setCurrentIdxInView] = useState(-1);
   const [currentContent, setCurrentContent] = useState<modalContent[]>();
   const [contentType, setContentType] = useState("links");
+  const [categories, setCategories] = useState(Array());
 
   const { menu_categories } = useLoaderData();
-  const categories = menu_categories.data;
+  const supabase = useOutletContext<SupabaseClient>();
 
   let { inView, categoryRefs } = useCategoryInView();
   let { width } = useWindowSize();
   // const currentAnnouncement = useAnnouncement(announcements);
+
+  useEffect(() => {
+    if (menu_categories) {
+      setCategories(menu_categories.data);
+      localStorage.setItem(
+        "menu_categories",
+        JSON.stringify(menu_categories.data)
+      );
+    } else {
+      const menuCategories = localStorage.getItem("menu_categories");
+      if (menuCategories) {
+        setCategories(JSON.parse(menuCategories));
+      } else {
+        setMenu();
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (width >= 812 && isOpen) {
@@ -98,6 +137,17 @@ export default function Index() {
       setIsOpen(true);
     }
   }, [width, isOpen, isOrderClicked]);
+
+  const setMenu = async () => {
+    const { data } = await supabase
+      .from("menu_categories")
+      .select("*")
+      .order("id");
+    if (data) {
+      setCategories(data);
+      localStorage.setItem("menu_categories", JSON.stringify(data));
+    }
+  };
 
   // handler functions
   const handleToggle = (e: React.SyntheticEvent) => {
@@ -116,7 +166,7 @@ export default function Index() {
 
   const handleOrder = () => {
     setContentType("links");
-    setCurrentContent([doordash, ubereats]);
+    setCurrentContent([DOORDASH, UBEREATES]);
   };
 
   return (
@@ -178,7 +228,7 @@ export default function Index() {
               {isOrderClicked ? (
                 <a
                   className="flex h-full w-full items-center justify-center"
-                  href={ubereats.url}
+                  href={UBEREATES.url}
                 >
                   <span className="text-white hover:text-white">Uber</span>Eats
                 </a>
@@ -201,7 +251,7 @@ export default function Index() {
               {isOrderClicked ? (
                 <a
                   className="flex h-full w-full items-center justify-center"
-                  href={doordash.url}
+                  href={DOORDASH.url}
                 >
                   DoorDash
                 </a>
