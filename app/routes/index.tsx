@@ -64,13 +64,12 @@ export const loader: LoaderFunction = async ({ request }) => {
     { request, response }
   );
 
-  const menu = await supabase.from("menu").select("*").order("id");
   const menu_categories = await supabase
     .from("menu_categories")
     .select("*")
     .order("id");
 
-  return { menu, menu_categories };
+  return { menu_categories };
 };
 
 export default function Index() {
