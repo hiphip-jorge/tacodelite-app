@@ -76,10 +76,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     { request, response }
   );
 
-  const menu_categories = await supabase
-    .from("menu_categories")
-    .select("*")
-    .order("id");
+  const menu_categories =
+    request.method === "GET"
+      ? await supabase.from("menu_categories").select("*").order("id")
+      : [];
 
   return json(
     { menu_categories },
