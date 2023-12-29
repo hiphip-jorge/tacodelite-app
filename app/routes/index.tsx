@@ -76,6 +76,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     { request, response }
   );
 
+  // make db call if GET request; avoids constant calls in healthcheck
   const menu_categories =
     request.method === "GET"
       ? await supabase.from("menu_categories").select("*").order("id")

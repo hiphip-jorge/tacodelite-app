@@ -64,9 +64,13 @@ export const loader = async ({ request }: LoaderArgs) => {
     }
   );
 
+  // make db call for session if GET request; avoids constant calls in healthcheck
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } =
+    request.method === "GET"
+      ? await supabase.auth.getSession()
+      : { data: { session: null } };
 
   return json(
     {
