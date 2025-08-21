@@ -4,7 +4,7 @@
 
 /* Prevent white flash during scrolling on dark backgrounds */
 html, body {
-  background-color: #111827; /* bg-gray-900 */
+  background-color: #1f2937; /* bg-gray-800 - matches navbar and footer */
   overflow-x: hidden;
 }
 
