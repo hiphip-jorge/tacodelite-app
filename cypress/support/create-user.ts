@@ -1,47 +1,21 @@
-// Use this to create a new user and login with that user
-// Simply call this with:
-// npx ts-node --require tsconfig-paths/register ./cypress/support/create-user.ts username@example.com
-// and it will log out the cookie value you can use to interact with the server
-// as that new user.
+// Cypress support file for creating test users
+// This file provides utilities for user management in tests
 
-import { installGlobals } from "@remix-run/node";
-import { parse } from "cookie";
+export function createTestUser(email: string, password: string) {
+  // Implementation for creating test users
+  // This would typically interact with your test database or auth service
+  cy.log(`Creating test user: ${email}`)
 
-import { createUserSession } from "~/session.server";
-
-installGlobals();
-
-async function createAndLogin(email: string) {
-  if (!email) {
-    throw new Error("email required for login");
-  }
-  if (!email.endsWith("@example.com")) {
-    throw new Error("All test emails must end in @example.com");
-  }
-
-  const user = await {id: "1"}
-
-  const response = await createUserSession({
-    request: new Request("test://test"),
-    userId: user.id,
-    remember: false,
-    redirectTo: "/",
-  });
-
-  const cookieValue = response.headers.get("Set-Cookie");
-  if (!cookieValue) {
-    throw new Error("Cookie missing from createUserSession response");
-  }
-  const parsedCookie = parse(cookieValue);
-  // we log it like this so our cypress command can parse it out and set it as
-  // the cookie value.
-  console.log(
-    `
-<cookie>
-  ${parsedCookie.__session}
-</cookie>
-  `.trim()
-  );
+  // Add your user creation logic here
+  // For example, if using Supabase:
+  // cy.request('POST', '/api/test/create-user', { email, password })
 }
 
-createAndLogin(process.argv[2]);
+export function cleanupTestUser(email: string) {
+  // Implementation for cleaning up test users
+  cy.log(`Cleaning up test user: ${email}`)
+
+  // Add your user cleanup logic here
+  // For example, if using Supabase:
+  // cy.request('DELETE', '/api/test/cleanup-user', { email })
+}

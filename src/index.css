@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent white flash during scrolling on dark backgrounds */
+html, body {
+  background-color: #111827; /* bg-gray-900 */
+  overflow-x: hidden;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-taco-yellow-500 hover:bg-taco-yellow-600 text-gray-900 font-bold py-2 px-4 rounded transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold py-2 px-4 rounded transition-colors border border-gray-700 hover:border-taco-green-800/50;
+  }
+  
+  .card {
+    @apply bg-gray-800 rounded-lg shadow-md p-6 border border-taco-green-800/30;
+  }
+}
+
+@layer utilities {
+  .font-hobo {
+    font-family: 'Chewy', cursive;
+  }
+}

@@ -1,0 +1,83 @@
+id,categoryId,name,description,price,img,alt,vegetarian,active,category
+1,1,breakfast taco,"A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99",3.50,,,false,true,Breakfast
+2,1,breakfast burrito,"A soft 10in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99",5.50,,,false,true,Breakfast
+3,1,breakfast bowl,"A bowl of your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99",5.50,,,false,true,Breakfast
+4,1,side of bacon,A cup of fresh cooked bacon,2.00,,,false,true,Breakfast
+5,1,side of potato,A cup of fresh cut potatoes,2.00,,,true,true,Breakfast
+6,2,taco,"A crispy shell, ground beef, lettuce, and shredded cheese",2.39,,,false,true,Tacos
+7,2,supreme taco,"A crispy shell, ground beef, lettuce, tomatoes, sour cream, and shredded cheese",2.99,,,false,true,Tacos
+8,2,soft taco,"A soft tortilla, ground beef, lettuce, and shredded cheese",2.79,,,false,true,Tacos
+9,2,soft taco supreme,"A soft tortilla, ground beef, lettuce, tomatoes, sour cream, and shredded cheese",2.99,,,false,true,Tacos
+10,2,fajita soft taco,"Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese",3.99,,,false,true,Tacos
+11,2,taco delite,"A crispy shell wrapped in a flour tortilla with beans, ground beef, lettuce, and shredded cheese",3.29,,,false,true,Tacos
+12,2,taco delite supreme,"A crispy shell wrapped in a flour tortilla with beans, ground beef, lettuce, tomatoes, sour cream, and shredded cheese",3.99,,,false,true,Tacos
+13,2,taco delite w/ queso,"A crispy shell wrapped in a flour tortilla with beans and queso, ground beef, lettuce, and shredded cheese",3.99,,,false,true,Tacos
+14,2,taco delite w/ guac,"A crispy shell wrapped in a flour tortilla with beans and guac made from scratch, ground beef, lettuce, and shredded cheese",3.99,,,false,true,Tacos
+15,3,bean burrito,"A 10in flour tortilla, homemade beans, our special burrito sauce, and shredded cheese",3.09,,,true,true,Burritos
+16,3,meat burrito,"A 10in flour tortilla, ground beef, our special burrito sauce, and shredded cheese",5.99,,,false,true,Burritos
+17,3,combo burrito,"A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, and shredded cheese",6.75,,,false,true,Burritos
+18,3,super burrito,"A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, lettuce, tomatoes, sour cream, and shredded cheese",7.99,,,false,true,Burritos
+19,3,fajita burrito,"A 10in flour tortilla, Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese",7.99,,,false,true,Burritos
+20,3,melt burrito,"A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, smothered in queso, and topped with lettuce, tomatoes, sour cream",9.99,,,false,true,Burritos
+21,4,cheese nachos,"Chips, our special queso, and jalapenos",7.50,,,true,true,Nachos
+22,4,bean nachos,"Chips, our special queso, homemade beans, and jalapenos",8.00,,,true,true,Nachos
+23,4,meat nachos,"Chips, our special queso, ground beef, and jalapenos",8.99,,,false,true,Nachos
+24,4,combo nachos,"Chips, our special queso, homemade beans, ground beef, and jalapenos",9.50,,,false,true,Nachos
+25,4,super nachos,"Chips, our special queso, homemade beans, ground beef, lettuce, tomatoes, sour cream, and jalapenos",10.99,,,false,true,Nachos
+26,4,deluxe fajita nachos,"Chips, our special queso, homemade beans, marinated fajitas (steak or chicken), sauteed bell peppers and onions, lettuce, tomatoes, sour cream, our guacamole made from scratch, and jalapenos",13.99,,,false,true,Nachos
+27,5,super salad,"Lettuce, homemade beans, ground beef, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all on a bed of chips",10.99,,,false,true,Salads
+28,5,salad supreme,"Lettuce, homemade beans, ground beef, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all in a edible salad bowl",10.99,,,false,true,Salads
+29,5,fajita salad,"Lettuce, homemade beans, marinated fajitas (steak or chicken), sauteed bell peppers and onions, our special sauce, shredded cheese, sour cream, tomatoes, and guac made from scratch all in a edible salad bowl",13.99,,,false,true,Salads
+30,6,single cheese quesadilla,A 10in flour tortilla and shredded cheese pressed in the flat iron to perfection,7.50,,,true,true,Quesadillas
+31,6,cheese quesadilla,"A 10in flour tortilla and shredded cheese pressed in the flat iron to perfection and served with guac made from scratch, sour cream, and pico de gallo on the side",8.90,,,true,true,Quesadillas
+32,6,bean quesadilla,"A 10in flour tortilla, shredded cheese, and homemade beans all pressed in the flat iron to perfection and served with guac made from scratch, sour cream, and pico de gallo on the side",9.95,,,true,true,Quesadillas
+33,6,meat quesadilla,"A 10in flour tortilla, shredded cheese, and ground beef all pressed in the flat iron to perfection and served with guac made from scratch, sour cream, and pico de gallo on the side",10.95,,,false,true,Quesadillas
+34,6,fajita quesadilla,"A 10in flour tortilla, shredded cheese, marinated fajitas (steak or chicken), and sauteed bell peppers and onions all pressed in the flat iron to perfection and served with guac made from scratch, sour cream, and pico de gallo on the side",12.95,,,false,true,Quesadillas
+35,7,bean tostada,"A flat crispy shell topped with homemade beans, lettuce, shredded cheese, and tomatoes",5.50,,,true,true,Tostadas
+36,7,guac tostada,"A flat crispy shell topped with guac made from scratch, lettuce, shredded cheese, and tomatoes",7.99,,,true,true,Tostadas
+37,7,super tostada,"A flat crispy shell topped with homemade beans, ground beef, lettuce, shredded cheese, tomatoes, and sour cream",8.25,,,false,true,Tostadas
+38,8,pico de gallo,4 oz of our homemade pico de gallo,2.00,,,false,true,Sides
+39,8,scoop of guac,4 oz of our homemade guac,2.75,,,false,true,Sides
+40,8,salsa,8 oz of our homemade salsa,2.50,,,false,true,Sides
+41,8,rice,8 oz of our homemade rice,2.25,,,false,true,Sides
+42,8,frijoles,8 oz of our homemade beans,2.25,,,false,true,Sides
+43,8,bag of chips,One serving of our fresh chips,2.75,,,false,true,Sides
+44,9,single chicken taquito,A fried 6in corn tortilla filled our special shredded chicken,1.25,,,false,true,Extras
+45,9,single tamale,A pork or beef tamale,1.75,,,false,true,Extras
+46,9,single enchilada,"A 6in corn tortilla filled with shredded cheese, ground beef, or our special shredded chicken topped with your choice of queso, chili con carne, or sour cream sauce, a sprinkle of shredded cheese and chips on the side",3.50,,,false,true,Extras
+47,9,taco burger,"A sesame seed bun, lettuce, ground beef, shredded cheese, and our special sauce",4.95,,,false,true,Extras
+48,9,chicken tortilla soup,"12 oz of our chicken tortilla soup topped with fried tortilla strips, shredded cheese, and a sliced avocado",5.90,,,false,true,Extras
+49,9,frito Pie,12 oz of our frito pie topped with shredded cheese,5.00,,,false,true,Extras
+50,10,chips and salsa,Our fresh chips and 8oz of our homemade salsa,5.00,,,false,true,Chips-n-Stuff
+51,10,chips and queso,Our fresh chips and 8oz of our queso,7.50,,,false,true,Chips-n-Stuff
+52,10,chips and guac,Our fresh chips and 2 scoops of guac made from scratch,7.99,,,false,true,Chips-n-Stuff
+53,10,chips and dip,"Our fresh chips, a side of queso, a side of homemade beans, and a scoop of our guac made from scratch",6.99,,,false,true,Chips-n-Stuff
+54,11,taco plate,"2 tacos, a side of our homemade rice and beans, and a bag of chips",8.99,,,false,true,Dinners
+55,11,burrito plate,"A meat burrito topped with your choice of chili con carne or queso, a side of our homemade rice and beans, and a bag of chips",12.99,,,false,true,Dinners
+56,11,enchilada plate,"2 enchiladas of your choice (beef, chicken, shredded cheese) topped with queso, chili con carne, or sour cream, a side of our homemade rice and beans, pico de gallo, sour cream, a scoop of guac made from scratch, and a bag of chips",12.99,,,false,true,Dinners
+57,11,fajita plate,"2 fajita tacos, a side of our homemade rice and beans, pico de gallo, sour cream, a scoop of guac made from scratch, and a bag of chips",12.99,,,false,true,Dinners
+58,11,tamale plate,"3 tamales of your choice (beef, pork), a side of our homemade rice and beans, pico de gallo, sour cream, a scoop of guac made from scratch, and a bag of chips",12.99,,,false,true,Dinners
+59,11,taquito plate,"4 shredded chicken taquitos, a side of our homemade rice and beans, pico de gallo, sour cream, a scoop of guac made from scratch, and a bag of chips",12.99,,,false,true,Dinners
+60,11,quesadilla plate,"Any quesadilla of your choice, a side of our homemade rice and beans, pico de gallo, sour cream, a scoop of guac made from scratch, and a bag of chips",12.99,,,false,true,Dinners
+61,12,10 pack of tacos,10 crispy tacos,18.99,,,false,true,Family
+62,12,dozen tamales,"12 tamales of your choice (pork, beef)",16.99,,,false,true,Family
+63,12,gallon of regular tea,Some of our fresh tea (sweet or unsweet),6.99,,,false,true,Family
+64,12,gallon of peach tea,Some of our fresh peach tea (sweet or unsweet),7.99,,,false,true,Family
+65,12,bag of pebble ice,A 8lbs of the best ice,3.99,,,false,true,Family
+66,13,chocolate chip cookies,3 for $2.50 | 6 for $3.99 | 12 for $6.99,0.90,,,false,true,Desserts
+67,13,cinnamon chips,A bag of our fresh cinnamon sugared chips,2.99,,,false,true,Desserts
+68,13,cinnamon roll,Ooey goey goodness,2.50,,,false,false,Desserts
+69,14,bottled mexican coke,,3.00,,,false,false,Drinks
+70,14,pepsi,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+71,14,diet pepsi,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+72,14,dr. pepper,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+73,14,diet dr. pepper,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+74,14,Mountain Dew,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+75,14,Mug Rootbeer,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+76,14,tropicana lemonade,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+77,14,tropicana fruit punch,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+78,14,brisk strawberry melon,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+79,14,horchata,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+80,14,sweet or unsweet tea,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+81,14,sweet or unsweet peach tea,sm (20oz) | md (32oz): +$0.25 | lg (44oz): +$0.50,2.25,,,false,true,Drinks
+82,1,breakfast quesadilla,"A soft 10in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese all pressed in the flat iron | add fresh cut potatoes or bacon for $0.50 or both for $0.99",6.00,,,false,true,Breakfast
