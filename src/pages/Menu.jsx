@@ -48,9 +48,28 @@ const Menu = () => {
 
                     <div className="mt-6">
                         {isLoading ? (
-                            <div className="text-center py-8">
-                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-                                <p className="mt-2 text-gray-400">Loading categories...</p>
+                            <div className="mb-8">
+                                {/* Category Skeleton Header */}
+                                <div className="text-center mb-6">
+                                    <div className="animate-pulse">
+                                        <div className="bg-gray-700 h-6 rounded w-48 mx-auto mb-2"></div>
+                                        <div className="bg-gray-700 h-4 rounded w-64 mx-auto"></div>
+                                    </div>
+                                </div>
+
+                                {/* Category Grid Skeleton */}
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                                    {[...Array(8)].map((_, i) => (
+                                        <div key={i} className="animate-pulse">
+                                            <div className="relative p-3 rounded-lg border-2 border-gray-700 bg-gray-800">
+                                                <div className="text-center">
+                                                    <div className="bg-gray-700 h-4 rounded w-20 mx-auto mb-1"></div>
+                                                    <div className="bg-gray-700 h-3 rounded w-16 mx-auto"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                             <CategoryFilter
@@ -73,7 +92,13 @@ const Menu = () => {
                 )}
 
                 {/* Menu Stats */}
-                {!isLoading && (
+                {isLoading ? (
+                    <div className="mb-8 text-center">
+                        <div className="animate-pulse">
+                            <div className="bg-gray-700 h-5 rounded w-64 mx-auto"></div>
+                        </div>
+                    </div>
+                ) : (
                     <div className="mb-8 text-center">
                         <p className="text-gray-300">
                             Showing {filteredItems.length} of {menuItems.length} items
@@ -84,9 +109,29 @@ const Menu = () => {
 
                 {/* Loading indicator for category filtering */}
                 {menuItemsLoading && (
-                    <div className="text-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
-                        <p className="mt-2 text-gray-400">Filtering menu items...</p>
+                    <div className="mb-12">
+                        {/* Menu Items Grid Skeleton */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {[...Array(12)].map((_, i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700">
+                                        {/* Image skeleton */}
+                                        <div className="bg-gray-700 h-48 w-full"></div>
+
+                                        {/* Content skeleton */}
+                                        <div className="p-4">
+                                            <div className="bg-gray-700 h-5 rounded w-3/4 mb-2"></div>
+                                            <div className="bg-gray-700 h-4 rounded w-full mb-2"></div>
+                                            <div className="bg-gray-700 h-4 rounded w-2/3 mb-3"></div>
+                                            <div className="flex justify-between items-center">
+                                                <div className="bg-gray-700 h-6 rounded w-16"></div>
+                                                <div className="bg-gray-700 h-6 rounded w-20"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
