@@ -158,10 +158,12 @@ resource "aws_lambda_function" "get_menu_items" {
   handler         = "index.handler"
   runtime         = "nodejs18.x"
   timeout         = 30
+  source_code_hash = filebase64sha256("lambda/getMenuItems.zip")
 
   environment {
     variables = {
-      MENU_ITEMS_TABLE = aws_dynamodb_table.menu_items.name
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
     }
   }
 
@@ -179,10 +181,12 @@ resource "aws_lambda_function" "get_categories" {
   handler         = "index.handler"
   runtime         = "nodejs18.x"
   timeout         = 30
+  source_code_hash = filebase64sha256("lambda/getCategories.zip")
 
   environment {
     variables = {
-      MENU_CATEGORIES_TABLE = aws_dynamodb_table.menu_categories.name
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_categories.name
+      ALLOWED_ORIGINS = var.allowed_origins
     }
   }
 
@@ -200,10 +204,12 @@ resource "aws_lambda_function" "search_menu_items" {
   handler         = "index.handler"
   runtime         = "nodejs18.x"
   timeout         = 30
+  source_code_hash = filebase64sha256("lambda/searchMenuItems.zip")
 
   environment {
     variables = {
-      MENU_ITEMS_TABLE = aws_dynamodb_table.menu_items.name
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
     }
   }
 
@@ -221,10 +227,12 @@ resource "aws_lambda_function" "get_menu_items_by_category" {
   handler         = "index.handler"
   runtime         = "nodejs18.x"
   timeout         = 30
+  source_code_hash = filebase64sha256("lambda/getMenuItemsByCategory.zip")
 
   environment {
     variables = {
-      MENU_ITEMS_TABLE = aws_dynamodb_table.menu_items.name
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
     }
   }
 
@@ -394,7 +402,7 @@ resource "aws_api_gateway_integration_response" "options_categories" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -446,7 +454,7 @@ resource "aws_api_gateway_integration_response" "options_menu_items" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -503,7 +511,7 @@ resource "aws_api_gateway_integration_response" "options_search" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -554,7 +562,7 @@ resource "aws_api_gateway_integration_response" "options_menu_items_by_category"
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -650,18 +658,7 @@ resource "aws_api_gateway_integration" "get_menu_items" {
   uri                    = aws_lambda_function.get_menu_items.invoke_arn
 }
 
-resource "aws_api_gateway_integration_response" "get_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.get_menu_items.http_method
-  status_code = aws_api_gateway_method_response.get_menu_items.status_code
 
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET, OPTIONS'"
-  }
-}
 
 resource "aws_api_gateway_integration" "get_categories" {
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -673,18 +670,7 @@ resource "aws_api_gateway_integration" "get_categories" {
   uri                    = aws_lambda_function.get_categories.invoke_arn
 }
 
-resource "aws_api_gateway_integration_response" "get_categories" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.categories.id
-  http_method = aws_api_gateway_method.get_categories.http_method
-  status_code = aws_api_gateway_method_response.get_categories.status_code
 
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET, OPTIONS'"
-  }
-}
 
 resource "aws_api_gateway_integration" "search_menu_items" {
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -696,18 +682,7 @@ resource "aws_api_gateway_integration" "search_menu_items" {
   uri                    = aws_lambda_function.search_menu_items.invoke_arn
 }
 
-resource "aws_api_gateway_integration_response" "search_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.search.id
-  http_method = aws_api_gateway_method.search_menu_items.http_method
-  status_code = aws_api_gateway_method_response.search_menu_items.status_code
 
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET, OPTIONS'"
-  }
-}
 
 resource "aws_api_gateway_integration" "get_menu_items_by_category" {
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -719,18 +694,7 @@ resource "aws_api_gateway_integration" "get_menu_items_by_category" {
   uri                    = aws_lambda_function.get_menu_items_by_category.invoke_arn
 }
 
-resource "aws_api_gateway_integration_response" "get_menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items_by_category.id
-  http_method = aws_api_gateway_method.get_menu_items_by_category.http_method
-  status_code = aws_api_gateway_method_response.get_menu_items_by_category.status_code
 
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET, OPTIONS'"
-  }
-}
 
 # Lambda Permissions
 resource "aws_lambda_permission" "get_menu_items" {
@@ -806,10 +770,7 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.get_categories,
     aws_api_gateway_integration.search_menu_items,
     aws_api_gateway_integration.get_menu_items_by_category,
-    aws_api_gateway_integration_response.get_menu_items,
-    aws_api_gateway_integration_response.get_categories,
-    aws_api_gateway_integration_response.search_menu_items,
-    aws_api_gateway_integration_response.get_menu_items_by_category,
+
     aws_api_gateway_method.options_categories,
     aws_api_gateway_method.options_menu_items,
     aws_api_gateway_method.options_search,

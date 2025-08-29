@@ -8,30 +8,40 @@ export const useMenu = () => {
     const [selectedCategory, setSelectedCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(false);
+    const [menuItemsLoading, setMenuItemsLoading] = useState(false);
     const [error, setError] = useState(null);
 
     // Use ref to store menuItems to avoid dependency warning in useEffect
     const menuItemsRef = useRef([]);
     menuItemsRef.current = menuItems;
 
+    // Use ref to track current category to prevent race conditions
+    const currentCategoryRef = useRef(selectedCategory);
+    currentCategoryRef.current = selectedCategory;
+
+    // Add request ID to prevent race conditions
+    const requestIdRef = useRef(0);
+
     // Load initial data
     useEffect(() => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                setError(null);
-
-                const [categoriesData, itemsData] = await Promise.all([
-                    getCategories(),
-                    getMenuItems()
-                ]);
-
+                const categoriesData = await getCategories();
                 setCategories(categoriesData);
-                setMenuItems(itemsData);
-                setFilteredItems(itemsData);
-            } catch (err) {
-                setError('Failed to load menu data');
-                console.error('Error loading data:', err);
+
+                const menuData = await getMenuItems();
+                setMenuItems(menuData);
+
+                // Sort and set initial filtered items to show all items
+                const sortedInitialItems = menuData.sort((a, b) => {
+                    const idA = parseInt(a.pk?.replace('ITEM#', '') || '0');
+                    const idB = parseInt(b.pk?.replace('ITEM#', '') || '0');
+                    return idA - idB;
+                });
+                setFilteredItems(sortedInitialItems);
+            } catch (error) {
+                console.error('Error loading data:', error);
             } finally {
                 setLoading(false);
             }
@@ -42,10 +52,18 @@ export const useMenu = () => {
 
     // Filter items when search or category changes
     useEffect(() => {
+        // Don't run filtering until initial data is loaded
+        if (menuItems.length === 0) {
+            console.log('Initial data not loaded yet, skipping filter');
+            return;
+        }
+
+        console.log('Filter useEffect triggered - selectedCategory:', selectedCategory, 'searchQuery:', searchQuery);
+
         const filterItems = async () => {
             try {
-                setLoading(true);
                 setError(null);
+                setMenuItemsLoading(true);
 
                 let items = [];
 
@@ -53,31 +71,59 @@ export const useMenu = () => {
                     // Search across all items
                     items = await searchMenuItems(searchQuery);
                 } else if (selectedCategory === 'all') {
-                    // Show all active items
-                    items = menuItemsRef.current;
+                    // Show all active items - no API call needed, instant response
+                    items = [...menuItems]; // Create a copy to avoid reference issues
                 } else {
                     // Filter by category - extract numeric part from PK (e.g., "CATEGORY#4" -> 4)
                     const categoryNumber = parseInt(selectedCategory.replace('CATEGORY#', ''));
                     console.log('Filtering by category:', selectedCategory, '->', categoryNumber);
                     items = await getMenuItemsByCategory(categoryNumber);
-                    console.log('API returned items:', items.length);
+                    console.log('Category API returned items:', items);
                 }
 
-                setFilteredItems(items);
+                console.log('Final items before sorting:', items);
+                console.log('Items length before sorting:', items?.length);
+
+                // Sort items by ID (assuming ID is numeric)
+                const sortedItems = items.sort((a, b) => {
+                    // Extract numeric part from item ID (e.g., "ITEM#1" -> 1)
+                    const idA = parseInt(a.pk?.replace('ITEM#', '') || '0');
+                    const idB = parseInt(b.pk?.replace('ITEM#', '') || '0');
+                    return idA - idB;
+                });
+
+                console.log('Final sorted items:', sortedItems);
+                console.log('Setting filtered items to:', sortedItems.length);
+
+                // Only update state if this is still the current category (prevents race conditions)
+                if (currentCategoryRef.current === selectedCategory) {
+                    console.log('Category still matches, updating filtered items');
+                    setFilteredItems(sortedItems);
+                } else {
+                    console.log('Category changed during API call, ignoring result');
+                }
             } catch (err) {
                 setError('Failed to filter menu items');
                 console.error('Error filtering items:', err);
             } finally {
-                setLoading(false);
+                setMenuItemsLoading(false);
             }
         };
 
         filterItems();
-    }, [selectedCategory, searchQuery]);
+
+    }, [selectedCategory, searchQuery, menuItems]);
+
+    // Debug: Log when filteredItems changes
+    useEffect(() => {
+        console.log('filteredItems state changed:', filteredItems.length, 'items');
+        console.log('Current selectedCategory:', selectedCategory);
+    }, [filteredItems, selectedCategory]);
 
     // Handle category selection
     const handleCategoryChange = useCallback((categoryId) => {
         console.log('Category changed to:', categoryId);
+
         setSelectedCategory(categoryId);
         setSearchQuery(''); // Clear search when changing categories
     }, []);
@@ -124,6 +170,14 @@ export const useMenu = () => {
         }
         // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
         const categoryNumber = parseInt(categoryId.replace('CATEGORY#', ''));
+
+        // Debug: Log the first few menu items to see their structure
+        if (menuItems.length > 0) {
+            console.log('First menu item structure:', menuItems[0]);
+            console.log('Looking for categoryId:', categoryNumber);
+            console.log('Available categoryIds:', [...new Set(menuItems.map(item => item.categoryId))]);
+        }
+
         return menuItems.filter(item => item.categoryId === categoryNumber).length;
     }, [menuItems]);
 
@@ -170,6 +224,7 @@ export const useMenu = () => {
         selectedCategory,
         searchTerm: searchQuery, // Map searchQuery to searchTerm
         isLoading: loading, // Map loading to isLoading
+        menuItemsLoading, // Loading state just for menu items
         error,
 
         // Actions that Menu.jsx expects

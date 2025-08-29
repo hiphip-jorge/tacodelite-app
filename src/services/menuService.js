@@ -29,8 +29,17 @@ const apiCall = async (endpoint, options = {}) => {
 // Get all categories
 export async function getCategories() {
     try {
-        const response = await apiCall('/categories');
-        return response.data || [];
+        const response = await apiCall('/prod/categories');
+        const categories = response || [];
+
+        // Sort categories by their numeric ID (e.g., "CATEGORY#1" -> 1)
+        const sortedCategories = categories.sort((a, b) => {
+            const idA = parseInt(a.pk?.replace('CATEGORY#', '') || '0');
+            const idB = parseInt(b.pk?.replace('CATEGORY#', '') || '0');
+            return idA - idB;
+        });
+
+        return sortedCategories;
     } catch (error) {
         console.error('Failed to fetch categories:', error);
         // Fallback to empty array if API fails
@@ -41,8 +50,8 @@ export async function getCategories() {
 // Get all menu items
 export async function getMenuItems() {
     try {
-        const response = await apiCall('/menu-items');
-        return response.data || [];
+        const response = await apiCall('/prod/menu-items');
+        return response;
     } catch (error) {
         console.error('Failed to fetch menu items:', error);
         // Fallback to empty array if API fails
@@ -54,11 +63,25 @@ export async function getMenuItems() {
 export async function getMenuItemsByCategory(categoryId) {
     try {
         if (categoryId === 'all') {
-            const response = await apiCall('/menu-items');
-            return response.data || [];
+            const response = await apiCall('/prod/menu-items');
+            return response || [];
         }
-        const response = await apiCall(`/menu-items-by-category?categoryId=${categoryId}`);
-        return response.data || [];
+        const response = await apiCall(`/prod/menu-items-by-category?categoryId=${categoryId}`);
+        // Handle both response formats:
+        // 1. Old format: {success: true, data: [...], ...}
+        // 2. New format: [...] (direct array)
+        let result;
+        if (response?.data) {
+            // Old format with nested data
+            result = response.data;
+        } else if (Array.isArray(response)) {
+            // New format with direct array
+            result = response;
+        } else {
+            // Fallback: try to convert object with numeric keys to array
+            result = Object.values(response || {});
+        }
+        return result;
     } catch (error) {
         console.error('Failed to fetch menu items by category:', error);
         // Fallback to empty array if API fails
@@ -69,8 +92,8 @@ export async function getMenuItemsByCategory(categoryId) {
 // Search menu items
 export async function searchMenuItems(query) {
     try {
-        const response = await apiCall(`/search?query=${encodeURIComponent(query)}`);
-        return response.data || [];
+        const response = await apiCall(`/prod/search?query=${encodeURIComponent(query)}`);
+        return response || [];
     } catch (error) {
         console.error('Failed to search menu items:', error);
         // Fallback to empty array if API fails

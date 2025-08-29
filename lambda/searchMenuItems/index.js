@@ -13,7 +13,7 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com',
+                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'GET, OPTIONS'
                 },
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
         }
 
         const params = {
-            TableName: process.env.MENU_ITEMS_TABLE || 'menu_items'
+            TableName: process.env.DYNAMODB_TABLE
         };
 
         const command = new ScanCommand(params);
@@ -49,7 +49,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com',
+                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Methods': 'GET, OPTIONS',
                 'Cache-Control': 'max-age=604800, public', // 7 days - search is more dynamic
@@ -69,7 +69,7 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com',
+                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Methods': 'GET, OPTIONS'
             },

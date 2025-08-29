@@ -123,7 +123,7 @@ const CategoryFilter = ({
                     <div className="inline-flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-full px-3 py-1">
                         <span className="text-gray-400 text-sm">Showing:</span>
                         <span className="text-taco-yellow-400 font-medium text-sm">
-                            {categories.find(cat => cat.id === parseInt(selectedCategory))?.name}
+                            {categories.find(cat => cat.pk === selectedCategory)?.name || 'Unknown Category'}
                         </span>
                         <span className="text-gray-400 text-sm">
                             ({getCategoryItemCount(selectedCategory)} items)

@@ -6,13 +6,13 @@ function Home() {
     const features = [
         {
             icon: '🌮',
-            title: 'Fresh Tacos',
-            description: 'Handmade tortillas with premium ingredients'
+            title: 'Fresh Food',
+            description: 'Prepped daily with premium ingredients'
         },
         {
-            icon: '🚚',
-            title: 'Fast Delivery',
-            description: 'Quick delivery to your door or office'
+            icon: '⭐',
+            title: 'Quality Service',
+            description: 'Exceptional customer service and attention to detail'
         },
         {
             icon: '🍽️',
@@ -43,7 +43,7 @@ function Home() {
                             Welcome to Taco Delite
                         </h1>
                         <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-                            The best authentic Mexican tacos in Plano and Richardson.
+                            The best Tex-Mex food in Plano.
                             Fresh ingredients, bold flavors, and friendly service.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -77,7 +77,7 @@ function Home() {
                             Why Choose Taco Delite?
                         </h2>
                         <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-                            We're committed to serving the most delicious and authentic Mexican food
+                            We're committed to serving the most delicious and freshest Tex-Mex food
                         </p>
                     </motion.div>
 
@@ -110,7 +110,7 @@ function Home() {
                         transition={{ duration: 0.8 }}
                     >
                         <h2 className="text-3xl md:text-4xl font-secular text-white mb-6">
-                            Ready for Amazing Tacos?
+                            Ready for Amazing Tex-Mex?
                         </h2>
                         <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
                             Order online for pickup or delivery, or visit us in person for the full experience

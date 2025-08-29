@@ -16,7 +16,7 @@ function About() {
         {
             icon: '🤝',
             title: 'Community',
-            description: 'Serving the Plano and Richardson communities since 1995'
+            description: 'Serving the Plano communities since 1989'
         }
     ]
 
@@ -49,12 +49,12 @@ function About() {
                             Our Story
                         </h2>
                         <p className="text-lg text-gray-300 mb-4">
-                            Founded in 1995, Taco Delite began as a small family-owned restaurant
+                            Founded in 1989, Taco Delite began as a small family-owned restaurant
                             with a big dream: to serve the most authentic Mexican food in Texas.
                         </p>
                         <p className="text-lg text-gray-300 mb-4">
                             What started as a humble taco stand has grown into one of the most
-                            beloved Mexican restaurants in Plano and Richardson, known for our
+                            beloved Mexican restaurants in Plano, known for our
                             fresh ingredients, bold flavors, and warm hospitality.
                         </p>
                         <p className="text-lg text-gray-300">

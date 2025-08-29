@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import MenuItem from '../components/MenuItem';
 import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
@@ -11,46 +11,19 @@ const Menu = () => {
         searchTerm,
         selectedCategory,
         isLoading,
+        menuItemsLoading,
         error,
+        filteredItems,
         setSearchTerm,
         setSelectedCategory,
-        getFilteredItems,
         getItemCount,
+        getCategoryName,
     } = useMenu();
-
-    const filteredItems = useMemo(() => getFilteredItems(), [getFilteredItems]);
 
     useEffect(() => {
         // Scroll to top when menu loads
         window.scrollTo(0, 0);
     }, []);
-
-    if (isLoading) {
-        return (
-            <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 py-12">
-                <div className="container mx-auto px-4">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto"></div>
-                        <p className="mt-4 text-gray-600">Loading menu...</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="min-h-screen bg-gray-800 py-8 overflow-hidden">
-                <div className="container mx-auto px-4">
-                    <div className="text-center">
-                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                            <p>Error loading menu: {error}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className="min-h-screen bg-gray-800 py-8 overflow-hidden">
@@ -74,31 +47,57 @@ const Menu = () => {
                     />
 
                     <div className="mt-6">
-                        <CategoryFilter
-                            categories={categories}
-                            selectedCategory={selectedCategory}
-                            onCategoryChange={setSelectedCategory}
-                            getCategoryItemCount={getItemCount}
-                        />
+                        {isLoading ? (
+                            <div className="text-center py-8">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                                <p className="mt-2 text-gray-400">Loading categories...</p>
+                            </div>
+                        ) : (
+                            <CategoryFilter
+                                categories={categories}
+                                selectedCategory={selectedCategory}
+                                onCategoryChange={setSelectedCategory}
+                                getCategoryItemCount={getItemCount}
+                            />
+                        )}
                     </div>
                 </div>
 
+                {/* Error Display */}
+                {error && (
+                    <div className="text-center mb-8">
+                        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                            <p>Error loading menu: {error}</p>
+                        </div>
+                    </div>
+                )}
+
                 {/* Menu Stats */}
-                <div className="mb-8 text-center">
-                    <p className="text-gray-300">
-                        Showing {filteredItems.length} of {menuItems.length} items
-                        {selectedCategory && ` in ${selectedCategory.name}`}
-                    </p>
-                </div>
+                {!isLoading && (
+                    <div className="mb-8 text-center">
+                        <p className="text-gray-300">
+                            Showing {filteredItems.length} of {menuItems.length} items
+                            {selectedCategory !== 'all' && selectedCategory && ` in ${getCategoryName(selectedCategory)}`}
+                        </p>
+                    </div>
+                )}
+
+                {/* Loading indicator for category filtering */}
+                {menuItemsLoading && (
+                    <div className="text-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500 mx-auto"></div>
+                        <p className="mt-2 text-gray-400">Filtering menu items...</p>
+                    </div>
+                )}
 
                 {/* Menu Items Grid */}
-                {filteredItems.length > 0 ? (
+                {!isLoading && !menuItemsLoading && filteredItems.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
                         {filteredItems.map((item) => (
                             <MenuItem key={item.pk} item={item} />
                         ))}
                     </div>
-                ) : (
+                ) : !isLoading && !menuItemsLoading && filteredItems.length === 0 ? (
                     <div className="text-center py-12">
                         <div className="text-gray-400 mb-4">
                             <svg className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,7 +109,7 @@ const Menu = () => {
                             Try adjusting your search or filter criteria.
                         </p>
                     </div>
-                )}
+                ) : null}
 
                 {/* CTA Section */}
                 <div className="text-center py-12 bg-gray-800 rounded-lg shadow-sm border border-gray-700">

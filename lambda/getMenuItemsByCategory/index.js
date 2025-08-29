@@ -13,7 +13,7 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com',
+                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                     'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                     'Access-Control-Allow-Methods': 'GET, OPTIONS'
                 },
@@ -25,7 +25,7 @@ exports.handler = async (event) => {
         }
 
         const params = {
-            TableName: process.env.MENU_ITEMS_TABLE || 'menu_items'
+            TableName: process.env.DYNAMODB_TABLE
         };
 
         const command = new ScanCommand(params);
@@ -44,36 +44,28 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com',
+                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'GET, OPTIONS',
-                'Cache-Control': 'max-age=2592000, public', // 30 days - menu changes rarely
-                'ETag': 'W/"menu-items-category-v1"',
-                'Vary': 'Accept-Encoding'
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                'Cache-Control': 'public, max-age=3600',
+                'ETag': `"${Date.now()}"`,
+                'Vary': 'Origin'
             },
-            body: JSON.stringify({
-                success: true,
-                data: filteredItems,
-                count: filteredItems.length,
-                categoryId: categoryId
-            })
+            body: JSON.stringify(filteredItems)
         };
     } catch (error) {
         console.error('Error fetching menu items by category:', error);
         return {
             statusCode: 500,
             headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com',
+                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'GET, OPTIONS'
+                'Access-Control-Allow-Methods': 'GET,OPTIONS',
+                'Cache-Control': 'public, max-age=3600',
+                'ETag': `"${Date.now()}"`,
+                'Vary': 'Origin'
             },
-            body: JSON.stringify({
-                success: false,
-                error: 'Failed to fetch menu items by category',
-                message: error.message
-            })
+            body: JSON.stringify({ error: 'Internal server error' })
         };
     }
 };

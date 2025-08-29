@@ -21,7 +21,7 @@ function Footer() {
                             </span>
                         </div>
                         <p className="text-gray-300 mb-4 max-w-md">
-                            Serving authentic Mexican cuisine in Plano and Richardson since 1995.
+                            Serving flavorful Tex-Mex cuisine in Plano since 1989.
                             Fresh ingredients, bold flavors, and friendly service.
                         </p>
                         <div className="flex space-x-4">
