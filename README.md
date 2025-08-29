@@ -32,12 +32,19 @@ A simplified, modern React application for Taco Delite restaurant, built with Re
    npm install
    ```
 
-3. Start the development server:
+3. Set up environment variables:
+   ```bash
+   cp env.example .env.local
+   ```
+   
+   Edit `.env.local` and set `VITE_USE_MOCK=true` to use mock data in development (avoids CORS issues)
+
+4. Start the development server:
    ```bash
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Build for Production
 
