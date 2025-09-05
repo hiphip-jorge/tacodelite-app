@@ -24,10 +24,15 @@ variable "app_name" {
 variable "allowed_origins" {
   description = "Comma-separated list of allowed origins for CORS (e.g., 'https://yourdomain.com,https://www.yourdomain.com')"
   type        = string
-  default     = "https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173"
+  default     = "https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com"
 }
 
-
+variable "jwt_secret" {
+  description = "Secret key for JWT token signing"
+  type        = string
+  default     = "your-secret-key-change-in-production"
+  sensitive   = true
+}
 
 variable "domain_name" {
   description = "Custom domain name for the application (optional)"

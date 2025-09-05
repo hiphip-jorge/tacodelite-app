@@ -47,9 +47,9 @@ exports.handler = async (event) => {
                 'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Methods': 'GET,OPTIONS',
-                'Cache-Control': 'public, max-age=3600',
-                'ETag': `"${Date.now()}"`,
-                'Vary': 'Origin'
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             },
             body: JSON.stringify(filteredItems)
         };
@@ -61,9 +61,9 @@ exports.handler = async (event) => {
                 'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
                 'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
                 'Access-Control-Allow-Methods': 'GET,OPTIONS',
-                'Cache-Control': 'public, max-age=3600',
-                'ETag': `"${Date.now()}"`,
-                'Vary': 'Origin'
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
             },
             body: JSON.stringify({ error: 'Internal server error' })
         };

@@ -26,7 +26,9 @@ package_lambda() {
         echo "📥 Installing dependencies for $function_name..."
         cd "$function_dir"
         npm install --production
-        cp -r node_modules "$temp_dir/"
+        if [ -d "node_modules" ]; then
+            cp -r node_modules "$temp_dir/"
+        fi
         cd - > /dev/null
     fi
     
@@ -47,8 +49,13 @@ package_lambda() {
 # Package each Lambda function
 package_lambda "getMenuItems" "lambda/getMenuItems"
 package_lambda "getCategories" "lambda/getCategories"
+package_lambda "updateCategory" "lambda/updateCategory"
 package_lambda "searchMenuItems" "lambda/searchMenuItems"
 package_lambda "getMenuItemsByCategory" "lambda/getMenuItemsByCategory"
+package_lambda "updateMenuItem" "lambda/updateMenuItem"
+package_lambda "deleteMenuItem" "lambda/deleteMenuItem"
+package_lambda "admin-login" "lambda/auth/login"
+package_lambda "admin-verify" "lambda/auth/verify"
 
 echo "🎉 All Lambda functions packaged successfully!"
 echo ""
