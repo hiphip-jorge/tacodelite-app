@@ -241,7 +241,7 @@ function Contact() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <a
-                            href="tel:+972-964-5419"
+                            href="tel:+19729645419"
                             className="btn-primary text-lg px-8 py-3 inline-block"
                         >
                             Call for Catering
