@@ -25,10 +25,7 @@ function Footer() {
                             Fresh ingredients, bold flavors, and friendly service.
                         </p>
                         <div className="flex space-x-4">
-                            <a href="#" className="text-gray-400 hover:text-taco-yellow-400 transition-colors">
-                                📘 Facebook
-                            </a>
-                            <a href="#" className="text-gray-400 hover:text-taco-yellow-400 transition-colors">
+                            <a href="https://www.tiktok.com/@tacodelite15thst?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-taco-yellow-400 transition-colors">
                                 🎥 TikTok
                             </a>
                         </div>
@@ -65,10 +62,32 @@ function Footer() {
                     <div>
                         <h3 className="text-lg font-secular mb-4">Contact</h3>
                         <ul className="space-y-2 text-gray-300">
-                            <li>📍 2957 W 15th St</li>
-                            <li>Plano, TX 75075</li>
-                            <li>📞 (972) 964-5419</li>
-                            <li>📧 tacodelitewestplano@gmail.com</li>
+                            <li>
+                                <a
+                                    href="https://maps.app.goo.gl/XhxheTxBpTHwJZ9ZA"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-gray-300 hover:text-white transition-colors"
+                                >
+                                    📍 2957 W 15th St, Plano, TX 75075
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="tel:+19729645419"
+                                    className="text-gray-300 hover:text-white transition-colors"
+                                >
+                                    📞 (972) 964-5419
+                                </a>
+                            </li>
+                            <li>
+                                <a
+                                    href="mailto:tacodelitewestplano@gmail.com"
+                                    className="text-gray-300 hover:text-white transition-colors"
+                                >
+                                    📧 tacodelitewestplano@gmail.com
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

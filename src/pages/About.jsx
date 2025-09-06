@@ -6,12 +6,12 @@ function About() {
         {
             icon: '🏆',
             title: 'Quality First',
-            description: 'We use only the freshest ingredients and traditional recipes'
+            description: 'We focus on delivering quality fast food that beats our competitors'
         },
         {
             icon: '👨‍🍳',
             title: 'Expert Chefs',
-            description: 'Our team brings years of experience in authentic Mexican cuisine'
+            description: 'Our team brings years of experience in Tex-Mex cuisine'
         },
         {
             icon: '🤝',
@@ -34,7 +34,7 @@ function About() {
                         About Taco Delite
                     </h1>
                     <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                        We're passionate about bringing authentic Mexican flavors to North Texas
+                        Continuing the Taco Delite tradition of bringing authentic Tex-Mex flavors to North Texas
                     </p>
                 </motion.div>
 
@@ -49,17 +49,21 @@ function About() {
                             Our Story
                         </h2>
                         <p className="text-lg text-gray-300 mb-4">
-                            Founded in 1989, Taco Delite began as a small family-owned restaurant
-                            with a big dream: to serve the most authentic Mexican food in Texas.
+                            Founded in 1989, this location of Taco Delite began as a branch of the original
+                            Taco Delite, striving to continue serving the same quality and favorites
+                            that made the original location beloved throughout Texas.
                         </p>
                         <p className="text-lg text-gray-300 mb-4">
-                            What started as a humble taco stand has grown into one of the most
-                            beloved Mexican restaurants in Plano, known for our
-                            fresh ingredients, bold flavors, and warm hospitality.
+                            Owner Javier Garcia started working here in 1989 and seized the opportunity
+                            to purchase the restaurant in 2007, helping this West Plano location grow
+                            into one of the most beloved Tex-Mex restaurants in the area while maintaining
+                            the same fresh ingredients, bold flavors, and warm hospitality that
+                            customers have come to expect from Taco Delite.
                         </p>
                         <p className="text-lg text-gray-300">
-                            Today, we continue to honor our family traditions while serving
-                            thousands of happy customers who have become part of our extended family.
+                            Today, we continue to honor the Taco Delite legacy while serving
+                            thousands of happy customers who have become part of our extended family,
+                            carrying forward the traditions and recipes that have made us a Texas favorite.
                         </p>
                     </motion.div>
 
@@ -129,8 +133,8 @@ function About() {
                                 Authenticity
                             </h3>
                             <p className="text-gray-300">
-                                We stay true to traditional Mexican recipes and cooking methods,
-                                ensuring every dish tastes like it came straight from Mexico.
+                                We stay true to Tex-Mex traditions and cooking methods,
+                                creating dishes that blend Mexican inspiration with Texas flavors.
                             </p>
                         </div>
                         <div>
@@ -138,8 +142,9 @@ function About() {
                                 Freshness
                             </h3>
                             <p className="text-gray-300">
-                                We source the highest quality ingredients and prepare everything
-                                fresh daily, never using frozen or pre-made items.
+                                As a fast food restaurant, we focus on delivering quality ingredients
+                                and fresh preparation that consistently beats our competitors, ensuring
+                                every meal meets our standards for taste and freshness.
                             </p>
                         </div>
                         <div>
@@ -156,8 +161,9 @@ function About() {
                                 Community
                             </h3>
                             <p className="text-gray-300">
-                                We're proud to be part of the Plano and Richardson communities,
-                                supporting local events and giving back whenever we can.
+                                We're proud to be part of the Plano communities,
+                                serving our neighbors and building lasting relationships with
+                                families who have been coming to us for generations.
                             </p>
                         </div>
                     </div>
