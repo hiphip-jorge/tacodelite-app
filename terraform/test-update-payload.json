@@ -1,0 +1,7 @@
+{
+  "httpMethod": "PUT",
+  "pathParameters": {
+    "id": "1757132172199"
+  },
+  "body": "{\"name\":\"Updated Test Admin\",\"permissions\":[\"user_crud\",\"menu_crud\"],\"active\":false}"
+}

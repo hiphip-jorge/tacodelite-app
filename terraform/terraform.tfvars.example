@@ -1,0 +1,17 @@
+# Taco Delite Terraform Variables
+# Copy this file to terraform.tfvars and update the values
+
+# AWS Region
+aws_region = "us-east-1"
+
+# Application Name
+app_name = "tacodelite-app"
+
+# Environment
+environment = "staging"
+
+# CORS Origins (comma-separated)
+allowed_origins = "https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com"
+
+# JWT Secret (REQUIRED - generate a secure random string)
+jwt_secret = "your-super-secret-jwt-key-here-change-this-in-production"
