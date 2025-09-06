@@ -18,7 +18,7 @@ function Contact() {
             title: 'Phone',
             content: '(972) 964-5419',
             action: 'Call Now',
-            href: 'tel:+972-964-5419',
+            href: 'tel:+19729645419',
             external: false
         },
         {

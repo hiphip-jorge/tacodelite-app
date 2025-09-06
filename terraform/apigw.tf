@@ -54,7 +54,7 @@ resource "aws_api_gateway_integration_response" "options" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -99,7 +99,7 @@ resource "aws_api_gateway_integration_response" "options_categories" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -208,7 +208,7 @@ resource "aws_api_gateway_integration_response" "options_menu_items" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -364,7 +364,7 @@ resource "aws_api_gateway_integration_response" "options_search" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -415,7 +415,7 @@ resource "aws_api_gateway_integration_response" "options_menu_items_by_category"
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -933,7 +933,7 @@ resource "aws_api_gateway_integration_response" "admin_login" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -977,7 +977,7 @@ resource "aws_api_gateway_integration_response" "admin_verify" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -1022,7 +1022,7 @@ resource "aws_api_gateway_integration_response" "options_admin" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -1067,7 +1067,7 @@ resource "aws_api_gateway_integration_response" "options_admin_login" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -1112,7 +1112,7 @@ resource "aws_api_gateway_integration_response" "options_admin_verify" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -1128,7 +1128,7 @@ resource "aws_api_gateway_integration_response" "options_admin_users" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
   depends_on = [aws_api_gateway_integration.options_admin_users]
@@ -1222,7 +1222,7 @@ resource "aws_api_gateway_integration_response" "options_users" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -1267,7 +1267,7 @@ resource "aws_api_gateway_integration_response" "options_user" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 }
 
@@ -1437,7 +1437,7 @@ resource "aws_api_gateway_integration_response" "options_admin_user" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
   depends_on = [aws_api_gateway_integration.options_admin_user]

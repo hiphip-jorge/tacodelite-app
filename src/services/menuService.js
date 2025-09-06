@@ -82,7 +82,7 @@ export async function getCategories() {
     }
 
     try {
-        const response = await apiCall('/prod/categories');
+        const response = await apiCall('/categories');
         const categories = response || [];
 
         // Sort categories by their numeric ID (e.g., "CATEGORY#1" -> 1)
@@ -110,7 +110,7 @@ export async function getMenuItems() {
     }
 
     try {
-        const response = await apiCall('/prod/menu-items');
+        const response = await apiCall('/menu-items');
         return response;
     } catch (error) {
         console.error('Failed to fetch menu items:', error);
@@ -136,10 +136,10 @@ export async function getMenuItemsByCategory(categoryId) {
 
     try {
         if (categoryId === 'all') {
-            const response = await apiCall('/prod/menu-items');
+            const response = await apiCall('/menu-items');
             return response || [];
         }
-        const response = await apiCall(`/prod/menu-items-by-category?categoryId=${categoryId}`);
+        const response = await apiCall(`/menu-items-by-category?categoryId=${categoryId}`);
         // Handle both response formats:
         // 1. Old format: {success: true, data: [...], ...}
         // 2. New format: [...] (direct array)
@@ -180,7 +180,7 @@ export async function searchMenuItems(query) {
     }
 
     try {
-        const response = await apiCall(`/prod/search?query=${encodeURIComponent(query)}`);
+        const response = await apiCall(`/search?query=${encodeURIComponent(query)}`);
         return response || [];
     } catch (error) {
         console.error('Failed to search menu items:', error);

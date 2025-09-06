@@ -5,7 +5,7 @@ import App from './App.jsx'
 import './index.css'
 
 // Start mock service worker in development
-if (import.meta.env.DEV) {
+if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true') {
     import('../mocks/index.js').then(({ worker }) => {
         console.log('🔶 Mock service worker started in development mode');
     }).catch(err => {

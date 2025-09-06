@@ -4,18 +4,31 @@ const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb')
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
 
+const getCorsHeaders = (origin) => {
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
+    const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0] || '*';
+
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Methods': 'GET,OPTIONS',
+        'Cache-Control': 'max-age=604800, public', // 7 days - search is more dynamic
+        'ETag': 'W/"search-v1"',
+        'Vary': 'Accept-Encoding'
+    };
+};
+
 exports.handler = async (event) => {
     try {
         const { query } = event.queryStringParameters || {};
 
         if (!query) {
+            const origin = event.headers?.origin || event.headers?.Origin || '*';
             return {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'GET, OPTIONS'
+                    ...getCorsHeaders(origin)
                 },
                 body: JSON.stringify({
                     success: false,
@@ -49,12 +62,7 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'GET, OPTIONS',
-                'Cache-Control': 'max-age=604800, public', // 7 days - search is more dynamic
-                'ETag': 'W/"search-v1"',
-                'Vary': 'Accept-Encoding'
+                ...getCorsHeaders(event.headers?.origin || event.headers?.Origin || '*')
             },
             body: JSON.stringify({
                 success: true,
@@ -69,9 +77,7 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'GET, OPTIONS'
+                ...getCorsHeaders(event.headers?.origin || event.headers?.Origin || '*')
             },
             body: JSON.stringify({
                 success: false,
