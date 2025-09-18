@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MenuItem from '../components/MenuItem';
 import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
 import { useMenu } from '../hooks/useMenu';
 
 const Menu = () => {
+    const navigate = useNavigate();
     const {
         menuItems,
         categories,
@@ -164,7 +166,10 @@ const Menu = () => {
                     <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
                         Our team is here to help you find the perfect dish. Contact us for recommendations, dietary restrictions, or any other questions.
                     </p>
-                    <button className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200">
+                    <button
+                        onClick={() => navigate('/contact')}
+                        className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-8 rounded-lg transition-colors duration-200"
+                    >
                         Contact Us
                     </button>
                 </div>

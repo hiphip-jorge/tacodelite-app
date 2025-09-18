@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getCategories, getMenuItems, searchMenuItems, getMenuItemsByCategory } from '../services/menuService';
+import { getCategories, getMenuItems, searchMenuItems, getMenuItemsByCategory, cacheManager } from '../services/menuService';
 
 export const useMenu = () => {
     const [categories, setCategories] = useState([]);
@@ -27,6 +27,9 @@ export const useMenu = () => {
         const loadData = async () => {
             try {
                 setLoading(true);
+                // Clear any existing cache to ensure fresh API calls
+                cacheManager.clearAllOnStartup();
+
                 const categoriesData = await getCategories();
                 setCategories(categoriesData);
 
@@ -83,6 +86,12 @@ export const useMenu = () => {
 
                 console.log('Final items before sorting:', items);
                 console.log('Items length before sorting:', items?.length);
+
+                // Ensure items is an array before sorting
+                if (!Array.isArray(items)) {
+                    console.error('Items is not an array:', items);
+                    items = [];
+                }
 
                 // Sort items by ID (assuming ID is numeric)
                 const sortedItems = items.sort((a, b) => {
@@ -216,6 +225,17 @@ export const useMenu = () => {
         return getCategoryItemCount(categoryId);
     }, [getCategoryItemCount]);
 
+    // Debug function to check cache status
+    const getCacheStatus = useCallback(() => {
+        return cacheManager.getCacheInfo();
+    }, []);
+
+    // Function to manually clear cache (useful for testing)
+    const clearCache = useCallback(() => {
+        cacheManager.clearAll();
+        console.log('🧹 Cache cleared manually');
+    }, []);
+
     return {
         // State
         categories,
@@ -244,6 +264,10 @@ export const useMenu = () => {
         getCategoryItemCount,
         getVegetarianCount,
         getPriceRange,
+
+        // Cache management (for debugging/testing)
+        getCacheStatus,
+        clearCache,
 
         // Utility
         totalItems: menuItems.length,

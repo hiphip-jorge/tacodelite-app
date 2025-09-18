@@ -1,0 +1,44 @@
+name: Test and Lint
+
+on:
+  pull_request:
+    branches: [ staging, main ]
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Build staging (test)
+      run: npm run build:staging
+      env:
+        VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
+        VITE_USE_MOCK: "false"
+        VITE_ENVIRONMENT: "staging"
+        VITE_APP_NAME: "Taco Delite"
+
+    - name: Build production (test)
+      run: npm run build:production
+      env:
+        VITE_API_URL: "https://tacodelitewestplano.com/prod"
+        VITE_USE_MOCK: "false"
+        VITE_ENVIRONMENT: "production"
+        VITE_APP_NAME: "Taco Delite"

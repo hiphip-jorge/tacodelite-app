@@ -1,10 +1,23 @@
 // Menu service for fetching data from DynamoDB via Lambda APIs
 // TODO: Update API_BASE_URL with your actual API Gateway URL after deployment
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://j0uotuymd1.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
 
 // Toggle this to true to use mock data instead of API calls
 const USE_MOCK_DATA = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
+
+// Cache configuration
+const CACHE_KEYS = {
+    MENU_VERSION: 'menu_version',
+    CATEGORIES: 'menu_categories',
+    MENU_ITEMS: 'menu_items'
+};
+
+// Cache duration (in milliseconds) - Optimized for menu that changes 3-5 times per year
+const CACHE_DURATION = {
+    VERSION: 24 * 60 * 60 * 1000,      // 24 hours (check version daily)
+    DATA: 30 * 24 * 60 * 60 * 1000    // 30 days (menu items/categories cached for a month)
+};
 
 // Mock data for development
 const mockCategories = [
@@ -50,6 +63,58 @@ const mockMenuItems = [
 // Helper function to simulate API delay
 const simulateDelay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+// Cache utility functions
+const cacheUtils = {
+    // Get cached data
+    get(key) {
+        try {
+            const cached = localStorage.getItem(key);
+            if (!cached) return null;
+
+            const { data, timestamp } = JSON.parse(cached);
+            const now = Date.now();
+
+            // Check if cache is expired
+            if (now - timestamp > CACHE_DURATION.DATA) {
+                localStorage.removeItem(key);
+                return null;
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error reading from cache:', error);
+            return null;
+        }
+    },
+
+    // Set cached data
+    set(key, data) {
+        try {
+            const cacheData = {
+                data,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(key, JSON.stringify(cacheData));
+        } catch (error) {
+            console.error('Error writing to cache:', error);
+        }
+    },
+
+    // Clear specific cache
+    clear(key) {
+        try {
+            localStorage.removeItem(key);
+        } catch (error) {
+            console.error('Error clearing cache:', error);
+        }
+    },
+
+    // Clear all menu-related cache
+    clearAll() {
+        Object.values(CACHE_KEYS).forEach(key => this.clear(key));
+    }
+};
+
 // Helper function to make API calls
 const apiCall = async (endpoint, options = {}) => {
     try {
@@ -73,6 +138,29 @@ const apiCall = async (endpoint, options = {}) => {
     }
 };
 
+// Get current menu version
+async function getMenuVersion() {
+    try {
+        const response = await apiCall('/menu-version');
+        return response?.version || 1;
+    } catch (error) {
+        console.error('Failed to get menu version:', error);
+        return 1; // Default version
+    }
+}
+
+// Check if cached data is still valid based on version
+async function isCacheValid(cacheKey) {
+    try {
+        // DISABLED - Always return false to force API calls
+        console.log('🌐 Caching disabled - making fresh API calls');
+        return false;
+    } catch (error) {
+        console.error('Error checking cache validity:', error);
+        return false;
+    }
+}
+
 // Get all categories
 export async function getCategories() {
     if (USE_MOCK_DATA) {
@@ -82,6 +170,7 @@ export async function getCategories() {
     }
 
     try {
+        console.log('🌐 Fetching fresh categories data');
         const response = await apiCall('/categories');
         const categories = response || [];
 
@@ -95,7 +184,15 @@ export async function getCategories() {
         return sortedCategories;
     } catch (error) {
         console.error('Failed to fetch categories:', error);
-        // Fallback to mock data if API fails
+
+        // Try to return cached data even if expired
+        const cachedCategories = cacheUtils.get(CACHE_KEYS.CATEGORIES);
+        if (cachedCategories) {
+            console.log('🔄 Using expired cached categories data as fallback');
+            return cachedCategories;
+        }
+
+        // Fallback to mock data if API fails and no cache
         console.log('🔶 Falling back to mock categories data');
         return mockCategories;
     }
@@ -110,11 +207,22 @@ export async function getMenuItems() {
     }
 
     try {
+        console.log('🌐 Fetching fresh menu items data');
         const response = await apiCall('/menu-items');
-        return response;
+        const menuItems = response || [];
+
+        return menuItems;
     } catch (error) {
         console.error('Failed to fetch menu items:', error);
-        // Fallback to mock data if API fails
+
+        // Try to return cached data even if expired
+        const cachedMenuItems = cacheUtils.get(CACHE_KEYS.MENU_ITEMS);
+        if (cachedMenuItems) {
+            console.log('🔄 Using expired cached menu items data as fallback');
+            return cachedMenuItems;
+        }
+
+        // Fallback to mock data if API fails and no cache
         console.log('🔶 Falling back to mock menu items data');
         return mockMenuItems;
     }
@@ -181,7 +289,19 @@ export async function searchMenuItems(query) {
 
     try {
         const response = await apiCall(`/search?query=${encodeURIComponent(query)}`);
-        return response || [];
+        // Handle both response formats:
+        // 1. Old format: {success: true, data: [...], ...}
+        // 2. New format: [...] (direct array)
+        if (response?.data) {
+            // Old format with nested data
+            return response.data;
+        } else if (Array.isArray(response)) {
+            // New format with direct array
+            return response;
+        } else {
+            console.warn('Unexpected search response format:', response);
+            return [];
+        }
     } catch (error) {
         console.error('Failed to search menu items:', error);
         // Fallback to mock data if API fails
@@ -196,3 +316,31 @@ export async function searchMenuItems(query) {
 
 // The service is now ready to use with your Lambda APIs!
 // Just update the API_BASE_URL environment variable with your actual API Gateway URL
+
+// Export cache utilities for manual cache management
+export const cacheManager = {
+    // Clear all menu cache
+    clearAll: () => cacheUtils.clearAll(),
+
+    // Clear specific cache
+    clearCategories: () => cacheUtils.clear(CACHE_KEYS.CATEGORIES),
+    clearMenuItems: () => cacheUtils.clear(CACHE_KEYS.MENU_ITEMS),
+    clearVersion: () => cacheUtils.clear(CACHE_KEYS.MENU_VERSION),
+
+    // Get cache info for debugging
+    getCacheInfo: () => {
+        // Clear any existing cache since we're disabling caching
+        cacheUtils.clearAll();
+        return {
+            categories: 'Caching disabled',
+            menuItems: 'Caching disabled',
+            version: 'Caching disabled'
+        };
+    },
+
+    // Clear all cache on startup
+    clearAllOnStartup: () => {
+        cacheUtils.clearAll();
+        console.log('🧹 Cache cleared on startup - using fresh API calls');
+    }
+};

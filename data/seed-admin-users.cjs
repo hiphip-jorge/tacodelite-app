@@ -6,7 +6,7 @@ const crypto = require('crypto');
 AWS.config.update({ region: 'us-east-1' });
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const ADMIN_USERS_TABLE = process.env.ADMIN_USERS_TABLE || 'tacodelite-app-admin-users-staging';
+const ADMIN_USERS_TABLE = process.env.ADMIN_USERS_TABLE || `tacodelite-app-admin-users-${process.env.ENVIRONMENT || 'staging'}`;
 
 async function hashPassword(password) {
     return await bcrypt.hash(password, 12);
@@ -49,7 +49,9 @@ async function createAdminUser(userData) {
 }
 
 async function seedAdminUsers() {
-    console.log('🌱 Seeding admin users...');
+    const environment = process.env.ENVIRONMENT || 'staging';
+    console.log(`🌱 Seeding admin users for ${environment} environment...`);
+    console.log(`📊 Table: ${ADMIN_USERS_TABLE}`);
     console.log('🔐 Generating secure credentials...\n');
 
     // Generate secure credentials

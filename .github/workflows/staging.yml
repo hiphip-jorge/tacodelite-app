@@ -1,0 +1,65 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
+
+env:
+  NODE_VERSION: '20'
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  deploy-staging:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build staging app
+      run: npm run build:staging
+      env:
+        VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
+        VITE_USE_MOCK: "false"
+        VITE_ENVIRONMENT: "staging"
+        VITE_APP_NAME: "Taco Delite"
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Deploy to AWS (Staging)
+      run: |
+        echo "🚀 Deploying to STAGING environment..."
+        
+        # Initialize Terraform
+        terraform -chdir=terraform init
+        
+        # Select staging workspace
+        terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
+        
+        # Plan and apply
+        terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars
+        terraform -chdir=terraform apply -var-file=../env_files/staging.tfvars -auto-approve
+        
+        # Upload static assets
+        ./scripts/upload-static.sh --environment staging
+
+    - name: Get deployment info
+      run: |
+        echo "📋 Deployment Summary:"
+        terraform -chdir=terraform output

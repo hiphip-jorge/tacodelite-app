@@ -1,9 +1,13 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import doorDashLogo from '../assets/logos/door-dash.png'
 import uberEatsLogo from '../assets/logos/uber-eats.png'
 
 function Contact() {
+    useEffect(() => {
+        // Scroll to top when contact page loads
+        window.scrollTo(0, 0);
+    }, []);
     const contactInfo = [
         {
             icon: '📍',

@@ -1,5 +1,5 @@
 // CloudFlare Worker to proxy requests to S3 bucket
-// This fixes the Host header issue when accessing staging.tacodelitewestplano.com
+// This fixes the Host header issue when accessing tacodelitewestplano.com
 
 addEventListener('fetch', event => {
     event.respondWith(handleRequest(event.request))
@@ -14,7 +14,7 @@ async function handleRequest(request) {
             // Handle admin authentication routes first
             if (url.pathname.startsWith('/prod/admin/')) {
                 // This is an admin API call - proxy to API Gateway
-                const baseUrl = 'https://j0uotuymd1.execute-api.us-east-1.amazonaws.com'
+                const baseUrl = 'https://vkuzmcj5bl.execute-api.us-east-1.amazonaws.com'
 
                 // Map admin calls to correct API Gateway paths
                 // Remove /prod prefix and keep the admin path
@@ -28,8 +28,11 @@ async function handleRequest(request) {
                 const headers = new Headers()
                 headers.set('Host', new URL(baseUrl).host)
                 headers.set('Content-Type', 'application/json')
-                headers.set('Origin', 'https://staging.tacodelitewestplano.com')
-                headers.set('Referer', 'https://staging.tacodelitewestplano.com')
+
+                // Use the request's origin or default to production
+                const requestOrigin = request.headers.get('Origin') || 'https://tacodelitewestplano.com'
+                headers.set('Origin', requestOrigin)
+                headers.set('Referer', requestOrigin)
 
                 // Forward Authorization header for admin routes
                 if (request.headers.get('Authorization')) {
@@ -54,7 +57,7 @@ async function handleRequest(request) {
                     const responseHeaders = new Headers(apiResponse.headers)
 
                     // Add CORS headers for admin API calls
-                    responseHeaders.set('Access-Control-Allow-Origin', 'https://staging.tacodelitewestplano.com')
+                    responseHeaders.set('Access-Control-Allow-Origin', requestOrigin)
                     responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token')
                     responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
 
@@ -78,7 +81,7 @@ async function handleRequest(request) {
             }
 
             // Handle other API calls - proxy to API Gateway
-            const baseUrl = 'https://j0uotuymd1.execute-api.us-east-1.amazonaws.com'
+            const baseUrl = 'https://vkuzmcj5bl.execute-api.us-east-1.amazonaws.com'
 
             // Map React app calls to correct API Gateway paths
             let apiPath = url.pathname.replace('/prod', '')
@@ -95,8 +98,11 @@ async function handleRequest(request) {
             const headers = new Headers()
             headers.set('Host', new URL(baseUrl).host)
             headers.set('Content-Type', 'application/json')
-            headers.set('Origin', 'https://staging.tacodelitewestplano.com')
-            headers.set('Referer', 'https://staging.tacodelitewestplano.com')
+
+            // Use the request's origin or default to production
+            const requestOrigin = request.headers.get('Origin') || 'https://tacodelitewestplano.com'
+            headers.set('Origin', requestOrigin)
+            headers.set('Referer', requestOrigin)
 
             // Only forward essential headers, avoid CloudFlare-specific ones
             if (request.headers.get('Accept')) headers.set('Accept', request.headers.get('Accept'))
@@ -133,11 +139,11 @@ async function handleRequest(request) {
         }
 
         // This is a static file request - proxy to S3
-        const s3Endpoint = 'http://tacodelite-app-staging.s3-website-us-east-1.amazonaws.com'
+        const s3Endpoint = 'http://tacodelite-app-production.s3-website-us-east-1.amazonaws.com'
 
         // Clone headers and set correct Host
         const headers = new Headers(request.headers)
-        headers.set('Host', 'tacodelite-app-staging.s3-website-us-east-1.amazonaws.com')
+        headers.set('Host', 'tacodelite-app-production.s3-website-us-east-1.amazonaws.com')
 
         // Handle admin app routing
         let s3Path = url.pathname

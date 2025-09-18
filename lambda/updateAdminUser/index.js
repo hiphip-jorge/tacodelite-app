@@ -5,7 +5,7 @@ const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1
 const docClient = DynamoDBDocumentClient.from(client);
 
 const ADMIN_USERS_TABLE = process.env.ADMIN_USERS_TABLE;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || 'https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com';
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || 'https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com,https://tacodelitewestplano.com';
 
 exports.handler = async (event) => {
     console.log('🚀 Update Admin User Lambda triggered');

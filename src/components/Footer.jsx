@@ -24,11 +24,11 @@ function Footer() {
                             Serving flavorful Tex-Mex cuisine in Plano since 1989.
                             Fresh ingredients, bold flavors, and friendly service.
                         </p>
-                        <div className="flex space-x-4">
+                        {/* <div className="flex space-x-4">
                             <a href="https://www.tiktok.com/@tacodelite15thst?is_from_webapp=1&sender_device=pc" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-taco-yellow-400 transition-colors">
                                 🎥 TikTok
                             </a>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Quick Links */}

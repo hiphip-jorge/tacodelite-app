@@ -10,7 +10,7 @@ output "s3_bucket_arn" {
 
 output "s3_website_endpoint" {
   description = "S3 website endpoint (for CloudFlare origin)"
-  value       = aws_s3_bucket.static_assets.website_endpoint
+  value       = "${aws_s3_bucket.static_assets.bucket}.s3-website-us-east-1.amazonaws.com"
 }
 
 output "dynamodb_menu_items_table" {
@@ -82,11 +82,11 @@ output "deployment_instructions" {
     🚀 Your S3 bucket is ready!
     
     📦 S3 Bucket: ${aws_s3_bucket.static_assets.bucket}
-    🌐 S3 Website URL: http://${aws_s3_bucket.static_assets.website_endpoint}
+    🌐 S3 Website URL: http://${aws_s3_bucket.static_assets.bucket}.s3-website-us-east-1.amazonaws.com
     
     🔧 Next steps for CloudFlare:
     1. Add your domain to CloudFlare
-    2. Set S3 website endpoint as origin: ${aws_s3_bucket.static_assets.website_endpoint}
+    2. Set S3 website endpoint as origin: ${aws_s3_bucket.static_assets.bucket}.s3-website-us-east-1.amazonaws.com
     3. Configure DNS to point to CloudFlare
     4. Enable CloudFlare proxy (orange cloud)
     

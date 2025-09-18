@@ -69,7 +69,7 @@ resource "aws_lambda_function" "get_menu_items" {
   function_name    = "${var.app_name}-get-menu-items-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/getMenuItems.zip")
 
@@ -92,7 +92,7 @@ resource "aws_lambda_function" "search_menu_items" {
   function_name    = "${var.app_name}-search-menu-items-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/searchMenuItems.zip")
 
@@ -115,7 +115,7 @@ resource "aws_lambda_function" "get_menu_items_by_category" {
   function_name    = "${var.app_name}-get-menu-items-by-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/getMenuItemsByCategory.zip")
 
@@ -138,7 +138,7 @@ resource "aws_lambda_function" "update_menu_item" {
   function_name    = "${var.app_name}-update-menu-item-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/updateMenuItem.zip")
 
@@ -161,7 +161,7 @@ resource "aws_lambda_function" "delete_menu_item" {
   function_name    = "${var.app_name}-delete-menu-item-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/deleteMenuItem.zip")
 
@@ -184,7 +184,7 @@ resource "aws_lambda_function" "create_menu_item" {
   function_name    = "${var.app_name}-create-menu-item-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/createMenuItem.zip")
 
@@ -209,7 +209,7 @@ resource "aws_lambda_function" "get_categories" {
   function_name    = "${var.app_name}-get-categories-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/getCategories.zip")
 
@@ -232,7 +232,7 @@ resource "aws_lambda_function" "update_category" {
   function_name    = "${var.app_name}-update-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/updateCategory.zip")
 
@@ -255,7 +255,7 @@ resource "aws_lambda_function" "create_category" {
   function_name    = "${var.app_name}-create-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/createCategory.zip")
 
@@ -279,7 +279,7 @@ resource "aws_lambda_function" "admin_login" {
   function_name    = "${var.app_name}-admin-login-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/auth/login.zip")
 
@@ -303,7 +303,7 @@ resource "aws_lambda_function" "admin_verify" {
   function_name    = "${var.app_name}-admin-verify-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/auth/verify.zip")
 
@@ -328,7 +328,7 @@ resource "aws_lambda_function" "get_admin_users" {
   function_name    = "${var.app_name}-get-admin-users-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/getAdminUsers.zip")
 
@@ -352,7 +352,7 @@ resource "aws_lambda_function" "get_users" {
   function_name    = "${var.app_name}-get-users-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/getUsers.zip")
 
@@ -375,7 +375,7 @@ resource "aws_lambda_function" "get_user_by_id" {
   function_name    = "${var.app_name}-get-user-by-id-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/getUserById.zip")
 
@@ -398,7 +398,7 @@ resource "aws_lambda_function" "update_user" {
   function_name    = "${var.app_name}-update-user-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/updateUser.zip")
 
@@ -421,7 +421,7 @@ resource "aws_lambda_function" "delete_user" {
   function_name    = "${var.app_name}-delete-user-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/deleteUser.zip")
 
@@ -445,7 +445,7 @@ resource "aws_lambda_function" "delete_category" {
   function_name    = "${var.app_name}-delete-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
-  runtime         = "nodejs18.x"
+  runtime         = "nodejs20.x"
   timeout         = 30
   source_code_hash = filebase64sha256("../lambda/deleteCategory.zip")
 
@@ -469,7 +469,7 @@ resource "aws_lambda_function" "create_admin_user" {
   function_name = "${var.app_name}-create-admin-user-${var.environment}"
   role         = aws_iam_role.lambda_role.arn
   handler      = "index.handler"
-  runtime      = "nodejs18.x"
+  runtime      = "nodejs20.x"
   timeout      = 30
 
   filename         = "../lambda/createAdminUser.zip"
@@ -494,7 +494,7 @@ resource "aws_lambda_function" "update_admin_user" {
   function_name = "${var.app_name}-update-admin-user-${var.environment}"
   role         = aws_iam_role.lambda_role.arn
   handler      = "index.handler"
-  runtime      = "nodejs18.x"
+  runtime      = "nodejs20.x"
   timeout      = 30
 
   filename         = "../lambda/updateAdminUser.zip"
@@ -519,7 +519,7 @@ resource "aws_lambda_function" "delete_admin_user" {
   function_name = "${var.app_name}-delete-admin-user-${var.environment}"
   role         = aws_iam_role.lambda_role.arn
   handler      = "index.handler"
-  runtime      = "nodejs18.x"
+  runtime      = "nodejs20.x"
   timeout      = 30
 
   filename         = "../lambda/deleteAdminUser.zip"
@@ -537,4 +537,25 @@ resource "aws_lambda_function" "delete_admin_user" {
     Environment = var.environment
     Purpose     = "Delete admin user"
   }
+}
+
+# Get Menu Version Lambda Function
+resource "aws_lambda_function" "get_menu_version" {
+  filename         = "../../lambda/getMenuVersion.zip"
+  function_name    = "${var.app_name}-${var.environment}-get-menu-version"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
 }

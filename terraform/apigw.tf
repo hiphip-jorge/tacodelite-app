@@ -54,7 +54,7 @@ resource "aws_api_gateway_integration_response" "options" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -73,9 +73,9 @@ resource "aws_api_gateway_method_response" "options_categories" {
   status_code = "200"
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
   }
 }
 
@@ -99,7 +99,7 @@ resource "aws_api_gateway_integration_response" "options_categories" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -208,7 +208,7 @@ resource "aws_api_gateway_integration_response" "options_menu_items" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -323,6 +323,12 @@ resource "aws_api_gateway_resource" "search" {
   path_part   = "search"
 }
 
+resource "aws_api_gateway_resource" "menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
+  path_part   = "menu-version"
+}
+
 # CORS Support - OPTIONS method for search
 resource "aws_api_gateway_method" "options_search" {
   rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
@@ -364,7 +370,95 @@ resource "aws_api_gateway_integration_response" "options_search" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# CORS Support - OPTIONS method for menu-version
+resource "aws_api_gateway_method" "options_menu_version" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.menu_version.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.options_menu_version.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.options_menu_version.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.options_menu_version.http_method
+  status_code = aws_api_gateway_method_response.options_menu_version.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# GET method for menu-version
+resource "aws_api_gateway_method" "get_menu_version" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.menu_version.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "get_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.get_menu_version.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "get_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.get_menu_version.http_method
+  type        = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri         = aws_lambda_function.get_menu_version.invoke_arn
+}
+
+resource "aws_api_gateway_integration_response" "get_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.get_menu_version.http_method
+  status_code = aws_api_gateway_method_response.get_menu_version.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
   }
 }
 
@@ -415,7 +509,7 @@ resource "aws_api_gateway_integration_response" "options_menu_items_by_category"
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -692,6 +786,14 @@ resource "aws_lambda_permission" "create_menu_item" {
   source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
 }
 
+resource "aws_lambda_permission" "get_menu_version" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_menu_version.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
 resource "aws_lambda_permission" "admin_login" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
@@ -847,6 +949,7 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_method.delete_category.id,
       aws_api_gateway_method.search_menu_items.id,
       aws_api_gateway_method.get_menu_items_by_category.id,
+      aws_api_gateway_method.get_menu_version.id,
       aws_api_gateway_method.put_menu_item.id,
       aws_api_gateway_method.admin_login.id,
       aws_api_gateway_method.admin_verify.id,
@@ -863,6 +966,7 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_integration.delete_category.id,
       aws_api_gateway_integration.search_menu_items.id,
       aws_api_gateway_integration.get_menu_items_by_category.id,
+      aws_api_gateway_integration.get_menu_version.id,
       aws_api_gateway_integration.put_menu_item.id,
       aws_api_gateway_integration.admin_login.id,
       aws_api_gateway_integration.admin_verify.id,
@@ -933,7 +1037,7 @@ resource "aws_api_gateway_integration_response" "admin_login" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -977,7 +1081,7 @@ resource "aws_api_gateway_integration_response" "admin_verify" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -1022,7 +1126,7 @@ resource "aws_api_gateway_integration_response" "options_admin" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -1067,7 +1171,7 @@ resource "aws_api_gateway_integration_response" "options_admin_login" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -1112,7 +1216,7 @@ resource "aws_api_gateway_integration_response" "options_admin_verify" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -1128,7 +1232,7 @@ resource "aws_api_gateway_integration_response" "options_admin_users" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 
   depends_on = [aws_api_gateway_integration.options_admin_users]
@@ -1222,7 +1326,7 @@ resource "aws_api_gateway_integration_response" "options_users" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -1267,7 +1371,7 @@ resource "aws_api_gateway_integration_response" "options_user" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 }
 
@@ -1437,7 +1541,7 @@ resource "aws_api_gateway_integration_response" "options_admin_user" {
   response_parameters = {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
   }
 
   depends_on = [aws_api_gateway_integration.options_admin_user]

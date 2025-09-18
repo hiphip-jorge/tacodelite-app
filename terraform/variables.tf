@@ -24,7 +24,7 @@ variable "app_name" {
 variable "allowed_origins" {
   description = "Comma-separated list of allowed origins for CORS (e.g., 'https://yourdomain.com,https://www.yourdomain.com')"
   type        = string
-  default     = "https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com"
+  default     = "https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com,https://tacodelitewestplano.com"
 }
 
 variable "jwt_secret" {

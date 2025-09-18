@@ -1,24 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const SearchBar = ({ onSearch, onClear, searchQuery, placeholder = "Search our menu..." }) => {
-    const [inputValue, setInputValue] = useState(searchQuery);
+const SearchBar = ({ searchTerm, onSearchChange, placeholder = "Search our menu..." }) => {
+    const [inputValue, setInputValue] = useState(searchTerm || '');
+
+    // Sync input value with searchTerm prop
+    useEffect(() => {
+        setInputValue(searchTerm || '');
+    }, [searchTerm]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSearch(inputValue.trim());
+        onSearchChange(inputValue.trim());
     };
 
     const handleClear = () => {
         setInputValue('');
-        onClear();
+        onSearchChange('');
     };
 
     const handleInputChange = (e) => {
-        setInputValue(e.target.value);
-        if (e.target.value === '') {
-            onClear();
-        }
+        const value = e.target.value;
+        setInputValue(value);
+        // Real-time search - call onSearchChange immediately
+        onSearchChange(value);
     };
 
     return (

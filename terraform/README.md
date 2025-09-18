@@ -11,6 +11,9 @@ This directory contains the Terraform configuration for the Taco Delite applicat
 - `dynamodb.tf` - DynamoDB tables for data storage
 - `lambda.tf` - Lambda functions and IAM roles/policies
 - `apigw.tf` - API Gateway configuration and endpoints
+- `.terraform.lock.hcl` - Terraform provider lock file
+- `.terraformignore` - Files to ignore during terraform operations
+- `terraform.tfstate*` - Terraform state files and backups
 
 ## Resources
 
@@ -39,24 +42,42 @@ This directory contains the Terraform configuration for the Taco Delite applicat
 
 ## Usage
 
+All terraform commands are run from the project root using npm scripts:
+
 ```bash
 # Initialize Terraform
-terraform init
+npm run terraform:init
 
-# Plan changes
-terraform plan
+# Plan changes for staging
+npm run terraform:plan
 
-# Apply changes
-terraform apply
+# Plan changes for production
+npm run terraform:plan:production
 
-# Destroy infrastructure
-terraform destroy
+# Apply changes for staging
+npm run terraform:apply
+
+# Apply changes for production
+npm run terraform:apply:production
+
+# Deploy to staging (build + terraform)
+npm run deploy:staging
+
+# Deploy to production (build + terraform)
+npm run deploy:production
+
+# Destroy staging infrastructure
+npm run terraform:destroy
+
+# Destroy production infrastructure
+npm run terraform:destroy:production
 ```
 
-## Environment Variables
+## Environment Files
 
-Required variables (set in `terraform.tfvars` or environment):
-- `jwt_secret` - Secret key for JWT token generation
+Environment-specific variables are stored in `../env_files/`:
+- `staging.tfvars` - Staging environment configuration
+- `production.tfvars` - Production environment configuration
 
 ## Outputs
 
