@@ -75,7 +75,9 @@ jobs:
   deploy-production:
     needs: setup
     runs-on: ubuntu-latest
-    
+    environment: production  # This enables manual approval
+    if: github.ref == 'refs/heads/main'  # Only run on main branch pushes
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4

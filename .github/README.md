@@ -30,14 +30,14 @@ The workflows are optimized for speed with parallel execution:
 - **Trigger**: Push to `staging` branch
 - **Environment**: Staging
 - **Jobs**:
-  - **Setup Job** (Parallel execution):
+  - **Setup Job** (Automatic):
     1. Setup Node.js 20 and Terraform 1.6.0
     2. Install dependencies
     3. Build Lambda functions (package into zip files)
     4. Build staging app with staging environment variables
     5. Configure AWS credentials
     6. Initialize Terraform and create plan
-  - **Deploy Job** (After setup completes):
+  - **Deploy Job** (Manual approval required):
     1. Configure AWS credentials
     2. Deploy infrastructure using Terraform staging workspace
     3. Upload static assets to staging S3 bucket
@@ -46,17 +46,36 @@ The workflows are optimized for speed with parallel execution:
 - **Trigger**: Push to `main` branch
 - **Environment**: Production
 - **Jobs**:
-  - **Setup Job** (Parallel execution):
+  - **Setup Job** (Automatic):
     1. Setup Node.js 20 and Terraform 1.6.0
     2. Install dependencies
     3. Build Lambda functions (package into zip files)
     4. Build production app with production environment variables
     5. Configure AWS credentials
     6. Initialize Terraform and create plan
-  - **Deploy Job** (After setup completes):
+  - **Deploy Job** (Manual approval required):
     1. Configure AWS credentials
     2. Deploy infrastructure using Terraform production workspace
     3. Upload static assets to production S3 bucket
+
+## Manual Deployment Approval
+
+Both staging and production deployments require manual approval for safety:
+
+### How It Works:
+1. **Setup Job runs automatically** when you push to `staging` or `main`
+2. **Deploy Job waits for approval** - you'll see a notification in GitHub
+3. **Review the setup output** - check the Terraform plan and build results
+4. **Approve deployment** - click "Review deployments" in GitHub Actions
+5. **Deployment proceeds** - infrastructure is deployed and assets are uploaded
+
+### Setting Up Environments:
+1. Go to **Repository Settings** → **Environments**
+2. Create environments named `staging` and `production`
+3. Configure protection rules (optional):
+   - Required reviewers
+   - Deployment branches (restrict to specific branches)
+   - Wait timer (delay before deployment)
 
 ## Required GitHub Secrets
 

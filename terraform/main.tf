@@ -7,17 +7,7 @@ terraform {
     }
   }
   
-  # Use local backend with state file in terraform directory
-  backend "local" {
-    path = "terraform.tfstate"
-  }
-  
-  # Comment out backend until bucket exists
-  # backend "s3" {
-  #   bucket = "your-terraform-state-bucket"
-  #   key    = "infrastructure/terraform.tfstate"
-  #   region = "us-east-1"
-  # }
+  # Backend configuration moved to backend.tf
 }
 
 provider "aws" {

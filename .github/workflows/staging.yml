@@ -75,7 +75,9 @@ jobs:
   deploy-staging:
     needs: setup
     runs-on: ubuntu-latest
-    
+    environment: staging  # This enables manual approval
+    if: github.ref == 'refs/heads/staging'  # Only run on staging branch pushes
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
