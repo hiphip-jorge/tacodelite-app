@@ -539,3 +539,24 @@ resource "aws_lambda_function" "get_menu_version" {
     aws_iam_role_policy.lambda_policy
   ]
 }
+
+# Increment Menu Version Lambda Function
+resource "aws_lambda_function" "increment_menu_version" {
+  filename         = "../lambda/incrementMenuVersion.zip"
+  function_name    = "${var.app_name}-${var.environment}-increment-menu-version"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
