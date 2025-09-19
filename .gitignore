@@ -24,6 +24,8 @@ yarn-error.log*
 *.tfstate.*
 *.tfvars
 !example.tfvars
+# Allow env_files directory for GitHub Actions
+!env_files/*.tfvars
 
 # AWS
 lambda/*.zip
