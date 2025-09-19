@@ -521,7 +521,7 @@ resource "aws_lambda_function" "delete_admin_user" {
 
 # Get Menu Version Lambda Function
 resource "aws_lambda_function" "get_menu_version" {
-  filename         = "../../lambda/getMenuVersion.zip"
+  filename         = "../lambda/getMenuVersion.zip"
   function_name    = "${var.app_name}-${var.environment}-get-menu-version"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"

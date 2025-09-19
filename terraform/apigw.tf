@@ -460,6 +460,11 @@ resource "aws_api_gateway_integration_response" "get_menu_version" {
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
     "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
   }
+
+  depends_on = [
+    aws_lambda_function.get_menu_version,
+    aws_api_gateway_integration.get_menu_version
+  ]
 }
 
 resource "aws_api_gateway_resource" "menu_items_by_category" {
