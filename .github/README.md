@@ -11,25 +11,33 @@ This repository uses GitHub Actions for automated deployment to AWS. The CI/CD p
 ### Test and Lint (`test.yml`)
 - **Trigger**: Pull requests to `staging` or `main` branches
 - **Actions**:
-  1. Run ESLint to check code quality
-  2. Test build both staging and production configurations
-  3. Ensure builds complete successfully
+  1. Setup Node.js 20
+  2. Install dependencies
+  3. Run ESLint to check code quality
+  4. Test build both staging and production configurations
+  5. Ensure builds complete successfully
 
 ### Staging Deployment (`staging.yml`)
 - **Trigger**: Push to `staging` branch
 - **Environment**: Staging
 - **Actions**:
-  1. Build staging app with staging environment variables
-  2. Deploy infrastructure using Terraform staging workspace
-  3. Upload static assets to staging S3 bucket
+  1. Setup Node.js 20 and Terraform 1.6.0
+  2. Install dependencies
+  3. Build staging app with staging environment variables
+  4. Configure AWS credentials
+  5. Deploy infrastructure using Terraform staging workspace
+  6. Upload static assets to staging S3 bucket
 
 ### Production Deployment (`production.yml`)
 - **Trigger**: Push to `main` branch
 - **Environment**: Production
 - **Actions**:
-  1. Build production app with production environment variables
-  2. Deploy infrastructure using Terraform production workspace
-  3. Upload static assets to production S3 bucket
+  1. Setup Node.js 20 and Terraform 1.6.0
+  2. Install dependencies
+  3. Build production app with production environment variables
+  4. Configure AWS credentials
+  5. Deploy infrastructure using Terraform production workspace
+  6. Upload static assets to production S3 bucket
 
 ## Required GitHub Secrets
 
