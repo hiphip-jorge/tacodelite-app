@@ -46,6 +46,12 @@ variable "certificate_arn" {
   default     = ""
 }
 
+variable "enable_api" {
+  description = "Whether to enable API Gateway (false for static site only)"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Additional tags to apply to resources"
   type        = map(string)

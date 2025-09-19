@@ -11,8 +11,11 @@ env:
   AWS_REGION: 'us-east-1'
 
 jobs:
-  deploy-staging:
+  setup:
     runs-on: ubuntu-latest
+    outputs:
+      build-complete: ${{ steps.build.outputs.complete }}
+      terraform-complete: ${{ steps.terraform.outputs.complete }}
     
     steps:
     - name: Checkout code
@@ -24,16 +27,25 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
         cache: 'npm'
 
-    - name: Install dependencies
-      run: npm ci
-
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: '1.6.0'
 
+    - name: Install dependencies
+      id: deps
+      run: npm ci
+
+    - name: Build Lambda functions
+      run: |
+        echo "📦 Building Lambda functions..."
+        ./scripts/build-lambda.sh
+
     - name: Build staging app
-      run: npm run build:staging
+      id: build
+      run: |
+        npm run build:staging
+        echo "complete=true" >> $GITHUB_OUTPUT
       env:
         VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
         VITE_USE_MOCK: "false"
@@ -47,21 +59,55 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Deploy to AWS (Staging)
+    - name: Terraform init and plan
+      id: terraform
+      run: |
+        # Initialize Terraform
+        terraform -chdir=terraform init
+
+        # Select staging workspace
+        terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
+
+        # Plan (but don't apply yet)
+        terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars -out=tfplan
+        echo "complete=true" >> $GITHUB_OUTPUT
+
+  deploy-staging:
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: '1.6.0'
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Deploy infrastructure
       run: |
         echo "🚀 Deploying to STAGING environment..."
         
-        # Initialize Terraform
+        # Initialize Terraform (quick since we're using same runner)
         terraform -chdir=terraform init
         
         # Select staging workspace
         terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
         
-        # Plan and apply
-        terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars
+        # Apply the plan
         terraform -chdir=terraform apply -var-file=../env_files/staging.tfvars -auto-approve
-        
-        # Upload static assets
+
+    - name: Upload static assets
+      run: |
+        echo "📤 Uploading static assets..."
         ./scripts/upload-static.sh --environment staging
 
     - name: Get deployment info

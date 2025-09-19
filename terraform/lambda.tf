@@ -71,7 +71,6 @@ resource "aws_lambda_function" "get_menu_items" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/getMenuItems.zip")
 
   environment {
     variables = {
@@ -94,7 +93,6 @@ resource "aws_lambda_function" "search_menu_items" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/searchMenuItems.zip")
 
   environment {
     variables = {
@@ -117,7 +115,6 @@ resource "aws_lambda_function" "get_menu_items_by_category" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/getMenuItemsByCategory.zip")
 
   environment {
     variables = {
@@ -140,7 +137,6 @@ resource "aws_lambda_function" "update_menu_item" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/updateMenuItem.zip")
 
   environment {
     variables = {
@@ -163,7 +159,6 @@ resource "aws_lambda_function" "delete_menu_item" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/deleteMenuItem.zip")
 
   environment {
     variables = {
@@ -186,7 +181,6 @@ resource "aws_lambda_function" "create_menu_item" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/createMenuItem.zip")
 
   environment {
     variables = {
@@ -211,7 +205,6 @@ resource "aws_lambda_function" "get_categories" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/getCategories.zip")
 
   environment {
     variables = {
@@ -234,7 +227,6 @@ resource "aws_lambda_function" "update_category" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/updateCategory.zip")
 
   environment {
     variables = {
@@ -257,7 +249,6 @@ resource "aws_lambda_function" "create_category" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/createCategory.zip")
 
   environment {
     variables = {
@@ -281,7 +272,6 @@ resource "aws_lambda_function" "admin_login" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/auth/login.zip")
 
   environment {
     variables = {
@@ -305,7 +295,6 @@ resource "aws_lambda_function" "admin_verify" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/auth/verify.zip")
 
   environment {
     variables = {
@@ -330,7 +319,6 @@ resource "aws_lambda_function" "get_admin_users" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/getAdminUsers.zip")
 
   environment {
     variables = {
@@ -354,7 +342,6 @@ resource "aws_lambda_function" "get_users" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/getUsers.zip")
 
   environment {
     variables = {
@@ -377,7 +364,6 @@ resource "aws_lambda_function" "get_user_by_id" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/getUserById.zip")
 
   environment {
     variables = {
@@ -400,7 +386,6 @@ resource "aws_lambda_function" "update_user" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/updateUser.zip")
 
   environment {
     variables = {
@@ -423,7 +408,6 @@ resource "aws_lambda_function" "delete_user" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/deleteUser.zip")
 
   environment {
     variables = {
@@ -447,7 +431,6 @@ resource "aws_lambda_function" "delete_category" {
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = filebase64sha256("../lambda/deleteCategory.zip")
 
   environment {
     variables = {
@@ -473,7 +456,6 @@ resource "aws_lambda_function" "create_admin_user" {
   timeout      = 30
 
   filename         = "../lambda/createAdminUser.zip"
-  source_code_hash = filebase64sha256("../lambda/createAdminUser.zip")
 
   environment {
     variables = {
@@ -498,7 +480,6 @@ resource "aws_lambda_function" "update_admin_user" {
   timeout      = 30
 
   filename         = "../lambda/updateAdminUser.zip"
-  source_code_hash = filebase64sha256("../lambda/updateAdminUser.zip")
 
   environment {
     variables = {
@@ -523,7 +504,6 @@ resource "aws_lambda_function" "delete_admin_user" {
   timeout      = 30
 
   filename         = "../lambda/deleteAdminUser.zip"
-  source_code_hash = filebase64sha256("../lambda/deleteAdminUser.zip")
 
   environment {
     variables = {

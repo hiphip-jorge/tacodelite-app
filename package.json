@@ -27,6 +27,7 @@
     "upload:static": "npm run build && ./scripts/upload-static.sh",
     "upload:static:staging": "npm run build:staging && ./scripts/upload-static.sh --environment staging",
     "upload:static:production": "npm run build:production && ./scripts/upload-static.sh --environment production",
+    "build:lambda": "./scripts/build-lambda.sh",
     "seed:db": "node data/seed-dynamodb.js"
   },
   "dependencies": {
