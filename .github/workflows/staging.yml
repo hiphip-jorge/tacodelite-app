@@ -59,23 +59,20 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    - name: Terraform init and plan
+    - name: Terraform init
       id: terraform
       run: |
-        # Initialize Terraform
+        # Initialize Terraform (no plan to avoid state lock issues)
         terraform -chdir=terraform init
 
         # Select staging workspace
         terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
-
-        # Plan (but don't apply yet)
-        terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars -out=tfplan
         echo "complete=true" >> $GITHUB_OUTPUT
 
   deploy-staging:
     needs: setup
     runs-on: ubuntu-latest
-    environment: staging  # This enables manual approval
+    environment: staging  # Manual approval required
     if: github.ref == 'refs/heads/staging'  # Only run on staging branch pushes
 
     steps:
@@ -94,18 +91,64 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    - name: Build Lambda functions
+      run: |
+        echo "📦 Building Lambda functions..."
+        echo "🔍 Current directory: $(pwd)"
+        echo "🔍 Lambda directory contents before build:"
+        ls -la lambda/ || echo "❌ Lambda directory not found"
+        echo ""
+        echo "🔧 Making build script executable..."
+        chmod +x scripts/build-lambda.sh
+        echo "🚀 Running build script..."
+        ./scripts/build-lambda.sh
+        echo ""
+        echo "🔍 Lambda directory contents after build:"
+        ls -la lambda/ || echo "❌ Lambda directory not found"
+        echo ""
+        echo "🔍 Checking specific files:"
+        ls -la lambda/getMenuVersion.zip lambda/incrementMenuVersion.zip || echo "❌ Specific files not found"
+
     - name: Deploy infrastructure
       run: |
         echo "🚀 Deploying to STAGING environment..."
         
+        # Verify Lambda zip files exist before Terraform
+        echo "🔍 Verifying Lambda zip files before Terraform..."
+        echo "📁 Current directory: $(pwd)"
+        echo "📁 Lambda directory contents:"
+        ls -la lambda/ | grep -E "(getMenuVersion|incrementMenuVersion)" || echo "❌ Files not found in lambda/"
+        echo ""
+        echo "📁 Testing Terraform's relative path:"
+        ls -la ../lambda/getMenuVersion.zip ../lambda/incrementMenuVersion.zip || echo "❌ Files not found with ../lambda/ path"
+        echo ""
+        
         # Initialize Terraform (quick since we're using same runner)
         terraform -chdir=terraform init
+        
+        # Test path from terraform directory
+        echo "📁 Testing from terraform directory:"
+        cd terraform
+        echo "📁 Current directory: $(pwd)"
+        ls -la ../lambda/getMenuVersion.zip ../lambda/incrementMenuVersion.zip || echo "❌ Files not found from terraform directory"
+        cd ..
+        echo ""
         
         # Select staging workspace
         terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
         
+        # Plan the changes
+        echo "📋 Planning Terraform changes..."
+        terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars -out=tfplan
+        
+        # Show plan summary
+        echo "📊 Plan Summary:"
+        terraform -chdir=terraform show -no-color tfplan | head -20
+        echo "... (see full plan above)"
+        
         # Apply the plan
-        terraform -chdir=terraform apply -var-file=../env_files/staging.tfvars -auto-approve
+        echo "🚀 Applying Terraform changes..."
+        terraform -chdir=terraform apply tfplan
 
     - name: Upload static assets
       run: |

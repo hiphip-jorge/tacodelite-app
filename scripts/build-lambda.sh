@@ -7,6 +7,19 @@ set -e
 
 echo "📦 Building Lambda functions..."
 
+# Check if zip command is available
+if ! command -v zip &> /dev/null; then
+    echo "❌ Error: zip command not found. Installing zip..."
+    if command -v apt-get &> /dev/null; then
+        sudo apt-get update && sudo apt-get install -y zip
+    elif command -v yum &> /dev/null; then
+        sudo yum install -y zip
+    else
+        echo "❌ Cannot install zip. Please ensure zip is available."
+        exit 1
+    fi
+fi
+
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
@@ -42,7 +55,14 @@ package_lambda() {
         fi
         
         cd ..
-        echo "  ✅ Created $zip_name"
+        
+        # Verify zip file was created
+        if [ -f "$zip_name" ]; then
+            echo "  ✅ Created $zip_name ($(du -h "$zip_name" | cut -f1))"
+        else
+            echo "  ❌ Failed to create $zip_name"
+            exit 1
+        fi
     else
         echo "  ⚠️  Directory $function_dir not found, skipping..."
     fi
@@ -127,11 +147,62 @@ package_lambda "updateUser" "updateUser.zip"
 package_lambda "deleteUser" "deleteUser.zip"
 
 echo "✅ Lambda packaging complete!"
-echo "📋 Created zip files:"
-ls -la *.zip
-echo ""
-echo "📁 Auth zip files:"
-ls -la auth/*.zip
 
-echo ""
-echo "🎯 Ready for Terraform deployment!"
+# Verify all required zip files exist
+echo "🔍 Verifying all zip files..."
+missing_files=()
+
+# Check main Lambda functions
+required_files=(
+    "getMenuItems.zip"
+    "searchMenuItems.zip"
+    "getMenuItemsByCategory.zip"
+    "updateMenuItem.zip"
+    "deleteMenuItem.zip"
+    "createMenuItem.zip"
+    "getMenuVersion.zip"
+    "incrementMenuVersion.zip"
+    "getCategories.zip"
+    "updateCategory.zip"
+    "createCategory.zip"
+    "deleteCategory.zip"
+    "getAdminUsers.zip"
+    "createAdminUser.zip"
+    "updateAdminUser.zip"
+    "deleteAdminUser.zip"
+    "getUsers.zip"
+    "getUserById.zip"
+    "updateUser.zip"
+    "deleteUser.zip"
+)
+
+for file in "${required_files[@]}"; do
+    if [ ! -f "$file" ]; then
+        missing_files+=("$file")
+    fi
+done
+
+# Check auth zip files
+if [ ! -f "auth/login.zip" ]; then
+    missing_files+=("auth/login.zip")
+fi
+if [ ! -f "auth/verify.zip" ]; then
+    missing_files+=("auth/verify.zip")
+fi
+
+if [ ${#missing_files[@]} -eq 0 ]; then
+    echo "✅ All required zip files created successfully!"
+    echo "📋 Created zip files:"
+    ls -la *.zip
+    echo ""
+    echo "📁 Auth zip files:"
+    ls -la auth/*.zip
+    echo ""
+    echo "🎯 Ready for Terraform deployment!"
+else
+    echo "❌ Missing zip files:"
+    for file in "${missing_files[@]}"; do
+        echo "  - $file"
+    done
+    exit 1
+fi
