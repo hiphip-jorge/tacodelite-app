@@ -94,45 +94,47 @@ jobs:
     - name: Build Lambda functions
       run: |
         echo "📦 Building Lambda functions..."
-        echo "🔍 Current directory: $(pwd)"
-        echo "🔍 Lambda directory contents before build:"
-        ls -la lambda/ || echo "❌ Lambda directory not found"
-        echo ""
-        echo "🔧 Making build script executable..."
         chmod +x scripts/build-lambda.sh
-        echo "🚀 Running build script..."
         ./scripts/build-lambda.sh
-        echo ""
-        echo "🔍 Lambda directory contents after build:"
-        ls -la lambda/ || echo "❌ Lambda directory not found"
-        echo ""
-        echo "🔍 Checking specific files:"
-        ls -la lambda/getMenuVersion.zip lambda/incrementMenuVersion.zip || echo "❌ Specific files not found"
 
     - name: Deploy infrastructure
       run: |
         echo "🏭 Deploying to PRODUCTION environment..."
         
-        # Verify Lambda zip files exist before Terraform
-        echo "🔍 Verifying Lambda zip files before Terraform..."
-        echo "📁 Current directory: $(pwd)"
-        echo "📁 Lambda directory contents:"
-        ls -la lambda/ | grep -E "(getMenuVersion|incrementMenuVersion)" || echo "❌ Files not found in lambda/"
-        echo ""
-        echo "📁 Testing Terraform's relative path:"
-        ls -la ../lambda/getMenuVersion.zip ../lambda/incrementMenuVersion.zip || echo "❌ Files not found with ../lambda/ path"
-        echo ""
+        # Function to clean up locks on exit
+        cleanup_locks() {
+            echo "🧹 Cleaning up any remaining state locks..."
+            EXISTING_LOCKS=$(aws dynamodb scan --table-name tacodelite-terraform-locks --region us-east-1 --query 'Items[?contains(Info.S, `production`)].LockID.S' --output text 2>/dev/null || echo "")
+            if [ -n "$EXISTING_LOCKS" ]; then
+                for lock_id in $EXISTING_LOCKS; do
+                    aws dynamodb delete-item \
+                        --table-name tacodelite-terraform-locks \
+                        --region us-east-1 \
+                        --key "{\"LockID\":{\"S\":\"$lock_id\"}}" \
+                        2>/dev/null && echo "✅ Lock cleared on cleanup: $lock_id"
+                done
+            fi
+        }
         
-        # Initialize Terraform (quick since we're using same runner)
+        # Set up trap to clean up locks on script exit/failure
+        trap cleanup_locks EXIT
+        
+        # Initialize Terraform
         terraform -chdir=terraform init
         
-        # Test path from terraform directory
-        echo "📁 Testing from terraform directory:"
-        cd terraform
-        echo "📁 Current directory: $(pwd)"
-        ls -la ../lambda/getMenuVersion.zip ../lambda/incrementMenuVersion.zip || echo "❌ Files not found from terraform directory"
-        cd ..
-        echo ""
+        # Clear any potential stale locks
+        echo "🔓 Checking for stale state locks..."
+        EXISTING_LOCKS=$(aws dynamodb scan --table-name tacodelite-terraform-locks --region us-east-1 --query 'Items[?contains(Info.S, `production`)].LockID.S' --output text 2>/dev/null || echo "")
+        if [ -n "$EXISTING_LOCKS" ]; then
+            echo "⚠️  Found existing production locks, clearing..."
+            for lock_id in $EXISTING_LOCKS; do
+                aws dynamodb delete-item \
+                    --table-name tacodelite-terraform-locks \
+                    --region us-east-1 \
+                    --key "{\"LockID\":{\"S\":\"$lock_id\"}}" \
+                    2>/dev/null && echo "✅ Lock cleared: $lock_id"
+            done
+        fi
         
         # Select production workspace
         terraform -chdir=terraform workspace select production || terraform -chdir=terraform workspace new production
