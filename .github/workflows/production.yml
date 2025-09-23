@@ -91,6 +91,24 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build production app
+      run: |
+        npm run build:production
+      env:
+        VITE_API_URL: "https://tacodelitewestplano.com/prod"
+        VITE_USE_MOCK: "false"
+        VITE_ENVIRONMENT: "production"
+        VITE_APP_NAME: "Taco Delite"
+
     - name: Build Lambda functions
       run: |
         echo "📦 Building Lambda functions..."
@@ -155,7 +173,12 @@ jobs:
     - name: Upload static assets
       run: |
         echo "📤 Uploading static assets..."
-        ./scripts/upload-static.sh --environment production
+        # Get S3 bucket name from Terraform output
+        BUCKET_NAME=$(terraform -chdir=terraform output -raw s3_bucket_name)
+        echo "📦 S3 Bucket: $BUCKET_NAME"
+        
+        # Upload using the bucket name directly
+        S3_BUCKET_NAME="$BUCKET_NAME" ./scripts/upload-static.sh --environment production
 
     - name: Get deployment info
       run: |

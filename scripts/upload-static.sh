@@ -29,10 +29,12 @@ done
 
 echo "📤 Uploading static assets to S3..."
 
-# Check if Terraform has been run
-if [ ! -f ".terraform/terraform.tfstate" ] && [ ! -f "terraform.tfstate" ]; then
-    echo "❌ Terraform state not found. Please run 'terraform init' and 'terraform apply' first."
-    exit 1
+# Check if Terraform has been run (only if we need to get bucket name from Terraform)
+if [ -z "$ENVIRONMENT" ] && [ -z "$S3_BUCKET_NAME" ]; then
+    if [ ! -f ".terraform/terraform.tfstate" ] && [ ! -f "terraform.tfstate" ] && [ ! -f "terraform/.terraform/terraform.tfstate" ] && [ ! -f "terraform/terraform.tfstate" ]; then
+        echo "❌ Terraform state not found. Please run 'terraform init' and 'terraform apply' first."
+        exit 1
+    fi
 fi
 
 # Determine S3 bucket name and build directory
@@ -61,8 +63,8 @@ elif [ -n "$S3_BUCKET_NAME" ]; then
     BUILD_DIR="dist"  # Default to dist for backward compatibility
     echo "🎯 Using S3_BUCKET_NAME: $BUCKET_NAME"
 else
-    # Try to get from Terraform output
-    BUCKET_NAME=$(terraform output -raw s3_bucket_name 2>/dev/null || echo "")
+    # Try to get from Terraform output (check both current dir and terraform subdir)
+    BUCKET_NAME=$(terraform output -raw s3_bucket_name 2>/dev/null || terraform -chdir=terraform output -raw s3_bucket_name 2>/dev/null || echo "")
     BUILD_DIR="dist"  # Default to dist for backward compatibility
     
     if [ -z "$BUCKET_NAME" ]; then
