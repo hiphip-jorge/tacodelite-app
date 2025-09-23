@@ -467,6 +467,54 @@ resource "aws_api_gateway_integration_response" "get_menu_version" {
   ]
 }
 
+# POST method for menu-version (increment)
+resource "aws_api_gateway_method" "increment_menu_version" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.menu_version.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "increment_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.increment_menu_version.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "increment_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.increment_menu_version.http_method
+  type        = "AWS_PROXY"
+  integration_http_method = "POST"
+  uri         = aws_lambda_function.increment_menu_version.invoke_arn
+}
+
+resource "aws_api_gateway_integration_response" "increment_menu_version" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.menu_version.id
+  http_method = aws_api_gateway_method.increment_menu_version.http_method
+  status_code = aws_api_gateway_method_response.increment_menu_version.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+  }
+
+  depends_on = [
+    aws_lambda_function.increment_menu_version,
+    aws_api_gateway_integration.increment_menu_version
+  ]
+}
+
 resource "aws_api_gateway_resource" "menu_items_by_category" {
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
   parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
@@ -799,6 +847,14 @@ resource "aws_lambda_permission" "get_menu_version" {
   source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
 }
 
+resource "aws_lambda_permission" "increment_menu_version" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.increment_menu_version.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
 resource "aws_lambda_permission" "admin_login" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
@@ -854,6 +910,9 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
   depends_on = [
     aws_api_gateway_integration.get_menu_items,
     aws_api_gateway_integration.post_menu_items,
+    aws_api_gateway_integration.get_menu_version,
+    aws_api_gateway_integration.increment_menu_version,
+    aws_api_gateway_integration.options_menu_version,
     aws_api_gateway_integration.get_categories,
     aws_api_gateway_integration.post_categories,
     aws_api_gateway_integration.search_menu_items,
@@ -865,6 +924,9 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.admin_login,
     aws_api_gateway_integration.admin_verify,
     aws_api_gateway_integration.get_admin_users,
+    aws_api_gateway_integration.post_admin_users,
+    aws_api_gateway_integration.put_admin_user,
+    aws_api_gateway_integration.delete_admin_user,
     aws_api_gateway_integration.get_users,
     aws_api_gateway_integration.get_user_by_id,
     aws_api_gateway_integration.put_user,
@@ -873,10 +935,13 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method.options_categories,
     aws_api_gateway_method.options_menu_items,
     aws_api_gateway_method.options_search,
+    aws_api_gateway_method.options_menu_version,
     aws_api_gateway_method.options_menu_items_by_category,
     aws_api_gateway_method.options_admin_users,
     aws_api_gateway_method.options_users,
     aws_api_gateway_method.options_user,
+    aws_api_gateway_method.get_menu_version,
+    aws_api_gateway_method.increment_menu_version,
     aws_api_gateway_method.admin_login,
     aws_api_gateway_method.admin_verify,
     aws_api_gateway_method.get_admin_users,
@@ -891,9 +956,12 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method_response.options_categories,
     aws_api_gateway_method_response.options_menu_items,
     aws_api_gateway_method_response.options_search,
+    aws_api_gateway_method_response.options_menu_version,
     aws_api_gateway_method_response.options_menu_items_by_category,
     aws_api_gateway_method_response.options_users,
     aws_api_gateway_method_response.options_user,
+    aws_api_gateway_method_response.get_menu_version,
+    aws_api_gateway_method_response.increment_menu_version,
     aws_api_gateway_method_response.admin_login,
     aws_api_gateway_method_response.admin_verify,
     aws_api_gateway_method_response.get_users,
@@ -906,14 +974,21 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.options_menu_items_by_category,
     aws_api_gateway_integration.options_users,
     aws_api_gateway_integration.options_user,
+    aws_api_gateway_integration.options,
     aws_api_gateway_integration.options_admin,
+    aws_api_gateway_integration.options_admin_login,
+    aws_api_gateway_integration.options_admin_verify,
+    aws_api_gateway_integration.options_admin_users,
     aws_api_gateway_integration_response.options_categories,
     aws_api_gateway_integration_response.options_menu_items,
     aws_api_gateway_integration_response.options_search,
+    aws_api_gateway_integration_response.options_menu_version,
     aws_api_gateway_integration_response.options_menu_items_by_category,
     aws_api_gateway_integration_response.options_users,
     aws_api_gateway_integration_response.options_user,
     aws_api_gateway_integration_response.options_admin,
+    aws_api_gateway_integration_response.get_menu_version,
+    aws_api_gateway_integration_response.increment_menu_version,
     aws_api_gateway_integration_response.options_admin_login,
     aws_api_gateway_integration_response.options_admin_verify,
     aws_api_gateway_integration_response.options_admin_users,
@@ -921,6 +996,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration_response.admin_verify,
     aws_lambda_permission.get_menu_items,
     aws_lambda_permission.create_menu_item,
+    aws_lambda_permission.get_menu_version,
+    aws_lambda_permission.increment_menu_version,
     aws_lambda_permission.get_categories,
     aws_lambda_permission.create_category,
     aws_lambda_permission.update_category,
@@ -948,39 +1025,75 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     redeployment = sha1(jsonencode([
       aws_api_gateway_method.get_menu_items.id,
       aws_api_gateway_method.post_menu_items.id,
+      aws_api_gateway_method.get_menu_version.id,
+      aws_api_gateway_method.increment_menu_version.id,
       aws_api_gateway_method.get_categories.id,
       aws_api_gateway_method.post_categories.id,
       aws_api_gateway_method.put_category.id,
       aws_api_gateway_method.delete_category.id,
       aws_api_gateway_method.search_menu_items.id,
       aws_api_gateway_method.get_menu_items_by_category.id,
-      aws_api_gateway_method.get_menu_version.id,
       aws_api_gateway_method.put_menu_item.id,
+      aws_api_gateway_method.delete_menu_item.id,
       aws_api_gateway_method.admin_login.id,
       aws_api_gateway_method.admin_verify.id,
       aws_api_gateway_method.get_admin_users.id,
+      aws_api_gateway_method.post_admin_users.id,
+      aws_api_gateway_method.put_admin_user.id,
+      aws_api_gateway_method.delete_admin_user.id,
       aws_api_gateway_method.get_users.id,
       aws_api_gateway_method.get_user_by_id.id,
       aws_api_gateway_method.put_user.id,
       aws_api_gateway_method.delete_user.id,
+      aws_api_gateway_method.options.id,
+      aws_api_gateway_method.options_categories.id,
+      aws_api_gateway_method.options_menu_items.id,
+      aws_api_gateway_method.options_search.id,
+      aws_api_gateway_method.options_menu_version.id,
+      aws_api_gateway_method.options_menu_items_by_category.id,
+      aws_api_gateway_method.options_admin.id,
+      aws_api_gateway_method.options_admin_login.id,
+      aws_api_gateway_method.options_admin_verify.id,
+      aws_api_gateway_method.options_admin_users.id,
+      aws_api_gateway_method.options_users.id,
+      aws_api_gateway_method.options_user.id,
+      aws_api_gateway_method.options_admin_user.id,
       aws_api_gateway_integration.get_menu_items.id,
       aws_api_gateway_integration.post_menu_items.id,
+      aws_api_gateway_integration.get_menu_version.id,
+      aws_api_gateway_integration.increment_menu_version.id,
+      aws_api_gateway_integration.options_menu_version.id,
       aws_api_gateway_integration.get_categories.id,
       aws_api_gateway_integration.post_categories.id,
       aws_api_gateway_integration.put_category.id,
       aws_api_gateway_integration.delete_category.id,
       aws_api_gateway_integration.search_menu_items.id,
       aws_api_gateway_integration.get_menu_items_by_category.id,
-      aws_api_gateway_integration.get_menu_version.id,
       aws_api_gateway_integration.put_menu_item.id,
+      aws_api_gateway_integration.delete_menu_item.id,
       aws_api_gateway_integration.admin_login.id,
       aws_api_gateway_integration.admin_verify.id,
       aws_api_gateway_integration.get_admin_users.id,
-      aws_api_gateway_integration.options_admin_users.id,
+      aws_api_gateway_integration.post_admin_users.id,
+      aws_api_gateway_integration.put_admin_user.id,
+      aws_api_gateway_integration.delete_admin_user.id,
       aws_api_gateway_integration.get_users.id,
       aws_api_gateway_integration.get_user_by_id.id,
       aws_api_gateway_integration.put_user.id,
-      aws_api_gateway_integration.delete_user.id
+      aws_api_gateway_integration.delete_user.id,
+      aws_api_gateway_integration.options.id,
+      aws_api_gateway_integration.options_categories.id,
+      aws_api_gateway_integration.options_menu_items.id,
+      aws_api_gateway_integration.options_search.id,
+      aws_api_gateway_integration.options_menu_version.id,
+      aws_api_gateway_integration.options_menu_items_by_category.id,
+      aws_api_gateway_integration.options_admin.id,
+      aws_api_gateway_integration.options_admin_login.id,
+      aws_api_gateway_integration.options_admin_verify.id,
+      aws_api_gateway_integration.options_admin_users.id,
+      aws_api_gateway_integration.options_users.id,
+      aws_api_gateway_integration.options_user.id,
+      aws_api_gateway_integration.options_admin_user.id
     ]))
   }
 }
