@@ -760,7 +760,7 @@ resource "aws_api_gateway_integration" "get_menu_items_by_category" {
 
 # Lambda Permissions
 resource "aws_lambda_permission" "get_menu_items" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-menu-items"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_menu_items.function_name
   principal     = "apigateway.amazonaws.com"
@@ -768,7 +768,7 @@ resource "aws_lambda_permission" "get_menu_items" {
 }
 
 resource "aws_lambda_permission" "get_categories" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-categories"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_categories.function_name
   principal     = "apigateway.amazonaws.com"
@@ -776,7 +776,7 @@ resource "aws_lambda_permission" "get_categories" {
 }
 
 resource "aws_lambda_permission" "update_category" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-update-category"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.update_category.function_name
   principal     = "apigateway.amazonaws.com"
@@ -784,7 +784,7 @@ resource "aws_lambda_permission" "update_category" {
 }
 
 resource "aws_lambda_permission" "create_category" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-create-category"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.create_category.function_name
   principal     = "apigateway.amazonaws.com"
@@ -792,7 +792,7 @@ resource "aws_lambda_permission" "create_category" {
 }
 
 resource "aws_lambda_permission" "delete_category" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-delete-category"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.delete_category.function_name
   principal     = "apigateway.amazonaws.com"
@@ -800,7 +800,7 @@ resource "aws_lambda_permission" "delete_category" {
 }
 
 resource "aws_lambda_permission" "search_menu_items" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-search-menu-items"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.search_menu_items.function_name
   principal     = "apigateway.amazonaws.com"
@@ -808,7 +808,7 @@ resource "aws_lambda_permission" "search_menu_items" {
 }
 
 resource "aws_lambda_permission" "get_menu_items_by_category" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-menu-items-by-category"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_menu_items_by_category.function_name
   principal     = "apigateway.amazonaws.com"
@@ -816,7 +816,7 @@ resource "aws_lambda_permission" "get_menu_items_by_category" {
 }
 
 resource "aws_lambda_permission" "update_menu_item" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-update-menu-item"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.update_menu_item.function_name
   principal     = "apigateway.amazonaws.com"
@@ -824,7 +824,7 @@ resource "aws_lambda_permission" "update_menu_item" {
 }
 
 resource "aws_lambda_permission" "delete_menu_item" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-delete-menu-item"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.delete_menu_item.function_name
   principal     = "apigateway.amazonaws.com"
@@ -832,7 +832,7 @@ resource "aws_lambda_permission" "delete_menu_item" {
 }
 
 resource "aws_lambda_permission" "create_menu_item" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-create-menu-item"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.create_menu_item.function_name
   principal     = "apigateway.amazonaws.com"
@@ -840,7 +840,7 @@ resource "aws_lambda_permission" "create_menu_item" {
 }
 
 resource "aws_lambda_permission" "get_menu_version" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-menu-version"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_menu_version.function_name
   principal     = "apigateway.amazonaws.com"
@@ -848,7 +848,7 @@ resource "aws_lambda_permission" "get_menu_version" {
 }
 
 resource "aws_lambda_permission" "increment_menu_version" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-increment-menu-version"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.increment_menu_version.function_name
   principal     = "apigateway.amazonaws.com"
@@ -856,7 +856,7 @@ resource "aws_lambda_permission" "increment_menu_version" {
 }
 
 resource "aws_lambda_permission" "admin_login" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-admin-login"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.admin_login.function_name
   principal     = "apigateway.amazonaws.com"
@@ -864,7 +864,7 @@ resource "aws_lambda_permission" "admin_login" {
 }
 
 resource "aws_lambda_permission" "admin_verify" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-admin-verify"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.admin_verify.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1095,6 +1095,11 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_integration.options_user.id,
       aws_api_gateway_integration.options_admin_user.id
     ]))
+  }
+
+  # Handle deployment recreation properly to avoid stage dependency issues
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
@@ -1803,7 +1808,7 @@ resource "aws_api_gateway_integration" "delete_user" {
 
 # Lambda Permissions for Admin User Management
 resource "aws_lambda_permission" "get_admin_users" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-admin-users"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_admin_users.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1811,7 +1816,7 @@ resource "aws_lambda_permission" "get_admin_users" {
 }
 
 resource "aws_lambda_permission" "create_admin_user" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-create-admin-user"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.create_admin_user.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1819,7 +1824,7 @@ resource "aws_lambda_permission" "create_admin_user" {
 }
 
 resource "aws_lambda_permission" "update_admin_user" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-update-admin-user"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.update_admin_user.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1827,7 +1832,7 @@ resource "aws_lambda_permission" "update_admin_user" {
 }
 
 resource "aws_lambda_permission" "delete_admin_user" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-delete-admin-user"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.delete_admin_user.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1836,7 +1841,7 @@ resource "aws_lambda_permission" "delete_admin_user" {
 
 # Lambda Permissions for User Management
 resource "aws_lambda_permission" "get_users" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-users"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_users.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1844,7 +1849,7 @@ resource "aws_lambda_permission" "get_users" {
 }
 
 resource "aws_lambda_permission" "get_user_by_id" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-get-user-by-id"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_user_by_id.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1852,7 +1857,7 @@ resource "aws_lambda_permission" "get_user_by_id" {
 }
 
 resource "aws_lambda_permission" "update_user" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-update-user"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.update_user.function_name
   principal     = "apigateway.amazonaws.com"
@@ -1860,7 +1865,7 @@ resource "aws_lambda_permission" "update_user" {
 }
 
 resource "aws_lambda_permission" "delete_user" {
-  statement_id  = "AllowExecutionFromAPIGateway"
+  statement_id  = "AllowExecutionFromAPIGateway-delete-user"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.delete_user.function_name
   principal     = "apigateway.amazonaws.com"
