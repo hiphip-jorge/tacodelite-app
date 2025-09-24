@@ -1,7 +1,9 @@
 const jwt = require('jsonwebtoken');
-const AWS = require('aws-sdk');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, GetCommand } = require('@aws-sdk/lib-dynamodb');
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const client = new DynamoDBClient({});
+const dynamodb = DynamoDBDocumentClient.from(client);
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Helper function to get CORS headers
@@ -70,7 +72,7 @@ exports.handler = async (event) => {
             }
         };
 
-        const result = await dynamodb.get(params).promise();
+        const result = await dynamodb.send(new GetCommand(params));
 
         if (!result.Item) {
             return {

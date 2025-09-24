@@ -1,8 +1,10 @@
-const AWS = require('aws-sdk');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, QueryCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const dynamodb = new AWS.DynamoDB.DocumentClient();
+const client = new DynamoDBClient({});
+const dynamodb = DynamoDBDocumentClient.from(client);
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Helper function to get CORS headers
@@ -62,7 +64,7 @@ exports.handler = async (event) => {
             }
         };
 
-        const result = await dynamodb.query(params).promise();
+        const result = await dynamodb.send(new QueryCommand(params));
 
         if (result.Items.length === 0) {
             return {
@@ -115,14 +117,14 @@ exports.handler = async (event) => {
         );
 
         // Update last login
-        await dynamodb.update({
+        await dynamodb.send(new UpdateCommand({
             TableName: process.env.ADMIN_USERS_TABLE,
             Key: { pk: user.pk },
             UpdateExpression: 'SET lastLogin = :lastLogin',
             ExpressionAttributeValues: {
                 ':lastLogin': new Date().toISOString()
             }
-        }).promise();
+        }));
 
         return {
             statusCode: 200,
