@@ -295,13 +295,20 @@ resource "aws_lambda_function" "admin_login" {
   }
 }
 
+data "archive_file" "admin_verify" {
+  type        = "zip"
+  source_dir  = "../lambda/auth/verify"
+  output_path = "../lambda/auth/verify.zip"
+}
+
 resource "aws_lambda_function" "admin_verify" {
-  filename         = "../lambda/auth/verify.zip"
+  filename         = data.archive_file.admin_verify.output_path
   function_name    = "${var.app_name}-admin-verify-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
+  source_code_hash = data.archive_file.admin_verify.output_base64sha256
 
   environment {
     variables = {
