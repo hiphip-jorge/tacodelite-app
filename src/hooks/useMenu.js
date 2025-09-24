@@ -27,8 +27,8 @@ export const useMenu = () => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                // Clear any existing cache to ensure fresh API calls
-                cacheManager.clearAllOnStartup();
+                // Don't clear cache on startup - let the caching system work
+                // cacheManager.clearAllOnStartup(); // Removed to enable caching
 
                 const categoriesData = await getCategories();
                 setCategories(categoriesData);
