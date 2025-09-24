@@ -212,24 +212,39 @@ async function getMenuVersion() {
 // Check if cached data is still valid based on version
 async function isCacheValid(cacheKey) {
     try {
-        const cachedData = cacheUtils.getWithETag(cacheKey);
-        if (!cachedData.data || !cachedData.etag) {
-            return false;
-        }
-
-        // Get current menu version
-        const currentVersion = await getMenuVersion();
+        // Check if we have a cached version
         const cachedVersion = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
 
-        // If we have a cached version and it matches current version, cache is valid
-        if (cachedVersion && cachedVersion === currentVersion) {
-            console.log('✅ Cache is valid - using cached data');
+        // If no cached version, assume cache is valid for now
+        // We'll let the ETag mechanism handle version checking
+        if (!cachedVersion) {
+            console.log('✅ Cache is valid - no version check needed (using ETag)');
             return true;
         }
 
-        // Update cached version
-        cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
-        return false;
+        // Check if cached version is still fresh (within 24 hours)
+        const versionTimestamp = cacheUtils.get(`${CACHE_KEYS.MENU_VERSION}_timestamp`);
+        const now = Date.now();
+        const VERSION_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+        if (!versionTimestamp || (now - versionTimestamp) > VERSION_CACHE_DURATION) {
+            console.log('🔄 Version cache expired, checking for updates...');
+            const currentVersion = await getMenuVersion();
+
+            if (currentVersion !== cachedVersion) {
+                console.log('🔄 Menu version changed, invalidating cache');
+                cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
+                cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, now);
+                return false; // Version changed, need fresh data
+            }
+
+            // Version is same, update timestamp
+            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, now);
+        }
+
+        // We have a cached version and it's still fresh, cache is valid
+        console.log('✅ Cache is valid - using cached data (version:', cachedVersion, ')');
+        return true;
     } catch (error) {
         console.error('Error checking cache validity:', error);
         return false;
@@ -246,26 +261,28 @@ export async function getCategories() {
 
     try {
         // Check if we have valid cached data
-        const cacheValid = await isCacheValid(CACHE_KEYS.CATEGORIES);
-        if (cacheValid) {
-            const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
-            console.log('📦 Using cached categories data');
-            return cachedData.data;
+        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
+        if (cachedData.data && cachedData.etag) {
+            const cacheValid = await isCacheValid(CACHE_KEYS.CATEGORIES);
+            if (cacheValid) {
+                console.log('📦 Using cached categories data');
+                return cachedData.data;
+            }
         }
 
         // Get cached ETag for conditional request
-        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
+        const existingCache = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
 
         console.log('🌐 Fetching fresh categories data');
         const response = await apiCall('/categories', {
-            etag: cachedData.etag
+            etag: existingCache.etag
         });
 
         let categories;
         if (response.cached) {
             // Server returned 304, use cached data
             console.log('📦 Server confirmed cache is valid - using cached categories');
-            categories = cachedData.data;
+            categories = existingCache.data;
         } else {
             // Server returned new data
             console.log('🔄 Server returned new categories data');
@@ -309,26 +326,28 @@ export async function getMenuItems() {
 
     try {
         // Check if we have valid cached data
-        const cacheValid = await isCacheValid(CACHE_KEYS.MENU_ITEMS);
-        if (cacheValid) {
-            const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
-            console.log('📦 Using cached menu items data');
-            return cachedData.data;
+        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
+        if (cachedData.data && cachedData.etag) {
+            const cacheValid = await isCacheValid(CACHE_KEYS.MENU_ITEMS);
+            if (cacheValid) {
+                console.log('📦 Using cached menu items data');
+                return cachedData.data;
+            }
         }
 
         // Get cached ETag for conditional request
-        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
+        const existingCache = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
 
         console.log('🌐 Fetching fresh menu items data');
         const response = await apiCall('/menu-items', {
-            etag: cachedData.etag
+            etag: existingCache.etag
         });
 
         let menuItems;
         if (response.cached) {
             // Server returned 304, use cached data
             console.log('📦 Server confirmed cache is valid - using cached menu items');
-            menuItems = cachedData.data;
+            menuItems = existingCache.data;
         } else {
             // Server returned new data
             console.log('🔄 Server returned new menu items data');
@@ -456,7 +475,10 @@ export const cacheManager = {
         cacheUtils.clear(CACHE_KEYS.MENU_ITEMS);
         cacheUtils.clear(CACHE_KEYS.MENU_ITEMS_ETAG);
     },
-    clearVersion: () => cacheUtils.clear(CACHE_KEYS.MENU_VERSION),
+    clearVersion: () => {
+        cacheUtils.clear(CACHE_KEYS.MENU_VERSION);
+        cacheUtils.clear(`${CACHE_KEYS.MENU_VERSION}_timestamp`);
+    },
 
     // Get cache info for debugging
     getCacheInfo: () => {
