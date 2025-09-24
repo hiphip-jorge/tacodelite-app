@@ -67,8 +67,9 @@ package_lambda_with_checksum() {
             rm -rf "$function_dir/shared"
         fi
         
-        # Calculate checksum and rename
-        checksum=$(sha256sum "${base_name}.zip" | cut -d' ' -f1 | cut -c1-8)
+        # Calculate content-based checksum (based on source files, not zip)
+        # This ensures same checksum for identical code, different only when code changes
+        checksum=$(find . -name "*.js" -o -name "*.json" | sort | xargs cat | sha256sum | cut -c1-8)
         mv "${base_name}.zip" "${base_name}.${checksum}.zip"
         
         # Verify zip file was created
