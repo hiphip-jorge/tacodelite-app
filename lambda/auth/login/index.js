@@ -134,7 +134,8 @@ exports.handler = async (event) => {
                     id: user.pk,
                     email: user.email,
                     name: user.name,
-                    role: user.role
+                    role: user.role,
+                    permissions: user.permissions || []
                 }
             })
         };
