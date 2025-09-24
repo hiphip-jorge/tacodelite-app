@@ -265,13 +265,20 @@ resource "aws_lambda_function" "create_category" {
 }
 
 # Authentication Lambda Functions
+data "archive_file" "admin_login" {
+  type        = "zip"
+  source_dir  = "../lambda/auth/login"
+  output_path = "../lambda/auth/login.zip"
+}
+
 resource "aws_lambda_function" "admin_login" {
-  filename         = "../lambda/auth/login.zip"
+  filename         = data.archive_file.admin_login.output_path
   function_name    = "${var.app_name}-admin-login-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
+  source_code_hash = data.archive_file.admin_login.output_base64sha256
 
   environment {
     variables = {
