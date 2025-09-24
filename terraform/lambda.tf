@@ -265,20 +265,14 @@ resource "aws_lambda_function" "create_category" {
 }
 
 # Authentication Lambda Functions
-data "archive_file" "admin_login" {
-  type        = "zip"
-  source_dir  = "../lambda/auth/login"
-  output_path = "../lambda/auth/login.zip"
-}
-
 resource "aws_lambda_function" "admin_login" {
-  filename         = data.archive_file.admin_login.output_path
+  filename         = "../lambda/auth/login.zip"
   function_name    = "${var.app_name}-admin-login-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = data.archive_file.admin_login.output_base64sha256
+  source_code_hash = filebase64sha256("../lambda/auth/login.zip")
 
   environment {
     variables = {
@@ -295,20 +289,14 @@ resource "aws_lambda_function" "admin_login" {
   }
 }
 
-data "archive_file" "admin_verify" {
-  type        = "zip"
-  source_dir  = "../lambda/auth/verify"
-  output_path = "../lambda/auth/verify.zip"
-}
-
 resource "aws_lambda_function" "admin_verify" {
-  filename         = data.archive_file.admin_verify.output_path
+  filename         = "../lambda/auth/verify.zip"
   function_name    = "${var.app_name}-admin-verify-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
   runtime         = "nodejs20.x"
   timeout         = 30
-  source_code_hash = data.archive_file.admin_verify.output_base64sha256
+  source_code_hash = filebase64sha256("../lambda/auth/verify.zip")
 
   environment {
     variables = {
