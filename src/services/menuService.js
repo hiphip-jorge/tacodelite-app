@@ -6,17 +6,19 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://i8vgeh8do9.execute
 // Toggle this to true to use mock data instead of API calls
 const USE_MOCK_DATA = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
 
-// Cache configuration
-const CACHE_KEYS = {
-    MENU_VERSION: 'menu_version',
-    CATEGORIES: 'menu_categories',
-    MENU_ITEMS: 'menu_items'
-};
-
 // Cache duration (in milliseconds) - Optimized for menu that changes 3-5 times per year
 const CACHE_DURATION = {
     VERSION: 24 * 60 * 60 * 1000,      // 24 hours (check version daily)
     DATA: 30 * 24 * 60 * 60 * 1000    // 30 days (menu items/categories cached for a month)
+};
+
+// Cache configuration
+const CACHE_KEYS = {
+    MENU_VERSION: 'menu_version',
+    CATEGORIES: 'menu_categories',
+    MENU_ITEMS: 'menu_items',
+    CATEGORIES_ETAG: 'categories_etag',
+    MENU_ITEMS_ETAG: 'menu_items_etag'
 };
 
 // Mock data for development
@@ -100,6 +102,42 @@ const cacheUtils = {
         }
     },
 
+    // Get cached data with ETag
+    getWithETag(key) {
+        try {
+            const cached = localStorage.getItem(key);
+            if (!cached) return { data: null, etag: null };
+
+            const { data, timestamp, etag } = JSON.parse(cached);
+            const now = Date.now();
+
+            // Check if cache is expired
+            if (now - timestamp > CACHE_DURATION.DATA) {
+                localStorage.removeItem(key);
+                return { data: null, etag: null };
+            }
+
+            return { data, etag };
+        } catch (error) {
+            console.error('Error reading from cache:', error);
+            return { data: null, etag: null };
+        }
+    },
+
+    // Set cached data with ETag
+    setWithETag(key, data, etag) {
+        try {
+            const cacheData = {
+                data,
+                etag,
+                timestamp: Date.now()
+            };
+            localStorage.setItem(key, JSON.stringify(cacheData));
+        } catch (error) {
+            console.error('Error writing to cache:', error);
+        }
+    },
+
     // Clear specific cache
     clear(key) {
         try {
@@ -115,23 +153,45 @@ const cacheUtils = {
     }
 };
 
-// Helper function to make API calls
+// Helper function to make API calls with ETag support
 const apiCall = async (endpoint, options = {}) => {
     try {
+        const headers = {
+            'Content-Type': 'application/json',
+            ...options.headers
+        };
+
+        // Add If-None-Match header if ETag is provided
+        if (options.etag) {
+            headers['If-None-Match'] = options.etag;
+        }
+
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            },
+            headers,
             ...options
         });
+
+        // Handle 304 Not Modified response
+        if (response.status === 304) {
+            return {
+                data: null, // No data needed, use cached version
+                etag: response.headers.get('ETag'),
+                version: response.headers.get('X-Menu-Version'),
+                cached: true
+            };
+        }
 
         if (!response.ok) {
             throw new Error(`API call failed: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
-        return data;
+        return {
+            data,
+            etag: response.headers.get('ETag'),
+            version: response.headers.get('X-Menu-Version'),
+            cached: false
+        };
     } catch (error) {
         console.error('API call error:', error);
         throw error;
@@ -142,7 +202,7 @@ const apiCall = async (endpoint, options = {}) => {
 async function getMenuVersion() {
     try {
         const response = await apiCall('/menu-version');
-        return response?.version || 1;
+        return response.data?.version || 1;
     } catch (error) {
         console.error('Failed to get menu version:', error);
         return 1; // Default version
@@ -152,8 +212,23 @@ async function getMenuVersion() {
 // Check if cached data is still valid based on version
 async function isCacheValid(cacheKey) {
     try {
-        // DISABLED - Always return false to force API calls
-        console.log('🌐 Caching disabled - making fresh API calls');
+        const cachedData = cacheUtils.getWithETag(cacheKey);
+        if (!cachedData.data || !cachedData.etag) {
+            return false;
+        }
+
+        // Get current menu version
+        const currentVersion = await getMenuVersion();
+        const cachedVersion = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
+
+        // If we have a cached version and it matches current version, cache is valid
+        if (cachedVersion && cachedVersion === currentVersion) {
+            console.log('✅ Cache is valid - using cached data');
+            return true;
+        }
+
+        // Update cached version
+        cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
         return false;
     } catch (error) {
         console.error('Error checking cache validity:', error);
@@ -170,9 +245,35 @@ export async function getCategories() {
     }
 
     try {
+        // Check if we have valid cached data
+        const cacheValid = await isCacheValid(CACHE_KEYS.CATEGORIES);
+        if (cacheValid) {
+            const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
+            console.log('📦 Using cached categories data');
+            return cachedData.data;
+        }
+
+        // Get cached ETag for conditional request
+        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
+
         console.log('🌐 Fetching fresh categories data');
-        const response = await apiCall('/categories');
-        const categories = response || [];
+        const response = await apiCall('/categories', {
+            etag: cachedData.etag
+        });
+
+        let categories;
+        if (response.cached) {
+            // Server returned 304, use cached data
+            console.log('📦 Server confirmed cache is valid - using cached categories');
+            categories = cachedData.data;
+        } else {
+            // Server returned new data
+            console.log('🔄 Server returned new categories data');
+            categories = response.data || [];
+
+            // Cache the new data with ETag
+            cacheUtils.setWithETag(CACHE_KEYS.CATEGORIES, categories, response.etag);
+        }
 
         // Sort categories by their numeric ID (e.g., "CATEGORY#1" -> 1)
         const sortedCategories = categories.sort((a, b) => {
@@ -186,10 +287,10 @@ export async function getCategories() {
         console.error('Failed to fetch categories:', error);
 
         // Try to return cached data even if expired
-        const cachedCategories = cacheUtils.get(CACHE_KEYS.CATEGORIES);
-        if (cachedCategories) {
+        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
+        if (cachedData.data) {
             console.log('🔄 Using expired cached categories data as fallback');
-            return cachedCategories;
+            return cachedData.data;
         }
 
         // Fallback to mock data if API fails and no cache
@@ -207,19 +308,45 @@ export async function getMenuItems() {
     }
 
     try {
+        // Check if we have valid cached data
+        const cacheValid = await isCacheValid(CACHE_KEYS.MENU_ITEMS);
+        if (cacheValid) {
+            const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
+            console.log('📦 Using cached menu items data');
+            return cachedData.data;
+        }
+
+        // Get cached ETag for conditional request
+        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
+
         console.log('🌐 Fetching fresh menu items data');
-        const response = await apiCall('/menu-items');
-        const menuItems = response || [];
+        const response = await apiCall('/menu-items', {
+            etag: cachedData.etag
+        });
+
+        let menuItems;
+        if (response.cached) {
+            // Server returned 304, use cached data
+            console.log('📦 Server confirmed cache is valid - using cached menu items');
+            menuItems = cachedData.data;
+        } else {
+            // Server returned new data
+            console.log('🔄 Server returned new menu items data');
+            menuItems = response.data || [];
+
+            // Cache the new data with ETag
+            cacheUtils.setWithETag(CACHE_KEYS.MENU_ITEMS, menuItems, response.etag);
+        }
 
         return menuItems;
     } catch (error) {
         console.error('Failed to fetch menu items:', error);
 
         // Try to return cached data even if expired
-        const cachedMenuItems = cacheUtils.get(CACHE_KEYS.MENU_ITEMS);
-        if (cachedMenuItems) {
+        const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
+        if (cachedData.data) {
             console.log('🔄 Using expired cached menu items data as fallback');
-            return cachedMenuItems;
+            return cachedData.data;
         }
 
         // Fallback to mock data if API fails and no cache
@@ -244,9 +371,10 @@ export async function getMenuItemsByCategory(categoryId) {
 
     try {
         if (categoryId === 'all') {
-            const response = await apiCall('/menu-items');
-            return response || [];
+            // Use the cached menu items for 'all' category
+            return await getMenuItems();
         }
+
         const response = await apiCall(`/menu-items-by-category?categoryId=${categoryId}`);
         // Handle both response formats:
         // 1. Old format: {success: true, data: [...], ...}
@@ -288,20 +416,17 @@ export async function searchMenuItems(query) {
     }
 
     try {
-        const response = await apiCall(`/search?query=${encodeURIComponent(query)}`);
-        // Handle both response formats:
-        // 1. Old format: {success: true, data: [...], ...}
-        // 2. New format: [...] (direct array)
-        if (response?.data) {
-            // Old format with nested data
-            return response.data;
-        } else if (Array.isArray(response)) {
-            // New format with direct array
-            return response;
-        } else {
-            console.warn('Unexpected search response format:', response);
-            return [];
-        }
+        // For search, we can use cached menu items and filter locally
+        // This is more efficient than making a separate API call
+        const allMenuItems = await getMenuItems();
+
+        const searchResults = allMenuItems.filter(item =>
+            item.name.toLowerCase().includes(query.toLowerCase()) ||
+            item.description.toLowerCase().includes(query.toLowerCase())
+        );
+
+        console.log(`🔍 Found ${searchResults.length} items matching "${query}"`);
+        return searchResults;
     } catch (error) {
         console.error('Failed to search menu items:', error);
         // Fallback to mock data if API fails
@@ -323,18 +448,26 @@ export const cacheManager = {
     clearAll: () => cacheUtils.clearAll(),
 
     // Clear specific cache
-    clearCategories: () => cacheUtils.clear(CACHE_KEYS.CATEGORIES),
-    clearMenuItems: () => cacheUtils.clear(CACHE_KEYS.MENU_ITEMS),
+    clearCategories: () => {
+        cacheUtils.clear(CACHE_KEYS.CATEGORIES);
+        cacheUtils.clear(CACHE_KEYS.CATEGORIES_ETAG);
+    },
+    clearMenuItems: () => {
+        cacheUtils.clear(CACHE_KEYS.MENU_ITEMS);
+        cacheUtils.clear(CACHE_KEYS.MENU_ITEMS_ETAG);
+    },
     clearVersion: () => cacheUtils.clear(CACHE_KEYS.MENU_VERSION),
 
     // Get cache info for debugging
     getCacheInfo: () => {
-        // Clear any existing cache since we're disabling caching
-        cacheUtils.clearAll();
+        const categoriesCache = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
+        const menuItemsCache = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
+        const versionCache = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
+
         return {
-            categories: 'Caching disabled',
-            menuItems: 'Caching disabled',
-            version: 'Caching disabled'
+            categories: categoriesCache.data ? `Cached (${categoriesCache.data.length} items, ETag: ${categoriesCache.etag?.substring(0, 8)}...)` : 'Not cached',
+            menuItems: menuItemsCache.data ? `Cached (${menuItemsCache.data.length} items, ETag: ${menuItemsCache.etag?.substring(0, 8)}...)` : 'Not cached',
+            version: versionCache ? `Version ${versionCache}` : 'Not cached'
         };
     },
 
@@ -342,5 +475,11 @@ export const cacheManager = {
     clearAllOnStartup: () => {
         cacheUtils.clearAll();
         console.log('🧹 Cache cleared on startup - using fresh API calls');
+    },
+
+    // Force refresh cache
+    forceRefresh: async () => {
+        cacheUtils.clearAll();
+        console.log('🔄 Cache cleared - will fetch fresh data on next request');
     }
 };

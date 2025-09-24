@@ -1,5 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const { incrementMenuVersion } = require('../shared/menuVersionUtils');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -82,6 +83,9 @@ exports.handler = async (event) => {
         const putCommand = new PutCommand(putParams);
         await docClient.send(putCommand);
 
+        // Increment menu version after successful creation
+        const versionInfo = await incrementMenuVersion();
+
         return {
             statusCode: 201,
             headers: {
@@ -92,7 +96,8 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({
                 message: 'Category created successfully',
-                category: categoryData
+                category: categoryData,
+                version: versionInfo?.version || 'unknown'
             })
         };
     } catch (error) {

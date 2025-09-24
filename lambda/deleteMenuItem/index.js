@@ -1,5 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, ScanCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { incrementMenuVersion } = require('../shared/menuVersionUtils');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -95,6 +96,9 @@ exports.handler = async (event) => {
         const deleteCommand = new DeleteCommand(deleteParams);
         await docClient.send(deleteCommand);
 
+        // Increment menu version after successful deletion
+        const versionInfo = await incrementMenuVersion();
+
         console.log('✅ Item deleted successfully');
 
         return {
@@ -107,7 +111,8 @@ exports.handler = async (event) => {
             },
             body: JSON.stringify({
                 message: 'Menu item deleted successfully',
-                deletedItemId: itemId
+                deletedItemId: itemId,
+                version: versionInfo?.version || 'unknown'
             })
         };
     } catch (error) {
