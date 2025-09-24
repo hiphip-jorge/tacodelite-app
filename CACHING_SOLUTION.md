@@ -125,10 +125,11 @@ const CACHE_KEYS = {
 - **After Menu Changes**: Cache invalidated, fresh data fetched
 - **Network Issues**: Expired cache used as fallback
 
-## Deployment Checklist
+## Deployment
 
 ### Backend
-- [ ] Deploy updated Lambda functions
+- [ ] Run `./scripts/build-lambda.sh` to create zip files with checksums
+- [ ] Deploy with `terraform apply` (Terraform automatically detects checksum files)
 - [ ] Verify `MENU_VERSION` record exists in DynamoDB
 - [ ] Test API endpoints return proper headers
 - [ ] Confirm version incrementing works

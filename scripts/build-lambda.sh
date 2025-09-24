@@ -27,7 +27,63 @@ LAMBDA_DIR="$PROJECT_ROOT/lambda"
 
 cd "$LAMBDA_DIR"
 
-# Function to package a Lambda function
+# Function to package a Lambda function with checksum
+package_lambda_with_checksum() {
+    local function_dir="$1"
+    local base_name="$2"
+    
+    if [ -d "$function_dir" ]; then
+        echo "📦 Packaging $function_dir..."
+        
+        # Remove old zip files
+        rm -f "${base_name}.zip"
+        rm -f "${base_name}."[0-9a-f]*".zip"
+        
+        # Copy shared directory if it exists
+        if [ -d "shared" ]; then
+            cp -r shared "$function_dir/"
+        fi
+        
+        # Create zip file
+        cd "$function_dir"
+        
+        # Install dependencies if package.json exists
+        if [ -f "package.json" ]; then
+            echo "  📥 Installing dependencies..."
+            npm ci --only=production
+        fi
+        
+        # Create zip (exclude node_modules if it exists, as Lambda runtime provides AWS SDK)
+        if [ -d "node_modules" ]; then
+            zip -r "../${base_name}.zip" . -x "node_modules/@aws-sdk/*" "node_modules/aws-sdk/*" "*.DS_Store"
+        else
+            zip -r "../${base_name}.zip" . -x "*.DS_Store"
+        fi
+        
+        cd ..
+        
+        # Remove copied shared directory
+        if [ -d "$function_dir/shared" ]; then
+            rm -rf "$function_dir/shared"
+        fi
+        
+        # Calculate checksum and rename
+        checksum=$(sha256sum "${base_name}.zip" | cut -d' ' -f1 | cut -c1-8)
+        mv "${base_name}.zip" "${base_name}.${checksum}.zip"
+        
+        # Verify zip file was created
+        if [ -f "${base_name}.${checksum}.zip" ]; then
+            echo "  ✅ Created ${base_name}.${checksum}.zip ($(du -h "${base_name}.${checksum}.zip" | cut -f1))"
+        else
+            echo "  ❌ Failed to create ${base_name}.${checksum}.zip"
+            exit 1
+        fi
+    else
+        echo "  ⚠️  Directory $function_dir not found, skipping..."
+    fi
+}
+
+# Function to package a Lambda function without checksum (for functions that don't need it)
 package_lambda() {
     local function_dir="$1"
     local zip_name="$2"
@@ -49,9 +105,9 @@ package_lambda() {
         
         # Create zip (exclude node_modules if it exists, as Lambda runtime provides AWS SDK)
         if [ -d "node_modules" ]; then
-            zip -r "../$zip_name" . -x "node_modules/@aws-sdk/*" "node_modules/aws-sdk/*"
+            zip -r "../$zip_name" . -x "node_modules/@aws-sdk/*" "node_modules/aws-sdk/*" "*.DS_Store"
         else
-            zip -r "../$zip_name" .
+            zip -r "../$zip_name" . -x "*.DS_Store"
         fi
         
         cd ..
@@ -71,21 +127,21 @@ package_lambda() {
 # Package all Lambda functions
 echo "🚀 Starting Lambda packaging process..."
 
-# Core functions
-package_lambda "getMenuItems" "getMenuItems.zip"
+# Core functions with checksums (for caching support)
+package_lambda_with_checksum "getMenuItems" "getMenuItems"
+package_lambda_with_checksum "getCategories" "getCategories"
+package_lambda_with_checksum "createCategory" "createCategory"
+package_lambda_with_checksum "updateCategory" "updateCategory"
+package_lambda_with_checksum "deleteCategory" "deleteCategory"
+package_lambda_with_checksum "createMenuItem" "createMenuItem"
+package_lambda_with_checksum "updateMenuItem" "updateMenuItem"
+package_lambda_with_checksum "deleteMenuItem" "deleteMenuItem"
+
+# Other functions without checksums
 package_lambda "searchMenuItems" "searchMenuItems.zip"
 package_lambda "getMenuItemsByCategory" "getMenuItemsByCategory.zip"
-package_lambda "updateMenuItem" "updateMenuItem.zip"
-package_lambda "deleteMenuItem" "deleteMenuItem.zip"
-package_lambda "createMenuItem" "createMenuItem.zip"
 package_lambda "getMenuVersion" "getMenuVersion.zip"
 package_lambda "incrementMenuVersion" "incrementMenuVersion.zip"
-
-# Category functions
-package_lambda "getCategories" "getCategories.zip"
-package_lambda "updateCategory" "updateCategory.zip"
-package_lambda "createCategory" "createCategory.zip"
-package_lambda "deleteCategory" "deleteCategory.zip"
 
 # Auth functions (these create zip files in auth/ subdirectory)
 echo "📦 Packaging auth/login..."
@@ -152,20 +208,24 @@ echo "✅ Lambda packaging complete!"
 echo "🔍 Verifying all zip files..."
 missing_files=()
 
-# Check main Lambda functions
+# Check main Lambda functions (with checksums)
+required_files_with_checksums=(
+    "getMenuItems.*.zip"
+    "getCategories.*.zip"
+    "createCategory.*.zip"
+    "updateCategory.*.zip"
+    "deleteCategory.*.zip"
+    "createMenuItem.*.zip"
+    "updateMenuItem.*.zip"
+    "deleteMenuItem.*.zip"
+)
+
+# Check other Lambda functions
 required_files=(
-    "getMenuItems.zip"
     "searchMenuItems.zip"
     "getMenuItemsByCategory.zip"
-    "updateMenuItem.zip"
-    "deleteMenuItem.zip"
-    "createMenuItem.zip"
     "getMenuVersion.zip"
     "incrementMenuVersion.zip"
-    "getCategories.zip"
-    "updateCategory.zip"
-    "createCategory.zip"
-    "deleteCategory.zip"
     "getAdminUsers.zip"
     "createAdminUser.zip"
     "updateAdminUser.zip"
@@ -176,6 +236,14 @@ required_files=(
     "deleteUser.zip"
 )
 
+# Check files with checksums
+for pattern in "${required_files_with_checksums[@]}"; do
+    if ! ls $pattern 1> /dev/null 2>&1; then
+        missing_files+=("$pattern")
+    fi
+done
+
+# Check regular files
 for file in "${required_files[@]}"; do
     if [ ! -f "$file" ]; then
         missing_files+=("$file")

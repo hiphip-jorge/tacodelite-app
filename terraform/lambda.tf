@@ -61,11 +61,24 @@ resource "aws_iam_role_policy" "lambda_policy" {
   })
 }
 
+# Local variables for dynamic Lambda zip file detection
+locals {
+  # Functions with checksums (caching functions)
+  get_menu_items_zip     = length(tolist(fileset("../lambda", "getMenuItems.*.zip"))) > 0 ? tolist(fileset("../lambda", "getMenuItems.*.zip"))[0] : "getMenuItems.zip"
+  get_categories_zip     = length(tolist(fileset("../lambda", "getCategories.*.zip"))) > 0 ? tolist(fileset("../lambda", "getCategories.*.zip"))[0] : "getCategories.zip"
+  create_category_zip    = length(tolist(fileset("../lambda", "createCategory.*.zip"))) > 0 ? tolist(fileset("../lambda", "createCategory.*.zip"))[0] : "createCategory.zip"
+  update_category_zip    = length(tolist(fileset("../lambda", "updateCategory.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateCategory.*.zip"))[0] : "updateCategory.zip"
+  delete_category_zip    = length(tolist(fileset("../lambda", "deleteCategory.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteCategory.*.zip"))[0] : "deleteCategory.zip"
+  create_menu_item_zip   = length(tolist(fileset("../lambda", "createMenuItem.*.zip"))) > 0 ? tolist(fileset("../lambda", "createMenuItem.*.zip"))[0] : "createMenuItem.zip"
+  update_menu_item_zip   = length(tolist(fileset("../lambda", "updateMenuItem.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateMenuItem.*.zip"))[0] : "updateMenuItem.zip"
+  delete_menu_item_zip   = length(tolist(fileset("../lambda", "deleteMenuItem.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteMenuItem.*.zip"))[0] : "deleteMenuItem.zip"
+}
+
 # Lambda Functions
 
 # Menu Items Lambda Functions
 resource "aws_lambda_function" "get_menu_items" {
-  filename         = "../lambda/getMenuItems.zip"
+  filename         = "../lambda/${local.get_menu_items_zip}"
   function_name    = "${var.app_name}-get-menu-items-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -131,7 +144,7 @@ resource "aws_lambda_function" "get_menu_items_by_category" {
 }
 
 resource "aws_lambda_function" "update_menu_item" {
-  filename         = "../lambda/updateMenuItem.zip"
+  filename         = "../lambda/${local.update_menu_item_zip}"
   function_name    = "${var.app_name}-update-menu-item-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -153,7 +166,7 @@ resource "aws_lambda_function" "update_menu_item" {
 }
 
 resource "aws_lambda_function" "delete_menu_item" {
-  filename         = "../lambda/deleteMenuItem.zip"
+  filename         = "../lambda/${local.delete_menu_item_zip}"
   function_name    = "${var.app_name}-delete-menu-item-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -175,7 +188,7 @@ resource "aws_lambda_function" "delete_menu_item" {
 }
 
 resource "aws_lambda_function" "create_menu_item" {
-  filename         = "../lambda/createMenuItem.zip"
+  filename         = "../lambda/${local.create_menu_item_zip}"
   function_name    = "${var.app_name}-create-menu-item-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -199,7 +212,7 @@ resource "aws_lambda_function" "create_menu_item" {
 
 # Categories Lambda Functions
 resource "aws_lambda_function" "get_categories" {
-  filename         = "../lambda/getCategories.zip"
+  filename         = "../lambda/${local.get_categories_zip}"
   function_name    = "${var.app_name}-get-categories-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -221,7 +234,7 @@ resource "aws_lambda_function" "get_categories" {
 }
 
 resource "aws_lambda_function" "update_category" {
-  filename         = "../lambda/updateCategory.zip"
+  filename         = "../lambda/${local.update_category_zip}"
   function_name    = "${var.app_name}-update-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -243,7 +256,7 @@ resource "aws_lambda_function" "update_category" {
 }
 
 resource "aws_lambda_function" "create_category" {
-  filename         = "../lambda/createCategory.zip"
+  filename         = "../lambda/${local.create_category_zip}"
   function_name    = "${var.app_name}-create-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -427,7 +440,7 @@ resource "aws_lambda_function" "delete_user" {
 
 # Delete Category Lambda Function
 resource "aws_lambda_function" "delete_category" {
-  filename         = "../lambda/deleteCategory.zip"
+  filename         = "../lambda/${local.delete_category_zip}"
   function_name    = "${var.app_name}-delete-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
