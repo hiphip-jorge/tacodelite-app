@@ -221,27 +221,18 @@ async function isCacheValid(cacheKey) {
             return true;
         }
 
-        // Check if cached version is still fresh (within 24 hours)
-        const versionTimestamp = cacheUtils.get(`${CACHE_KEYS.MENU_VERSION}_timestamp`);
-        const now = Date.now();
-        const VERSION_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+        // Always check the current menu version to detect changes immediately
+        console.log('🔄 Checking current menu version...');
+        const currentVersion = await getMenuVersion();
 
-        if (!versionTimestamp || (now - versionTimestamp) > VERSION_CACHE_DURATION) {
-            console.log('🔄 Version cache expired, checking for updates...');
-            const currentVersion = await getMenuVersion();
-
-            if (currentVersion !== cachedVersion) {
-                console.log('🔄 Menu version changed, invalidating cache');
-                cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
-                cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, now);
-                return false; // Version changed, need fresh data
-            }
-
-            // Version is same, update timestamp
-            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, now);
+        if (currentVersion !== cachedVersion) {
+            console.log('🔄 Menu version changed from', cachedVersion, 'to', currentVersion, '- invalidating cache');
+            cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
+            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, Date.now());
+            return false; // Version changed, need fresh data
         }
 
-        // We have a cached version and it's still fresh, cache is valid
+        // Version is same, cache is valid
         console.log('✅ Cache is valid - using cached data (version:', cachedVersion, ')');
         return true;
     } catch (error) {
