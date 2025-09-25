@@ -281,7 +281,7 @@ export async function getCategories() {
         const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
         console.log('🔍 Cache check - cachedData:', cachedData);
 
-        if (cachedData.data && cachedData.etag) {
+        if (cachedData.data) {
             console.log('🔍 Found cached data, checking validity...');
             const cacheValid = await isCacheValid(CACHE_KEYS.CATEGORIES);
             console.log('🔍 Cache validity result:', cacheValid);
@@ -299,7 +299,7 @@ export async function getCategories() {
 
         console.log('🌐 Fetching fresh categories data');
         const response = await apiCall('/categories', {
-            etag: existingCache.etag
+            etag: existingCache.etag || undefined
         });
 
         let categories;
@@ -351,7 +351,7 @@ export async function getMenuItems() {
     try {
         // Check if we have valid cached data
         const cachedData = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
-        if (cachedData.data && cachedData.etag) {
+        if (cachedData.data) {
             const cacheValid = await isCacheValid(CACHE_KEYS.MENU_ITEMS);
             if (cacheValid) {
                 console.log('📦 Using cached menu items data');
@@ -364,7 +364,7 @@ export async function getMenuItems() {
 
         console.log('🌐 Fetching fresh menu items data');
         const response = await apiCall('/menu-items', {
-            etag: existingCache.etag
+            etag: existingCache.etag || undefined
         });
 
         let menuItems;
