@@ -426,30 +426,43 @@ export async function getMenuItemsByCategory(categoryId) {
             return await getMenuItems();
         }
 
-        const response = await apiCall(`/menu-items-by-category?categoryId=${categoryId}`);
-        // Handle both response formats:
-        // 1. Old format: {success: true, data: [...], ...}
-        // 2. New format: [...] (direct array)
-        let result;
-        if (response?.data) {
-            // Old format with nested data
-            result = response.data;
-        } else if (Array.isArray(response)) {
-            // New format with direct array
-            result = response;
-        } else {
-            // Fallback: try to convert object with numeric keys to array
-            result = Object.values(response || {});
-        }
-        return result;
+        // Get all menu items from cache and filter by category
+        const allMenuItems = await getMenuItems();
+        const categoryIdNumber = parseInt(categoryId);
+        const filteredItems = allMenuItems.filter(item => item.categoryId === categoryIdNumber);
+
+        console.log(`📦 Filtered ${filteredItems.length} items for category ${categoryId} from cached data`);
+        return filteredItems;
     } catch (error) {
         console.error('Failed to fetch menu items by category:', error);
-        // Fallback to mock data if API fails
-        console.log('🔶 Falling back to mock menu items by category data');
-        if (categoryId === 'all') {
-            return mockMenuItems;
+        // Fallback to API call if cache fails
+        console.log('🔄 Falling back to API call for menu items by category');
+        try {
+            const response = await apiCall(`/menu-items-by-category?categoryId=${categoryId}`);
+            // Handle both response formats:
+            // 1. Old format: {success: true, data: [...], ...}
+            // 2. New format: [...] (direct array)
+            let result;
+            if (response?.data) {
+                // Old format with nested data
+                result = response.data;
+            } else if (Array.isArray(response)) {
+                // New format with direct array
+                result = response;
+            } else {
+                // Fallback: try to convert object with numeric keys to array
+                result = Object.values(response || {});
+            }
+            return result;
+        } catch (apiError) {
+            console.error('API fallback also failed:', apiError);
+            // Only use mock data as last resort
+            console.log('🔶 Using mock data as last resort');
+            if (categoryId === 'all') {
+                return mockMenuItems;
+            }
+            return mockMenuItems.filter(item => item.categoryId === categoryId);
         }
-        return mockMenuItems.filter(item => item.categoryId === categoryId);
     }
 }
 
