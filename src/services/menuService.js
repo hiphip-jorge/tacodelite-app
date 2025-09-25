@@ -105,30 +105,18 @@ const cacheUtils = {
     // Get cached data with ETag
     getWithETag(key) {
         try {
-            console.log('🔍 getWithETag called for:', key);
             const cached = localStorage.getItem(key);
-            console.log('🔍 Raw cached data:', cached);
-
-            if (!cached) {
-                console.log('🔍 No cached data found');
-                return { data: null, etag: null };
-            }
+            if (!cached) return { data: null, etag: null };
 
             const { data, timestamp, etag } = JSON.parse(cached);
             const now = Date.now();
-            const age = now - timestamp;
-            const maxAge = CACHE_DURATION.DATA;
-
-            console.log('🔍 Cache age:', age, 'ms, max age:', maxAge, 'ms');
 
             // Check if cache is expired
-            if (age > maxAge) {
-                console.log('🔍 Cache expired, removing...');
+            if (now - timestamp > CACHE_DURATION.DATA) {
                 localStorage.removeItem(key);
                 return { data: null, etag: null };
             }
 
-            console.log('🔍 Cache is valid, returning data');
             return { data, etag };
         } catch (error) {
             console.error('Error reading from cache:', error);
@@ -139,14 +127,12 @@ const cacheUtils = {
     // Set cached data with ETag
     setWithETag(key, data, etag) {
         try {
-            console.log('🔍 setWithETag called for:', key, 'with', data?.length || 0, 'items, etag:', etag);
             const cacheData = {
                 data,
                 etag,
                 timestamp: Date.now()
             };
             localStorage.setItem(key, JSON.stringify(cacheData));
-            console.log('🔍 Data cached successfully');
         } catch (error) {
             console.error('Error writing to cache:', error);
         }
@@ -226,16 +212,12 @@ async function getMenuVersion() {
 // Check if cached data is still valid based on version
 async function isCacheValid(cacheKey) {
     try {
-        console.log('🔍 isCacheValid called for:', cacheKey);
-
         // Check if we have a cached version
         const cachedVersion = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
-        console.log('🔍 Cached version:', cachedVersion);
 
         // If no cached version, assume cache is valid for now
         // We'll let the ETag mechanism handle version checking
         if (!cachedVersion) {
-            console.log('✅ Cache is valid - no version check needed (using ETag)');
             return true;
         }
 
@@ -279,19 +261,12 @@ export async function getCategories() {
     try {
         // Check if we have valid cached data
         const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
-        console.log('🔍 Cache check - cachedData:', cachedData);
-
         if (cachedData.data) {
-            console.log('🔍 Found cached data, checking validity...');
             const cacheValid = await isCacheValid(CACHE_KEYS.CATEGORIES);
-            console.log('🔍 Cache validity result:', cacheValid);
-
             if (cacheValid) {
                 console.log('📦 Using cached categories data');
                 return cachedData.data;
             }
-        } else {
-            console.log('🔍 No cached data found or cache expired');
         }
 
         // Get cached ETag for conditional request

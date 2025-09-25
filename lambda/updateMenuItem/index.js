@@ -5,6 +5,19 @@ const { incrementMenuVersion } = require('../shared/menuVersionUtils');
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
 
+// CORS headers helper function
+const getCorsHeaders = (origin, additionalHeaders = {}) => {
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
+    const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0] || '*';
+
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Methods': 'PUT,OPTIONS',
+        ...additionalHeaders
+    };
+};
+
 exports.handler = async (event) => {
     try {
         // Get the item ID from path parameters
@@ -12,14 +25,12 @@ exports.handler = async (event) => {
         const body = JSON.parse(event.body);
 
         if (!itemId) {
+            const origin = event.headers?.origin || event.headers?.Origin || '*';
             return {
                 statusCode: 400,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
-                },
+                headers: getCorsHeaders(origin, {
+                    'Content-Type': 'application/json'
+                }),
                 body: JSON.stringify({ error: 'Item ID is required' })
             };
         }
@@ -29,14 +40,12 @@ exports.handler = async (event) => {
         const missingFields = requiredFields.filter(field => body[field] === undefined);
 
         if (missingFields.length > 0) {
+            const origin = event.headers?.origin || event.headers?.Origin || '*';
             return {
                 statusCode: 400,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
-                },
+                headers: getCorsHeaders(origin, {
+                    'Content-Type': 'application/json'
+                }),
                 body: JSON.stringify({
                     error: 'Missing required fields',
                     missingFields
@@ -82,14 +91,12 @@ exports.handler = async (event) => {
         // Increment menu version after successful update
         const versionInfo = await incrementMenuVersion();
 
+        const origin = event.headers?.origin || event.headers?.Origin || '*';
         return {
             statusCode: 200,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'PUT, OPTIONS'
-            },
+            headers: getCorsHeaders(origin, {
+                'Content-Type': 'application/json'
+            }),
             body: JSON.stringify({
                 message: 'Menu item updated successfully',
                 item: response.Attributes,
@@ -98,14 +105,12 @@ exports.handler = async (event) => {
         };
     } catch (error) {
         console.error('Error updating menu item:', error);
+        const origin = event.headers?.origin || event.headers?.Origin || '*';
         return {
             statusCode: 500,
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'PUT, OPTIONS'
-            },
+            headers: getCorsHeaders(origin, {
+                'Content-Type': 'application/json'
+            }),
             body: JSON.stringify({
                 error: 'Failed to update menu item',
                 message: error.message
