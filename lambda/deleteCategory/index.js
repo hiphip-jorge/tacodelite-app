@@ -1,6 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, DeleteCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
-const { incrementMenuVersion } = require('../shared/menuVersionUtils');
+const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
