@@ -278,6 +278,9 @@ export async function getCategories() {
                 // Clear the invalid cache
                 cacheUtils.clear(CACHE_KEYS.CATEGORIES);
                 cacheUtils.clear(CACHE_KEYS.CATEGORIES_ETAG);
+                // Also clear menu items cache since version changed
+                cacheUtils.clear(CACHE_KEYS.MENU_ITEMS);
+                cacheUtils.clear(CACHE_KEYS.MENU_ITEMS_ETAG);
             }
         }
 
@@ -353,6 +356,9 @@ export async function getMenuItems() {
                 // Clear the invalid cache
                 cacheUtils.clear(CACHE_KEYS.MENU_ITEMS);
                 cacheUtils.clear(CACHE_KEYS.MENU_ITEMS_ETAG);
+                // Also clear categories cache since version changed
+                cacheUtils.clear(CACHE_KEYS.CATEGORIES);
+                cacheUtils.clear(CACHE_KEYS.CATEGORIES_ETAG);
             }
         }
 
