@@ -257,10 +257,15 @@ export async function getCategories() {
             if (cacheValid) {
                 console.log('📦 Using cached categories data');
                 return cachedData.data;
+            } else {
+                console.log('🔄 Cache invalidated, clearing cached data');
+                // Clear the invalid cache
+                cacheUtils.clear(CACHE_KEYS.CATEGORIES);
+                cacheUtils.clear(CACHE_KEYS.CATEGORIES_ETAG);
             }
         }
 
-        // Get cached ETag for conditional request
+        // Get cached ETag for conditional request (might be empty after clearing)
         const existingCache = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
 
         console.log('🌐 Fetching fresh categories data');
@@ -322,10 +327,15 @@ export async function getMenuItems() {
             if (cacheValid) {
                 console.log('📦 Using cached menu items data');
                 return cachedData.data;
+            } else {
+                console.log('🔄 Cache invalidated, clearing cached data');
+                // Clear the invalid cache
+                cacheUtils.clear(CACHE_KEYS.MENU_ITEMS);
+                cacheUtils.clear(CACHE_KEYS.MENU_ITEMS_ETAG);
             }
         }
 
-        // Get cached ETag for conditional request
+        // Get cached ETag for conditional request (might be empty after clearing)
         const existingCache = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
 
         console.log('🌐 Fetching fresh menu items data');
