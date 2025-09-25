@@ -214,15 +214,32 @@ async function isCacheValid(cacheKey) {
     try {
         // Check if we have a cached version
         const cachedVersion = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
+        const versionTimestamp = cacheUtils.get(`${CACHE_KEYS.MENU_VERSION}_timestamp`);
 
-        // If no cached version, assume cache is valid for now
-        // We'll let the ETag mechanism handle version checking
+        // If no cached version, we need to check the current version
+        // to ensure we don't use stale data after a menu update
         if (!cachedVersion) {
+            console.log('🔄 No cached version - checking current menu version...');
+            const currentVersion = await getMenuVersion();
+            // Cache the current version for future checks
+            cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
+            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, Date.now());
+            console.log('✅ Cached current version:', currentVersion);
             return true;
         }
 
-        // Always check the current menu version to detect changes immediately
-        console.log('🔄 Checking current menu version...');
+        // Check if version cache is fresh (less than 5 minutes old)
+        const now = Date.now();
+        const versionCacheAge = now - (versionTimestamp || 0);
+        const VERSION_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+        if (versionCacheAge < VERSION_CACHE_DURATION) {
+            console.log('✅ Version cache is fresh - using cached data (version:', cachedVersion, ')');
+            return true;
+        }
+
+        // Version cache is stale, check current version
+        console.log('🔄 Version cache is stale, checking current menu version...');
         const currentVersion = await getMenuVersion();
 
         if (currentVersion !== cachedVersion) {
@@ -230,8 +247,9 @@ async function isCacheValid(cacheKey) {
             return false; // Version changed, need fresh data
         }
 
-        // Version is same, cache is valid
-        console.log('✅ Cache is valid - using cached data (version:', cachedVersion, ')');
+        // Version is same, update timestamp and cache is valid
+        console.log('✅ Version unchanged - updating timestamp and using cached data (version:', cachedVersion, ')');
+        cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, now);
         return true;
     } catch (error) {
         console.error('Error checking cache validity:', error);
