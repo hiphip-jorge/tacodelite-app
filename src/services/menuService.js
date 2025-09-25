@@ -227,8 +227,6 @@ async function isCacheValid(cacheKey) {
 
         if (currentVersion !== cachedVersion) {
             console.log('🔄 Menu version changed from', cachedVersion, 'to', currentVersion, '- invalidating cache');
-            cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
-            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, Date.now());
             return false; // Version changed, need fresh data
         }
 
@@ -285,6 +283,11 @@ export async function getCategories() {
 
             // Cache the new data with ETag
             cacheUtils.setWithETag(CACHE_KEYS.CATEGORIES, categories, response.etag);
+
+            // Update the cached menu version
+            const currentVersion = await getMenuVersion();
+            cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
+            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, Date.now());
         }
 
         // Sort categories by their numeric ID (e.g., "CATEGORY#1" -> 1)
@@ -355,6 +358,11 @@ export async function getMenuItems() {
 
             // Cache the new data with ETag
             cacheUtils.setWithETag(CACHE_KEYS.MENU_ITEMS, menuItems, response.etag);
+
+            // Update the cached menu version
+            const currentVersion = await getMenuVersion();
+            cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
+            cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, Date.now());
         }
 
         return menuItems;
