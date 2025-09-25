@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, UpdateCommand, ScanCommand, DeleteCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
@@ -53,40 +53,100 @@ exports.handler = async (event) => {
             };
         }
 
-        // Use the categoryId from the request body to construct the key
-        const categoryId = body.categoryId;
         const itemIdNumber = itemId;
 
-        const params = {
+        // First, find the existing item to get its current category
+        const scanParams = {
             TableName: process.env.DYNAMODB_TABLE,
-            Key: {
-                pk: `ITEM#${categoryId}`,
-                sk: `ITEM#${itemIdNumber}`
-            },
-            UpdateExpression: 'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id',
+            FilterExpression: '#id = :id',
             ExpressionAttributeNames: {
-                '#name': 'name',
-                '#price': 'price',
-                '#active': 'active',
-                '#vegetarian': 'vegetarian',
-                '#description': 'description',
-                '#categoryId': 'categoryId',
                 '#id': 'id'
             },
             ExpressionAttributeValues: {
-                ':name': body.name,
-                ':price': body.price,
-                ':active': body.active,
-                ':vegetarian': body.vegetarian,
-                ':description': body.description,
-                ':categoryId': body.categoryId,
                 ':id': parseInt(itemIdNumber)
-            },
-            ReturnValues: 'ALL_NEW'
+            }
         };
 
-        const command = new UpdateCommand(params);
-        const response = await docClient.send(command);
+        const scanCommand = new ScanCommand(scanParams);
+        const scanResult = await docClient.send(scanCommand);
+
+        if (!scanResult.Items || scanResult.Items.length === 0) {
+            const origin = event.headers?.origin || event.headers?.Origin || '*';
+            return {
+                statusCode: 404,
+                headers: getCorsHeaders(origin, {
+                    'Content-Type': 'application/json'
+                }),
+                body: JSON.stringify({ error: 'Menu item not found' })
+            };
+        }
+
+        const existingItem = scanResult.Items[0];
+        const originalCategoryId = existingItem.categoryId;
+        const newCategoryId = body.categoryId;
+
+        // If category changed, we need to delete the old item and create a new one
+        if (originalCategoryId !== newCategoryId) {
+            // Delete the old item
+            const deleteParams = {
+                TableName: process.env.DYNAMODB_TABLE,
+                Key: {
+                    pk: existingItem.pk,
+                    sk: existingItem.sk
+                }
+            };
+            await docClient.send(new DeleteCommand(deleteParams));
+
+            // Create new item in the new category
+            const putParams = {
+                TableName: process.env.DYNAMODB_TABLE,
+                Item: {
+                    pk: `ITEM#${newCategoryId}`,
+                    sk: `ITEM#${itemIdNumber}`,
+                    id: parseInt(itemIdNumber),
+                    name: body.name,
+                    price: body.price,
+                    active: body.active,
+                    vegetarian: body.vegetarian,
+                    description: body.description,
+                    categoryId: newCategoryId
+                }
+            };
+            const putCommand = new PutCommand(putParams);
+            const response = await docClient.send(putCommand);
+        } else {
+            // Category didn't change, just update the existing item
+            const updateParams = {
+                TableName: process.env.DYNAMODB_TABLE,
+                Key: {
+                    pk: existingItem.pk,
+                    sk: existingItem.sk
+                },
+                UpdateExpression: 'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id',
+                ExpressionAttributeNames: {
+                    '#name': 'name',
+                    '#price': 'price',
+                    '#active': 'active',
+                    '#vegetarian': 'vegetarian',
+                    '#description': 'description',
+                    '#categoryId': 'categoryId',
+                    '#id': 'id'
+                },
+                ExpressionAttributeValues: {
+                    ':name': body.name,
+                    ':price': body.price,
+                    ':active': body.active,
+                    ':vegetarian': body.vegetarian,
+                    ':description': body.description,
+                    ':categoryId': body.categoryId,
+                    ':id': parseInt(itemIdNumber)
+                },
+                ReturnValues: 'ALL_NEW'
+            };
+
+            const updateCommand = new UpdateCommand(updateParams);
+            const response = await docClient.send(updateCommand);
+        }
 
         // Increment menu version after successful update
         const versionInfo = await incrementMenuVersion();
@@ -99,7 +159,6 @@ exports.handler = async (event) => {
             }),
             body: JSON.stringify({
                 message: 'Menu item updated successfully',
-                item: response.Attributes,
                 version: versionInfo?.version || 'unknown'
             })
         };
