@@ -203,6 +203,12 @@ package_lambda "getUserById" "getUserById.zip"
 package_lambda "updateUser" "updateUser.zip"
 package_lambda "deleteUser" "deleteUser.zip"
 
+# Announcement functions
+package_lambda "getAnnouncements" "getAnnouncements.zip"
+package_lambda "createAnnouncement" "createAnnouncement.zip"
+package_lambda "updateAnnouncement" "updateAnnouncement.zip"
+package_lambda "deleteAnnouncement" "deleteAnnouncement.zip"
+
 echo "✅ Lambda packaging complete!"
 
 # Verify all required zip files exist
@@ -235,6 +241,10 @@ required_files=(
     "getUserById.zip"
     "updateUser.zip"
     "deleteUser.zip"
+    "getAnnouncements.zip"
+    "createAnnouncement.zip"
+    "updateAnnouncement.zip"
+    "deleteAnnouncement.zip"
 )
 
 # Check files with checksums
