@@ -44,7 +44,19 @@ vi.mock('../../hooks/useMenu', () => ({
         selectedCategory: 'all',
         setSelectedCategory: vi.fn(),
         loading: false,
-        error: null
+        error: null,
+        getCategoryItemCount: vi.fn((categoryId) => {
+            if (categoryId === 'all') return 2;
+            if (categoryId === 1) return 1;
+            if (categoryId === 2) return 1;
+            return 0;
+        }),
+        getItemCount: vi.fn((categoryId) => {
+            if (categoryId === 'all') return 2;
+            if (categoryId === 1) return 1;
+            if (categoryId === 2) return 1;
+            return 0;
+        })
     })
 }))
 
@@ -54,7 +66,8 @@ vi.mock('framer-motion', () => ({
         div: ({ children, ...props }) => <div {...props}>{children}</div>,
         section: ({ children, ...props }) => <section {...props}>{children}</section>,
         h2: ({ children, ...props }) => <h2 {...props}>{children}</h2>,
-        p: ({ children, ...props }) => <p {...props}>{children}</p>
+        p: ({ children, ...props }) => <p {...props}>{children}</p>,
+        button: ({ children, ...props }) => <button {...props}>{children}</button>
     },
     AnimatePresence: ({ children }) => children
 }))

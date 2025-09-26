@@ -24,23 +24,23 @@ describe('MenuService Caching', () => {
                 { id: 2, name: 'Burrito', price: 7.99, categoryId: 3 }
             ]
 
-            // Mock menu version call
-            fetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ version: 1 }),
-                headers: new Map([['etag', 'version123']])
-            })
-
-            // Mock menu items call
+            // Mock menu items call (first, because getMenuItems calls this first)
             fetch.mockResolvedValueOnce({
                 ok: true,
                 json: async () => mockMenuItems,
                 headers: new Map([['etag', 'abc123']])
             })
 
+            // Mock menu version call (second, because getMenuItems calls getMenuVersion at the end)
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }),
+                headers: new Map([['etag', 'version123']])
+            })
+
             const result = await getMenuItems()
 
-            expect(fetch).toHaveBeenCalledTimes(2) // menu version + menu items
+            expect(fetch).toHaveBeenCalledTimes(2) // menu items + menu version
             expect(result).toEqual(mockMenuItems)
             expect(localStorage.getItem('menu_items')).toBeTruthy()
         })
@@ -50,16 +50,16 @@ describe('MenuService Caching', () => {
                 { id: 1, name: 'Breakfast Taco', price: 3.50, categoryId: 1 }
             ]
 
-            // First call - mock menu version + menu items
-            fetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ version: 1 }),
-                headers: new Map([['etag', 'version123']])
-            })
+            // First call - mock menu items + menu version (correct order)
             fetch.mockResolvedValueOnce({
                 ok: true,
                 json: async () => mockMenuItems,
                 headers: new Map([['etag', 'abc123']])
+            })
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }),
+                headers: new Map([['etag', 'version123']])
             })
 
             await getMenuItems()
@@ -76,21 +76,30 @@ describe('MenuService Caching', () => {
                 { id: 1, name: 'Breakfast Taco', price: 3.50, categoryId: 1 }
             ]
 
-            // First call - mock menu version + menu items
-            fetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ version: 1 }),
-                headers: new Map([['etag', 'version123']])
-            })
+            // First call - mock menu items + menu version (correct order)
             fetch.mockResolvedValueOnce({
                 ok: true,
                 json: async () => mockMenuItems,
                 headers: new Map([['etag', 'abc123']])
             })
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }),
+                headers: new Map([['etag', 'version123']])
+            })
 
             await getMenuItems()
 
-            // Second call with If-None-Match header - mock 304 for menu items
+            // Clear the version cache to force a version check on second call
+            localStorage.removeItem('menu_version')
+            localStorage.removeItem('menu_version_timestamp')
+
+            // Second call - should check version, then make conditional request for items
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }), // Same version
+                headers: new Map([['etag', 'version123']])
+            })
             fetch.mockResolvedValueOnce({
                 status: 304,
                 headers: new Map([['etag', 'abc123']])
@@ -98,7 +107,7 @@ describe('MenuService Caching', () => {
 
             const result = await getMenuItems()
 
-            expect(fetch).toHaveBeenCalledTimes(3) // version + items + 304 response
+            expect(fetch).toHaveBeenCalledTimes(3) // first: items + version, second: version check only (no need for 304 if version unchanged)
             expect(result).toEqual(mockMenuItems) // Should return cached data
         })
     })
@@ -110,23 +119,23 @@ describe('MenuService Caching', () => {
                 { id: 2, name: 'Tacos', pk: 'CATEGORY#002' }
             ]
 
-            // Mock menu version call
-            fetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ version: 1 }),
-                headers: new Map([['etag', 'version123']])
-            })
-
-            // Mock categories call
+            // Mock categories call (first)
             fetch.mockResolvedValueOnce({
                 ok: true,
                 json: async () => mockCategories,
                 headers: new Map([['etag', 'def456']])
             })
 
+            // Mock menu version call (second)
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }),
+                headers: new Map([['etag', 'version123']])
+            })
+
             const result = await getCategories()
 
-            expect(fetch).toHaveBeenCalledTimes(2) // version + categories
+            expect(fetch).toHaveBeenCalledTimes(2) // categories + version
             expect(result).toEqual(mockCategories)
             expect(localStorage.getItem('menu_categories')).toBeTruthy()
         })
@@ -140,18 +149,18 @@ describe('MenuService Caching', () => {
                 { id: 3, name: 'Egg Bowl', price: 5.50, categoryId: 1 }
             ]
 
-            // Mock menu version call
-            fetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ version: 1 }),
-                headers: new Map([['etag', 'version123']])
-            })
-
-            // Mock menu items call
+            // Mock menu items call (first, because getMenuItemsByCategory calls getMenuItems first)
             fetch.mockResolvedValueOnce({
                 ok: true,
                 json: async () => mockMenuItems,
                 headers: new Map([['etag', 'abc123']])
+            })
+
+            // Mock menu version call (second)
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }),
+                headers: new Map([['etag', 'version123']])
             })
 
             const result = await getMenuItemsByCategory(1)
@@ -169,18 +178,18 @@ describe('MenuService Caching', () => {
                 { id: 2, name: 'Burrito', price: 7.99, categoryId: 3 }
             ]
 
-            // Mock menu version call
-            fetch.mockResolvedValueOnce({
-                ok: true,
-                json: async () => ({ version: 1 }),
-                headers: new Map([['etag', 'version123']])
-            })
-
-            // Mock menu items call
+            // Mock menu items call (first)
             fetch.mockResolvedValueOnce({
                 ok: true,
                 json: async () => mockMenuItems,
                 headers: new Map([['etag', 'abc123']])
+            })
+
+            // Mock menu version call (second)
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => ({ version: 1 }),
+                headers: new Map([['etag', 'version123']])
             })
 
             const result = await getMenuItemsByCategory('all')
