@@ -931,6 +931,10 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.get_user_by_id,
     aws_api_gateway_integration.put_user,
     aws_api_gateway_integration.delete_user,
+    aws_api_gateway_integration.get_announcements,
+    aws_api_gateway_integration.post_announcements,
+    aws_api_gateway_integration.put_announcement,
+    aws_api_gateway_integration.delete_announcement,
 
     aws_api_gateway_method.options_categories,
     aws_api_gateway_method.options_menu_items,
@@ -953,6 +957,12 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method.get_user_by_id,
     aws_api_gateway_method.put_user,
     aws_api_gateway_method.delete_user,
+    aws_api_gateway_method.get_announcements,
+    aws_api_gateway_method.post_announcements,
+    aws_api_gateway_method.put_announcement,
+    aws_api_gateway_method.delete_announcement,
+    aws_api_gateway_method.options_announcements,
+    aws_api_gateway_method.options_announcement,
     aws_api_gateway_method_response.options_categories,
     aws_api_gateway_method_response.options_menu_items,
     aws_api_gateway_method_response.options_search,
@@ -968,12 +978,20 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method_response.get_user_by_id,
     aws_api_gateway_method_response.put_user,
     aws_api_gateway_method_response.delete_user,
+    aws_api_gateway_method_response.get_announcements,
+    aws_api_gateway_method_response.post_announcements,
+    aws_api_gateway_method_response.put_announcement,
+    aws_api_gateway_method_response.delete_announcement,
+    aws_api_gateway_method_response.options_announcements,
+    aws_api_gateway_method_response.options_announcement,
     aws_api_gateway_integration.options_categories,
     aws_api_gateway_integration.options_menu_items,
     aws_api_gateway_integration.options_search,
     aws_api_gateway_integration.options_menu_items_by_category,
     aws_api_gateway_integration.options_users,
     aws_api_gateway_integration.options_user,
+    aws_api_gateway_integration.options_announcements,
+    aws_api_gateway_integration.options_announcement,
     aws_api_gateway_integration.options,
     aws_api_gateway_integration.options_admin,
     aws_api_gateway_integration.options_admin_login,
@@ -986,6 +1004,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration_response.options_menu_items_by_category,
     aws_api_gateway_integration_response.options_users,
     aws_api_gateway_integration_response.options_user,
+    aws_api_gateway_integration_response.options_announcements,
+    aws_api_gateway_integration_response.options_announcement,
     aws_api_gateway_integration_response.options_admin,
     aws_api_gateway_integration_response.get_menu_version,
     aws_api_gateway_integration_response.increment_menu_version,
@@ -1015,7 +1035,11 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_lambda_permission.get_users,
     aws_lambda_permission.get_user_by_id,
     aws_lambda_permission.update_user,
-    aws_lambda_permission.delete_user
+    aws_lambda_permission.delete_user,
+    aws_lambda_permission.get_announcements,
+    aws_lambda_permission.create_announcement,
+    aws_lambda_permission.update_announcement,
+    aws_lambda_permission.delete_announcement
   ]
 
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -1385,6 +1409,109 @@ resource "aws_api_gateway_resource" "user" {
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
   parent_id   = aws_api_gateway_resource.users.id
   path_part   = "{userId}"
+}
+
+# Announcements API Resources
+resource "aws_api_gateway_resource" "announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
+  path_part   = "announcements"
+}
+
+resource "aws_api_gateway_resource" "announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_resource.announcements.id
+  path_part   = "{id}"
+}
+
+# CORS Support - OPTIONS method for announcements
+resource "aws_api_gateway_method" "options_announcements" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.announcements.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.options_announcements.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.options_announcements.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.options_announcements.http_method
+  status_code = aws_api_gateway_method_response.options_announcements.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# CORS Support - OPTIONS method for individual announcement
+resource "aws_api_gateway_method" "options_announcement" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.announcement.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.options_announcement.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.options_announcement.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.options_announcement.http_method
+  status_code = aws_api_gateway_method_response.options_announcement.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
 }
 
 # CORS Support - OPTIONS method for admin users
@@ -1870,6 +1997,165 @@ resource "aws_lambda_permission" "delete_user" {
   function_name = aws_lambda_function.delete_user.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+# Lambda Permissions for Announcements
+resource "aws_lambda_permission" "get_announcements" {
+  statement_id  = "AllowExecutionFromAPIGateway-get-announcements"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_announcements.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "create_announcement" {
+  statement_id  = "AllowExecutionFromAPIGateway-create-announcement"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create_announcement.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "update_announcement" {
+  statement_id  = "AllowExecutionFromAPIGateway-update-announcement"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.update_announcement.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "delete_announcement" {
+  statement_id  = "AllowExecutionFromAPIGateway-delete-announcement"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.delete_announcement.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+# Announcements API Methods
+
+# GET method for announcements
+resource "aws_api_gateway_method" "get_announcements" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.announcements.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "get_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.get_announcements.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "get_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.get_announcements.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.get_announcements.invoke_arn
+}
+
+# POST method for creating announcements
+resource "aws_api_gateway_method" "post_announcements" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.announcements.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "post_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.post_announcements.http_method
+  status_code = "201"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "post_announcements" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcements.id
+  http_method = aws_api_gateway_method.post_announcements.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.create_announcement.invoke_arn
+}
+
+# PUT method for updating announcements
+resource "aws_api_gateway_method" "put_announcement" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.announcement.id
+  http_method   = "PUT"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "put_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.put_announcement.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "put_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.put_announcement.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.update_announcement.invoke_arn
+}
+
+# DELETE method for announcements
+resource "aws_api_gateway_method" "delete_announcement" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.announcement.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "delete_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.delete_announcement.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "delete_announcement" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.announcement.id
+  http_method = aws_api_gateway_method.delete_announcement.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.delete_announcement.invoke_arn
 }
 
 # API Gateway Methods

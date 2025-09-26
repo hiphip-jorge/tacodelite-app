@@ -575,3 +575,85 @@ resource "aws_lambda_function" "increment_menu_version" {
     aws_iam_role_policy.lambda_policy
   ]
 }
+
+# Announcements Lambda Functions
+
+resource "aws_lambda_function" "get_announcements" {
+  filename         = "../lambda/getAnnouncements.zip"
+  function_name    = "${var.app_name}-${var.environment}-get-announcements"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "create_announcement" {
+  filename         = "../lambda/createAnnouncement.zip"
+  function_name    = "${var.app_name}-${var.environment}-create-announcement"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "update_announcement" {
+  filename         = "../lambda/updateAnnouncement.zip"
+  function_name    = "${var.app_name}-${var.environment}-update-announcement"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "delete_announcement" {
+  filename         = "../lambda/deleteAnnouncement.zip"
+  function_name    = "${var.app_name}-${var.environment}-delete-announcement"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
