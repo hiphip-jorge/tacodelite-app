@@ -69,8 +69,41 @@ jobs:
         terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
         echo "complete=true" >> $GITHUB_OUTPUT
 
-  deploy-staging:
+  test:
     needs: setup
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging'  # Only run on staging branch pushes
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run tests
+      run: |
+        echo "🧪 Running test suite..."
+        npm test -- --run --reporter=verbose
+      env:
+        VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
+        VITE_USE_MOCK: "false"
+        VITE_ENVIRONMENT: "staging"
+        VITE_APP_NAME: "Taco Delite"
+
+    - name: Test coverage
+      run: |
+        echo "📊 Generating test coverage report..."
+        npm run test:coverage
+
+  deploy-staging:
+    needs: [setup, test]
     runs-on: ubuntu-latest
     environment: staging  # Manual approval required
     if: github.ref == 'refs/heads/staging'  # Only run on staging branch pushes
