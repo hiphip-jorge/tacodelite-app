@@ -1082,6 +1082,12 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_method.options_users.id,
       aws_api_gateway_method.options_user.id,
       aws_api_gateway_method.options_admin_user.id,
+      aws_api_gateway_method.get_announcements.id,
+      aws_api_gateway_method.post_announcements.id,
+      aws_api_gateway_method.put_announcement.id,
+      aws_api_gateway_method.delete_announcement.id,
+      aws_api_gateway_method.options_announcements.id,
+      aws_api_gateway_method.options_announcement.id,
       aws_api_gateway_integration.get_menu_items.id,
       aws_api_gateway_integration.post_menu_items.id,
       aws_api_gateway_integration.get_menu_version.id,
@@ -1117,7 +1123,11 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_integration.options_admin_users.id,
       aws_api_gateway_integration.options_users.id,
       aws_api_gateway_integration.options_user.id,
-      aws_api_gateway_integration.options_admin_user.id
+      aws_api_gateway_integration.options_admin_user.id,
+      aws_api_gateway_integration.get_announcements.id,
+      aws_api_gateway_integration.post_announcements.id,
+      aws_api_gateway_integration.put_announcement.id,
+      aws_api_gateway_integration.delete_announcement.id
     ]))
   }
 
