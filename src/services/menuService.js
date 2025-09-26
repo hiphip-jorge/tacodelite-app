@@ -312,13 +312,16 @@ export async function getCategories() {
         }
 
         // Sort categories by their numeric ID (e.g., "CATEGORY#1" -> 1)
-        const sortedCategories = categories.sort((a, b) => {
-            const idA = parseInt(a.pk?.replace('CATEGORY#', '') || '0');
-            const idB = parseInt(b.pk?.replace('CATEGORY#', '') || '0');
-            return idA - idB;
-        });
+        if (categories && Array.isArray(categories)) {
+            const sortedCategories = categories.sort((a, b) => {
+                const idA = parseInt(a.pk?.replace('CATEGORY#', '') || '0');
+                const idB = parseInt(b.pk?.replace('CATEGORY#', '') || '0');
+                return idA - idB;
+            });
+            return sortedCategories;
+        }
 
-        return sortedCategories;
+        return categories || [];
     } catch (error) {
         console.error('Failed to fetch categories:', error);
 

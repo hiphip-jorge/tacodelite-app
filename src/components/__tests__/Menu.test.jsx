@@ -39,6 +39,15 @@ vi.mock('../../hooks/useMenu', () => ({
                 description: 'A delicious breakfast taco',
                 active: true,
                 vegetarian: false
+            },
+            {
+                id: 2,
+                name: 'Bean Burrito',
+                price: 7.99,
+                categoryId: 2,
+                description: 'A hearty bean burrito',
+                active: true,
+                vegetarian: true
             }
         ],
         selectedCategory: 'all',
