@@ -71,6 +71,7 @@ exports.handler = async (event) => {
 
         // Filter out expired announcements if activeOnly is true
         const now = new Date();
+        console.log('Current time:', now.toISOString());
         const filteredAnnouncements = activeOnly
             ? announcements.filter(announcement => {
                 if (!announcement.expiresAt) return true;
@@ -83,6 +84,7 @@ exports.handler = async (event) => {
                     expirationDate.setHours(23, 59, 59, 999);
                 }
 
+                console.log(`Announcement ${announcement.id}: expiresAt=${announcement.expiresAt}, expirationDate=${expirationDate.toISOString()}, isActive=${expirationDate > now}`);
                 return expirationDate > now;
             })
             : announcements;
