@@ -7,6 +7,7 @@ const AnnouncementBanner = () => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(true);
     const [dismissedAnnouncements, setDismissedAnnouncements] = useState(new Set());
+    const [isHovered, setIsHovered] = useState(false);
 
     useEffect(() => {
         loadDismissedAnnouncements();
@@ -14,7 +15,7 @@ const AnnouncementBanner = () => {
     }, []);
 
     useEffect(() => {
-        if (announcements.length > 1) {
+        if (announcements.length > 1 && !isHovered) {
             const interval = setInterval(() => {
                 setCurrentIndex((prevIndex) =>
                     (prevIndex + 1) % announcements.length
@@ -23,7 +24,7 @@ const AnnouncementBanner = () => {
 
             return () => clearInterval(interval);
         }
-    }, [announcements.length]);
+    }, [announcements.length, isHovered]);
 
     const loadDismissedAnnouncements = () => {
         try {
@@ -138,6 +139,8 @@ const AnnouncementBanner = () => {
                 exit={{ opacity: 0, y: -50 }}
                 transition={{ duration: 0.3 }}
                 className={`${styles.bg} ${styles.text} shadow-lg`}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-3">

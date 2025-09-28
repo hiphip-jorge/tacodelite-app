@@ -281,8 +281,6 @@ describe('AnnouncementBanner', () => {
                 expect(screen.getByText('Special Discount')).toBeInTheDocument()
             })
         })
-
-        // Timer-based tests removed due to async rendering issues
     })
 
 })
