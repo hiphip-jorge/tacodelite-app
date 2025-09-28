@@ -5,7 +5,7 @@ import { getActiveAnnouncements, clearAnnouncementsCache } from '../announcement
 global.fetch = vi.fn()
 
 describe('AnnouncementService', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
         // Clear all mocks and localStorage before each test
         vi.clearAllMocks()
         localStorage.clear()
@@ -13,15 +13,28 @@ describe('AnnouncementService', () => {
 
         // Reset fetch mock to ensure clean state
         global.fetch = vi.fn()
+
+        // Ensure cache is fully cleared before proceeding
+        await new Promise(resolve => setTimeout(resolve, 0))
     })
 
-    afterEach(() => {
+    afterEach(async () => {
         // Clean up after each test
         clearAnnouncementsCache()
+        // Ensure cleanup is complete
+        await new Promise(resolve => setTimeout(resolve, 0))
     })
 
     describe('getActiveAnnouncements', () => {
         it('should fetch announcements from API on first call', async () => {
+            // Explicitly clear cache to ensure clean state
+            clearAnnouncementsCache()
+            localStorage.clear()
+
+            // Ensure fetch mock is reset
+            vi.clearAllMocks()
+            global.fetch = vi.fn()
+
             const now = new Date()
             const futureDate = new Date(now.getTime() + 24 * 60 * 60 * 1000) // 1 day from now
 
@@ -54,8 +67,10 @@ describe('AnnouncementService', () => {
             const result = await getActiveAnnouncements()
 
             expect(fetch).toHaveBeenCalledTimes(1)
+            // Get the expected API URL from the service's environment
+            const expectedApiUrl = import.meta.env.VITE_API_URL || 'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod'
             expect(fetch).toHaveBeenCalledWith(
-                'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod/announcements?activeOnly=true',
+                `${expectedApiUrl}/announcements?activeOnly=true`,
                 {
                     method: 'GET',
                     headers: {
