@@ -72,6 +72,25 @@ locals {
   create_menu_item_zip   = length(tolist(fileset("../lambda", "createMenuItem.*.zip"))) > 0 ? tolist(fileset("../lambda", "createMenuItem.*.zip"))[0] : "createMenuItem.zip"
   update_menu_item_zip   = length(tolist(fileset("../lambda", "updateMenuItem.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateMenuItem.*.zip"))[0] : "updateMenuItem.zip"
   delete_menu_item_zip   = length(tolist(fileset("../lambda", "deleteMenuItem.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteMenuItem.*.zip"))[0] : "deleteMenuItem.zip"
+  search_menu_items_zip  = length(tolist(fileset("../lambda", "searchMenuItems.*.zip"))) > 0 ? tolist(fileset("../lambda", "searchMenuItems.*.zip"))[0] : "searchMenuItems.zip"
+  get_menu_items_by_category_zip = length(tolist(fileset("../lambda", "getMenuItemsByCategory.*.zip"))) > 0 ? tolist(fileset("../lambda", "getMenuItemsByCategory.*.zip"))[0] : "getMenuItemsByCategory.zip"
+  get_menu_version_zip   = length(tolist(fileset("../lambda", "getMenuVersion.*.zip"))) > 0 ? tolist(fileset("../lambda", "getMenuVersion.*.zip"))[0] : "getMenuVersion.zip"
+  increment_menu_version_zip = length(tolist(fileset("../lambda", "incrementMenuVersion.*.zip"))) > 0 ? tolist(fileset("../lambda", "incrementMenuVersion.*.zip"))[0] : "incrementMenuVersion.zip"
+  get_admin_users_zip    = length(tolist(fileset("../lambda", "getAdminUsers.*.zip"))) > 0 ? tolist(fileset("../lambda", "getAdminUsers.*.zip"))[0] : "getAdminUsers.zip"
+  create_admin_user_zip  = length(tolist(fileset("../lambda", "createAdminUser.*.zip"))) > 0 ? tolist(fileset("../lambda", "createAdminUser.*.zip"))[0] : "createAdminUser.zip"
+  update_admin_user_zip  = length(tolist(fileset("../lambda", "updateAdminUser.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateAdminUser.*.zip"))[0] : "updateAdminUser.zip"
+  delete_admin_user_zip  = length(tolist(fileset("../lambda", "deleteAdminUser.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteAdminUser.*.zip"))[0] : "deleteAdminUser.zip"
+  get_users_zip          = length(tolist(fileset("../lambda", "getUsers.*.zip"))) > 0 ? tolist(fileset("../lambda", "getUsers.*.zip"))[0] : "getUsers.zip"
+  get_user_by_id_zip     = length(tolist(fileset("../lambda", "getUserById.*.zip"))) > 0 ? tolist(fileset("../lambda", "getUserById.*.zip"))[0] : "getUserById.zip"
+  update_user_zip        = length(tolist(fileset("../lambda", "updateUser.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateUser.*.zip"))[0] : "updateUser.zip"
+  delete_user_zip        = length(tolist(fileset("../lambda", "deleteUser.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteUser.*.zip"))[0] : "deleteUser.zip"
+  get_announcements_zip  = length(tolist(fileset("../lambda", "getAnnouncements.*.zip"))) > 0 ? tolist(fileset("../lambda", "getAnnouncements.*.zip"))[0] : "getAnnouncements.zip"
+  create_announcement_zip = length(tolist(fileset("../lambda", "createAnnouncement.*.zip"))) > 0 ? tolist(fileset("../lambda", "createAnnouncement.*.zip"))[0] : "createAnnouncement.zip"
+  update_announcement_zip = length(tolist(fileset("../lambda", "updateAnnouncement.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateAnnouncement.*.zip"))[0] : "updateAnnouncement.zip"
+  delete_announcement_zip = length(tolist(fileset("../lambda", "deleteAnnouncement.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteAnnouncement.*.zip"))[0] : "deleteAnnouncement.zip"
+  # Auth functions are not using checksums, keeping static paths
+  auth_login_zip         = "login.zip"
+  auth_verify_zip        = "verify.zip"
 }
 
 # Lambda Functions
@@ -100,7 +119,7 @@ resource "aws_lambda_function" "get_menu_items" {
 }
 
 resource "aws_lambda_function" "search_menu_items" {
-  filename         = "../lambda/searchMenuItems.zip"
+  filename         = "../lambda/${local.search_menu_items_zip}"
   function_name    = "${var.app_name}-search-menu-items-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -122,7 +141,7 @@ resource "aws_lambda_function" "search_menu_items" {
 }
 
 resource "aws_lambda_function" "get_menu_items_by_category" {
-  filename         = "../lambda/getMenuItemsByCategory.zip"
+  filename         = "../lambda/${local.get_menu_items_by_category_zip}"
   function_name    = "${var.app_name}-get-menu-items-by-category-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -328,7 +347,7 @@ resource "aws_lambda_function" "admin_verify" {
 
 # Admin User Management Lambda Functions
 resource "aws_lambda_function" "get_admin_users" {
-  filename         = "../lambda/getAdminUsers.zip"
+  filename         = "../lambda/${local.get_admin_users_zip}"
   function_name    = "${var.app_name}-get-admin-users-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -351,7 +370,7 @@ resource "aws_lambda_function" "get_admin_users" {
 
 # User Management Lambda Functions
 resource "aws_lambda_function" "get_users" {
-  filename         = "../lambda/getUsers.zip"
+  filename         = "../lambda/${local.get_users_zip}"
   function_name    = "${var.app_name}-get-users-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -373,7 +392,7 @@ resource "aws_lambda_function" "get_users" {
 }
 
 resource "aws_lambda_function" "get_user_by_id" {
-  filename         = "../lambda/getUserById.zip"
+  filename         = "../lambda/${local.get_user_by_id_zip}"
   function_name    = "${var.app_name}-get-user-by-id-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -395,7 +414,7 @@ resource "aws_lambda_function" "get_user_by_id" {
 }
 
 resource "aws_lambda_function" "update_user" {
-  filename         = "../lambda/updateUser.zip"
+  filename         = "../lambda/${local.update_user_zip}"
   function_name    = "${var.app_name}-update-user-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -417,7 +436,7 @@ resource "aws_lambda_function" "update_user" {
 }
 
 resource "aws_lambda_function" "delete_user" {
-  filename         = "../lambda/deleteUser.zip"
+  filename         = "../lambda/${local.delete_user_zip}"
   function_name    = "${var.app_name}-delete-user-${var.environment}"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -470,7 +489,7 @@ resource "aws_lambda_function" "create_admin_user" {
   runtime      = "nodejs20.x"
   timeout      = 30
 
-  filename         = "../lambda/createAdminUser.zip"
+  filename         = "../lambda/${local.create_admin_user_zip}"
 
   environment {
     variables = {
@@ -494,7 +513,7 @@ resource "aws_lambda_function" "update_admin_user" {
   runtime      = "nodejs20.x"
   timeout      = 30
 
-  filename         = "../lambda/updateAdminUser.zip"
+  filename         = "../lambda/${local.update_admin_user_zip}"
 
   environment {
     variables = {
@@ -518,7 +537,7 @@ resource "aws_lambda_function" "delete_admin_user" {
   runtime      = "nodejs20.x"
   timeout      = 30
 
-  filename         = "../lambda/deleteAdminUser.zip"
+  filename         = "../lambda/${local.delete_admin_user_zip}"
 
   environment {
     variables = {
@@ -536,7 +555,7 @@ resource "aws_lambda_function" "delete_admin_user" {
 
 # Get Menu Version Lambda Function
 resource "aws_lambda_function" "get_menu_version" {
-  filename         = "../lambda/getMenuVersion.zip"
+  filename         = "../lambda/${local.get_menu_version_zip}"
   function_name    = "${var.app_name}-${var.environment}-get-menu-version"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -557,7 +576,7 @@ resource "aws_lambda_function" "get_menu_version" {
 
 # Increment Menu Version Lambda Function
 resource "aws_lambda_function" "increment_menu_version" {
-  filename         = "../lambda/incrementMenuVersion.zip"
+  filename         = "../lambda/${local.increment_menu_version_zip}"
   function_name    = "${var.app_name}-${var.environment}-increment-menu-version"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -579,7 +598,7 @@ resource "aws_lambda_function" "increment_menu_version" {
 # Announcements Lambda Functions
 
 resource "aws_lambda_function" "get_announcements" {
-  filename         = "../lambda/getAnnouncements.zip"
+  filename         = "../lambda/${local.get_announcements_zip}"
   function_name    = "${var.app_name}-${var.environment}-get-announcements"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -599,7 +618,7 @@ resource "aws_lambda_function" "get_announcements" {
 }
 
 resource "aws_lambda_function" "create_announcement" {
-  filename         = "../lambda/createAnnouncement.zip"
+  filename         = "../lambda/${local.create_announcement_zip}"
   function_name    = "${var.app_name}-${var.environment}-create-announcement"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -619,7 +638,7 @@ resource "aws_lambda_function" "create_announcement" {
 }
 
 resource "aws_lambda_function" "update_announcement" {
-  filename         = "../lambda/updateAnnouncement.zip"
+  filename         = "../lambda/${local.update_announcement_zip}"
   function_name    = "${var.app_name}-${var.environment}-update-announcement"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
@@ -639,7 +658,7 @@ resource "aws_lambda_function" "update_announcement" {
 }
 
 resource "aws_lambda_function" "delete_announcement" {
-  filename         = "../lambda/deleteAnnouncement.zip"
+  filename         = "../lambda/${local.delete_announcement_zip}"
   function_name    = "${var.app_name}-${var.environment}-delete-announcement"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"

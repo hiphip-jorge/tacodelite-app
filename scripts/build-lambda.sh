@@ -67,10 +67,28 @@ package_lambda_with_checksum() {
             rm -rf "$function_dir/shared"
         fi
         
-        # Calculate content-based checksum (based on source files, not zip)
+        # Calculate content-based checksum (based on source files in this function directory)
         # This ensures same checksum for identical code, different only when code changes
-        checksum=$(find . -name "*.js" -o -name "*.json" | sort | xargs cat | sha256sum | cut -c1-8)
-        mv "${base_name}.zip" "${base_name}.${checksum}.zip"
+        # Use absolute path for subdirectories
+        if [[ "$function_dir" == *"/"* ]]; then
+            checksum=$(find "$LAMBDA_DIR/$function_dir" -name "*.js" -o -name "*.json" | sort | xargs cat | sha256sum | cut -c1-8)
+        else
+            checksum=$(find "$function_dir" -name "*.js" -o -name "*.json" | sort | xargs cat | sha256sum | cut -c1-8)
+        fi
+        
+        # Move zip file to the correct location based on base_name path
+        if [[ "$base_name" == *"/"* ]]; then
+            # For subdirectories like auth/login, move to the subdirectory
+            # The zip was created in the current directory, so we need to move it to the correct location
+            # Extract just the directory name (e.g., "auth" from "auth/login")
+            dir_name=$(echo "$base_name" | cut -d'/' -f1)
+            mkdir -p "$dir_name"
+            # Move the zip file to the correct location
+            mv "${base_name}.zip" "${base_name}.${checksum}.zip"
+        else
+            # For root level functions, move to current directory
+            mv "${base_name}.zip" "${base_name}.${checksum}.zip"
+        fi
         
         # Verify zip file was created
         if [ -f "${base_name}.${checksum}.zip" ]; then
@@ -138,13 +156,13 @@ package_lambda_with_checksum "createMenuItem" "createMenuItem"
 package_lambda_with_checksum "updateMenuItem" "updateMenuItem"
 package_lambda_with_checksum "deleteMenuItem" "deleteMenuItem"
 
-# Other functions without checksums
-package_lambda "searchMenuItems" "searchMenuItems.zip"
-package_lambda "getMenuItemsByCategory" "getMenuItemsByCategory.zip"
-package_lambda "getMenuVersion" "getMenuVersion.zip"
-package_lambda "incrementMenuVersion" "incrementMenuVersion.zip"
+# Other functions with checksums
+package_lambda_with_checksum "searchMenuItems" "searchMenuItems"
+package_lambda_with_checksum "getMenuItemsByCategory" "getMenuItemsByCategory"
+package_lambda_with_checksum "getMenuVersion" "getMenuVersion"
+package_lambda_with_checksum "incrementMenuVersion" "incrementMenuVersion"
 
-# Auth functions (these create zip files in auth/ subdirectory)
+# Auth functions (using old method without checksums)
 echo "📦 Packaging auth/login..."
 if [ -d "auth/login" ]; then
     cd "auth/login"
@@ -192,22 +210,22 @@ else
 fi
 
 # Admin functions
-package_lambda "getAdminUsers" "getAdminUsers.zip"
-package_lambda "createAdminUser" "createAdminUser.zip"
-package_lambda "updateAdminUser" "updateAdminUser.zip"
-package_lambda "deleteAdminUser" "deleteAdminUser.zip"
+package_lambda_with_checksum "getAdminUsers" "getAdminUsers"
+package_lambda_with_checksum "createAdminUser" "createAdminUser"
+package_lambda_with_checksum "updateAdminUser" "updateAdminUser"
+package_lambda_with_checksum "deleteAdminUser" "deleteAdminUser"
 
 # User functions
-package_lambda "getUsers" "getUsers.zip"
-package_lambda "getUserById" "getUserById.zip"
-package_lambda "updateUser" "updateUser.zip"
-package_lambda "deleteUser" "deleteUser.zip"
+package_lambda_with_checksum "getUsers" "getUsers"
+package_lambda_with_checksum "getUserById" "getUserById"
+package_lambda_with_checksum "updateUser" "updateUser"
+package_lambda_with_checksum "deleteUser" "deleteUser"
 
 # Announcement functions
-package_lambda "getAnnouncements" "getAnnouncements.zip"
-package_lambda "createAnnouncement" "createAnnouncement.zip"
-package_lambda "updateAnnouncement" "updateAnnouncement.zip"
-package_lambda "deleteAnnouncement" "deleteAnnouncement.zip"
+package_lambda_with_checksum "getAnnouncements" "getAnnouncements"
+package_lambda_with_checksum "createAnnouncement" "createAnnouncement"
+package_lambda_with_checksum "updateAnnouncement" "updateAnnouncement"
+package_lambda_with_checksum "deleteAnnouncement" "deleteAnnouncement"
 
 echo "✅ Lambda packaging complete!"
 
@@ -225,27 +243,26 @@ required_files_with_checksums=(
     "createMenuItem.*.zip"
     "updateMenuItem.*.zip"
     "deleteMenuItem.*.zip"
+    "searchMenuItems.*.zip"
+    "getMenuItemsByCategory.*.zip"
+    "getMenuVersion.*.zip"
+    "incrementMenuVersion.*.zip"
+    "getAdminUsers.*.zip"
+    "createAdminUser.*.zip"
+    "updateAdminUser.*.zip"
+    "deleteAdminUser.*.zip"
+    "getUsers.*.zip"
+    "getUserById.*.zip"
+    "updateUser.*.zip"
+    "deleteUser.*.zip"
+    "getAnnouncements.*.zip"
+    "createAnnouncement.*.zip"
+    "updateAnnouncement.*.zip"
+    "deleteAnnouncement.*.zip"
 )
 
-# Check other Lambda functions
-required_files=(
-    "searchMenuItems.zip"
-    "getMenuItemsByCategory.zip"
-    "getMenuVersion.zip"
-    "incrementMenuVersion.zip"
-    "getAdminUsers.zip"
-    "createAdminUser.zip"
-    "updateAdminUser.zip"
-    "deleteAdminUser.zip"
-    "getUsers.zip"
-    "getUserById.zip"
-    "updateUser.zip"
-    "deleteUser.zip"
-    "getAnnouncements.zip"
-    "createAnnouncement.zip"
-    "updateAnnouncement.zip"
-    "deleteAnnouncement.zip"
-)
+# Check other Lambda functions (none - all use checksums now)
+required_files=()
 
 # Check files with checksums
 for pattern in "${required_files_with_checksums[@]}"; do
