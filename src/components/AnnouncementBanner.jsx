@@ -60,11 +60,19 @@ const AnnouncementBanner = () => {
         setDismissedAnnouncements(newDismissedSet);
         saveDismissedAnnouncements(newDismissedSet);
 
-        if (announcements.length === 1) {
+        // Check if this was the last visible announcement
+        const remainingVisible = announcements.filter(
+            announcement => !newDismissedSet.has(announcement.id)
+        );
+
+        if (remainingVisible.length === 0) {
             setIsVisible(false);
         } else {
-            // Move to next announcement
-            const nextIndex = (currentIndex + 1) % announcements.length;
+            // Move to next announcement, but adjust for the new visible list
+            const currentVisibleIndex = visibleAnnouncements.findIndex(
+                ann => ann.id === announcementId
+            );
+            const nextIndex = currentVisibleIndex % remainingVisible.length;
             setCurrentIndex(nextIndex);
         }
     };
