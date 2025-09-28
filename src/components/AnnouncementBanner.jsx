@@ -9,6 +9,7 @@ const AnnouncementBanner = () => {
     const [dismissedAnnouncements, setDismissedAnnouncements] = useState(new Set());
 
     useEffect(() => {
+        loadDismissedAnnouncements();
         loadAnnouncements();
     }, []);
 
@@ -24,6 +25,27 @@ const AnnouncementBanner = () => {
         }
     }, [announcements.length]);
 
+    const loadDismissedAnnouncements = () => {
+        try {
+            const dismissed = localStorage.getItem('dismissedAnnouncements');
+            if (dismissed) {
+                const dismissedArray = JSON.parse(dismissed);
+                setDismissedAnnouncements(new Set(dismissedArray));
+            }
+        } catch (error) {
+            console.error('Error loading dismissed announcements:', error);
+        }
+    };
+
+    const saveDismissedAnnouncements = (dismissedSet) => {
+        try {
+            const dismissedArray = Array.from(dismissedSet);
+            localStorage.setItem('dismissedAnnouncements', JSON.stringify(dismissedArray));
+        } catch (error) {
+            console.error('Error saving dismissed announcements:', error);
+        }
+    };
+
     const loadAnnouncements = async () => {
         try {
             const activeAnnouncements = await getActiveAnnouncements();
@@ -34,7 +56,10 @@ const AnnouncementBanner = () => {
     };
 
     const handleDismiss = (announcementId) => {
-        setDismissedAnnouncements(prev => new Set([...prev, announcementId]));
+        const newDismissedSet = new Set([...dismissedAnnouncements, announcementId]);
+        setDismissedAnnouncements(newDismissedSet);
+        saveDismissedAnnouncements(newDismissedSet);
+
         if (announcements.length === 1) {
             setIsVisible(false);
         } else {
