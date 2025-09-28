@@ -72,9 +72,19 @@ exports.handler = async (event) => {
         // Filter out expired announcements if activeOnly is true
         const now = new Date();
         const filteredAnnouncements = activeOnly
-            ? announcements.filter(announcement =>
-                !announcement.expiresAt || new Date(announcement.expiresAt) > now
-            )
+            ? announcements.filter(announcement => {
+                if (!announcement.expiresAt) return true;
+
+                // Handle date-only expiration dates (YYYY-MM-DD format)
+                // Convert to end of day in local timezone to avoid timezone issues
+                const expirationDate = new Date(announcement.expiresAt);
+                if (announcement.expiresAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    // Date-only format: set to end of day in local timezone
+                    expirationDate.setHours(23, 59, 59, 999);
+                }
+
+                return expirationDate > now;
+            })
             : announcements;
 
         return {

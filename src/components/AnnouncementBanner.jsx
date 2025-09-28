@@ -26,9 +26,7 @@ const AnnouncementBanner = () => {
 
     const loadAnnouncements = async () => {
         try {
-            console.log('🔍 Loading announcements...');
             const activeAnnouncements = await getActiveAnnouncements();
-            console.log('📢 Loaded announcements:', activeAnnouncements);
             setAnnouncements(activeAnnouncements);
         } catch (error) {
             console.error('Error loading announcements:', error);
@@ -80,17 +78,7 @@ const AnnouncementBanner = () => {
         announcement => !dismissedAnnouncements.has(announcement.id)
     );
 
-    console.log('🔍 Banner state:', {
-        isVisible,
-        announcementsCount: announcements.length,
-        visibleCount: visibleAnnouncements.length,
-        dismissedCount: dismissedAnnouncements.size,
-        announcements,
-        visibleAnnouncements
-    });
-
     if (!isVisible || visibleAnnouncements.length === 0) {
-        console.log('🚫 Banner not showing:', { isVisible, visibleCount: visibleAnnouncements.length });
         return null;
     }
 
