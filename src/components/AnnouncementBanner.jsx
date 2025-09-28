@@ -46,23 +46,35 @@ const AnnouncementBanner = () => {
 
     const getTypeStyles = (type) => {
         switch (type) {
-            case 'success':
+            case 'holiday':
                 return {
                     bg: 'bg-green-600',
                     text: 'text-white',
-                    icon: '✅'
+                    icon: '🎉'
                 };
-            case 'warning':
+            case 'general':
                 return {
-                    bg: 'bg-yellow-600',
+                    bg: 'bg-taco-blue-600',
                     text: 'text-white',
-                    icon: '⚠️'
+                    icon: '📢'
                 };
-            case 'error':
+            case 'hours':
                 return {
                     bg: 'bg-red-600',
                     text: 'text-white',
-                    icon: '❌'
+                    icon: '🕐'
+                };
+            case 'discount':
+                return {
+                    bg: 'bg-yellow-600',
+                    text: 'text-white',
+                    icon: '💰'
+                };
+            case 'event':
+                return {
+                    bg: 'bg-pink-600',
+                    text: 'text-white',
+                    icon: '🎪'
                 };
             default:
                 return {

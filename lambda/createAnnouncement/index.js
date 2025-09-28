@@ -30,7 +30,7 @@ exports.handler = async (event) => {
 
         // Parse request body
         const body = JSON.parse(event.body);
-        const { title, message, type = 'info', active = true, expiresAt } = body;
+        const { title, message, type = 'general', active = true, expiresAt } = body;
 
         // Validate required fields
         if (!title || !message) {
