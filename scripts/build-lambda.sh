@@ -227,6 +227,18 @@ package_lambda_with_checksum "createAnnouncement" "createAnnouncement"
 package_lambda_with_checksum "updateAnnouncement" "updateAnnouncement"
 package_lambda_with_checksum "deleteAnnouncement" "deleteAnnouncement"
 
+# Modifier Groups functions
+package_lambda_with_checksum "getModifierGroups" "getModifierGroups"
+package_lambda_with_checksum "createModifierGroup" "createModifierGroup"
+package_lambda_with_checksum "updateModifierGroup" "updateModifierGroup"
+package_lambda_with_checksum "deleteModifierGroup" "deleteModifierGroup"
+
+# Modifiers functions
+package_lambda_with_checksum "getModifiers" "getModifiers"
+package_lambda_with_checksum "createModifier" "createModifier"
+package_lambda_with_checksum "updateModifier" "updateModifier"
+package_lambda_with_checksum "deleteModifier" "deleteModifier"
+
 echo "✅ Lambda packaging complete!"
 
 # Verify all required zip files exist
@@ -259,6 +271,14 @@ required_files_with_checksums=(
     "createAnnouncement.*.zip"
     "updateAnnouncement.*.zip"
     "deleteAnnouncement.*.zip"
+    "getModifierGroups.*.zip"
+    "createModifierGroup.*.zip"
+    "updateModifierGroup.*.zip"
+    "deleteModifierGroup.*.zip"
+    "getModifiers.*.zip"
+    "createModifier.*.zip"
+    "updateModifier.*.zip"
+    "deleteModifier.*.zip"
 )
 
 # Check other Lambda functions (none - all use checksums now)

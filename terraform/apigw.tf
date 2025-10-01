@@ -935,6 +935,14 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.post_announcements,
     aws_api_gateway_integration.put_announcement,
     aws_api_gateway_integration.delete_announcement,
+    aws_api_gateway_integration.get_modifier_groups,
+    aws_api_gateway_integration.post_modifier_groups,
+    aws_api_gateway_integration.put_modifier_group,
+    aws_api_gateway_integration.delete_modifier_group,
+    aws_api_gateway_integration.get_modifiers,
+    aws_api_gateway_integration.post_modifiers,
+    aws_api_gateway_integration.put_modifier,
+    aws_api_gateway_integration.delete_modifier,
 
     aws_api_gateway_method.options_categories,
     aws_api_gateway_method.options_menu_items,
@@ -963,6 +971,18 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method.delete_announcement,
     aws_api_gateway_method.options_announcements,
     aws_api_gateway_method.options_announcement,
+    aws_api_gateway_method.get_modifier_groups,
+    aws_api_gateway_method.post_modifier_groups,
+    aws_api_gateway_method.put_modifier_group,
+    aws_api_gateway_method.delete_modifier_group,
+    aws_api_gateway_method.options_modifier_groups,
+    aws_api_gateway_method.options_modifier_group,
+    aws_api_gateway_method.get_modifiers,
+    aws_api_gateway_method.post_modifiers,
+    aws_api_gateway_method.put_modifier,
+    aws_api_gateway_method.delete_modifier,
+    aws_api_gateway_method.options_modifiers,
+    aws_api_gateway_method.options_modifier,
     aws_api_gateway_method_response.options_categories,
     aws_api_gateway_method_response.options_menu_items,
     aws_api_gateway_method_response.options_search,
@@ -992,6 +1012,10 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.options_user,
     aws_api_gateway_integration.options_announcements,
     aws_api_gateway_integration.options_announcement,
+    aws_api_gateway_integration.options_modifier_groups,
+    aws_api_gateway_integration.options_modifier_group,
+    aws_api_gateway_integration.options_modifiers,
+    aws_api_gateway_integration.options_modifier,
     aws_api_gateway_integration.options,
     aws_api_gateway_integration.options_admin,
     aws_api_gateway_integration.options_admin_login,
@@ -1039,7 +1063,15 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_lambda_permission.get_announcements,
     aws_lambda_permission.create_announcement,
     aws_lambda_permission.update_announcement,
-    aws_lambda_permission.delete_announcement
+    aws_lambda_permission.delete_announcement,
+    aws_lambda_permission.get_modifier_groups,
+    aws_lambda_permission.create_modifier_group,
+    aws_lambda_permission.update_modifier_group,
+    aws_lambda_permission.delete_modifier_group,
+    aws_lambda_permission.get_modifiers,
+    aws_lambda_permission.create_modifier,
+    aws_lambda_permission.update_modifier,
+    aws_lambda_permission.delete_modifier
   ]
 
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -1088,6 +1120,18 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_method.delete_announcement.id,
       aws_api_gateway_method.options_announcements.id,
       aws_api_gateway_method.options_announcement.id,
+      aws_api_gateway_method.get_modifier_groups.id,
+      aws_api_gateway_method.post_modifier_groups.id,
+      aws_api_gateway_method.put_modifier_group.id,
+      aws_api_gateway_method.delete_modifier_group.id,
+      aws_api_gateway_method.options_modifier_groups.id,
+      aws_api_gateway_method.options_modifier_group.id,
+      aws_api_gateway_method.get_modifiers.id,
+      aws_api_gateway_method.post_modifiers.id,
+      aws_api_gateway_method.put_modifier.id,
+      aws_api_gateway_method.delete_modifier.id,
+      aws_api_gateway_method.options_modifiers.id,
+      aws_api_gateway_method.options_modifier.id,
       aws_api_gateway_integration.get_menu_items.id,
       aws_api_gateway_integration.post_menu_items.id,
       aws_api_gateway_integration.get_menu_version.id,
@@ -1127,7 +1171,15 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_integration.get_announcements.id,
       aws_api_gateway_integration.post_announcements.id,
       aws_api_gateway_integration.put_announcement.id,
-      aws_api_gateway_integration.delete_announcement.id
+      aws_api_gateway_integration.delete_announcement.id,
+      aws_api_gateway_integration.get_modifier_groups.id,
+      aws_api_gateway_integration.post_modifier_groups.id,
+      aws_api_gateway_integration.put_modifier_group.id,
+      aws_api_gateway_integration.delete_modifier_group.id,
+      aws_api_gateway_integration.get_modifiers.id,
+      aws_api_gateway_integration.post_modifiers.id,
+      aws_api_gateway_integration.put_modifier.id,
+      aws_api_gateway_integration.delete_modifier.id
     ]))
   }
 
@@ -2166,6 +2218,526 @@ resource "aws_api_gateway_integration" "delete_announcement" {
   integration_http_method = "POST"
   type                   = "AWS_PROXY"
   uri                    = aws_lambda_function.delete_announcement.invoke_arn
+}
+
+# Modifier Groups API Resources
+resource "aws_api_gateway_resource" "modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
+  path_part   = "modifier-groups"
+}
+
+resource "aws_api_gateway_resource" "modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_resource.modifier_groups.id
+  path_part   = "{id}"
+}
+
+# Modifiers API Resources
+resource "aws_api_gateway_resource" "modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
+  path_part   = "modifiers"
+}
+
+resource "aws_api_gateway_resource" "modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_resource.modifiers.id
+  path_part   = "{id}"
+}
+
+# CORS Support - OPTIONS method for modifier-groups
+resource "aws_api_gateway_method" "options_modifier_groups" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier_groups.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.options_modifier_groups.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.options_modifier_groups.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.options_modifier_groups.http_method
+  status_code = aws_api_gateway_method_response.options_modifier_groups.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# CORS Support - OPTIONS method for individual modifier-group
+resource "aws_api_gateway_method" "options_modifier_group" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier_group.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.options_modifier_group.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.options_modifier_group.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.options_modifier_group.http_method
+  status_code = aws_api_gateway_method_response.options_modifier_group.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# CORS Support - OPTIONS method for modifiers
+resource "aws_api_gateway_method" "options_modifiers" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifiers.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.options_modifiers.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.options_modifiers.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.options_modifiers.http_method
+  status_code = aws_api_gateway_method_response.options_modifiers.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# CORS Support - OPTIONS method for individual modifier
+resource "aws_api_gateway_method" "options_modifier" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.options_modifier.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
+  }
+}
+
+resource "aws_api_gateway_integration" "options_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.options_modifier.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.options_modifier.http_method
+  status_code = aws_api_gateway_method_response.options_modifier.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'PUT,DELETE,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
+  }
+}
+
+# GET method for modifier groups
+resource "aws_api_gateway_method" "get_modifier_groups" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier_groups.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "get_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.get_modifier_groups.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "get_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.get_modifier_groups.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.get_modifier_groups.invoke_arn
+}
+
+# POST method for creating modifier groups
+resource "aws_api_gateway_method" "post_modifier_groups" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier_groups.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "post_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.post_modifier_groups.http_method
+  status_code = "201"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "post_modifier_groups" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_groups.id
+  http_method = aws_api_gateway_method.post_modifier_groups.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.create_modifier_group.invoke_arn
+}
+
+# PUT method for updating modifier groups
+resource "aws_api_gateway_method" "put_modifier_group" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier_group.id
+  http_method   = "PUT"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "put_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.put_modifier_group.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "put_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.put_modifier_group.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.update_modifier_group.invoke_arn
+}
+
+# DELETE method for modifier groups
+resource "aws_api_gateway_method" "delete_modifier_group" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier_group.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "delete_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.delete_modifier_group.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "delete_modifier_group" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier_group.id
+  http_method = aws_api_gateway_method.delete_modifier_group.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.delete_modifier_group.invoke_arn
+}
+
+# GET method for modifiers
+resource "aws_api_gateway_method" "get_modifiers" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifiers.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "get_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.get_modifiers.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "get_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.get_modifiers.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.get_modifiers.invoke_arn
+}
+
+# POST method for creating modifiers
+resource "aws_api_gateway_method" "post_modifiers" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifiers.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "post_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.post_modifiers.http_method
+  status_code = "201"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "post_modifiers" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifiers.id
+  http_method = aws_api_gateway_method.post_modifiers.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.create_modifier.invoke_arn
+}
+
+# PUT method for updating modifiers
+resource "aws_api_gateway_method" "put_modifier" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier.id
+  http_method   = "PUT"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "put_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.put_modifier.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "put_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.put_modifier.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.update_modifier.invoke_arn
+}
+
+# DELETE method for modifiers
+resource "aws_api_gateway_method" "delete_modifier" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.modifier.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "delete_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.delete_modifier.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "delete_modifier" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.modifier.id
+  http_method = aws_api_gateway_method.delete_modifier.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.delete_modifier.invoke_arn
+}
+
+# Lambda Permissions for Modifier Groups
+resource "aws_lambda_permission" "get_modifier_groups" {
+  statement_id  = "AllowExecutionFromAPIGateway-get-modifier-groups"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_modifier_groups.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "create_modifier_group" {
+  statement_id  = "AllowExecutionFromAPIGateway-create-modifier-group"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create_modifier_group.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "update_modifier_group" {
+  statement_id  = "AllowExecutionFromAPIGateway-update-modifier-group"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.update_modifier_group.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "delete_modifier_group" {
+  statement_id  = "AllowExecutionFromAPIGateway-delete-modifier-group"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.delete_modifier_group.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+# Lambda Permissions for Modifiers
+resource "aws_lambda_permission" "get_modifiers" {
+  statement_id  = "AllowExecutionFromAPIGateway-get-modifiers"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_modifiers.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "create_modifier" {
+  statement_id  = "AllowExecutionFromAPIGateway-create-modifier"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create_modifier.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "update_modifier" {
+  statement_id  = "AllowExecutionFromAPIGateway-update-modifier"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.update_modifier.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+resource "aws_lambda_permission" "delete_modifier" {
+  statement_id  = "AllowExecutionFromAPIGateway-delete-modifier"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.delete_modifier.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
 }
 
 # API Gateway Methods

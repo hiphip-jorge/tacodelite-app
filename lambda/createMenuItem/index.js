@@ -87,6 +87,7 @@ exports.handler = async (event) => {
             categoryName: categoryName,
             alt: body.alt || null,
             img: body.img || null,
+            modifierGroups: body.modifierGroups || [],
             createdAt: new Date().toISOString()
         };
 

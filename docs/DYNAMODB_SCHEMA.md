@@ -107,6 +107,80 @@ This document describes the DynamoDB table structure and data models for the Tac
 - If `expiresAt` is null, announcement never expires
 - Announcements only display when current date is between `startsAt` (inclusive) and `expiresAt` (inclusive)
 
+### **5. Modifier Groups Table** (`tacodelite-app-staging`)
+
+**Primary Key Structure:**
+- **PK (Partition Key):** `MODIFIER_GROUP#{groupId}` (e.g., `MODIFIER_GROUP#SMALL_ADDONS`)
+- **SK (Sort Key):** `MODIFIER_GROUP#{groupId}`
+
+**Attributes:**
+```json
+{
+  "pk": "MODIFIER_GROUP#SMALL_ADDONS",
+  "sk": "MODIFIER_GROUP#SMALL_ADDONS",
+  "id": "SMALL_ADDONS",
+  "name": "Small Portion Add-ons",
+  "description": "For tacos and smaller items",
+  "sortOrder": 1,
+  "active": true,
+  "createdAt": "2025-01-15T12:00:00Z",
+  "updatedAt": "2025-01-15T12:00:00Z"
+}
+```
+
+**Example Modifier Groups:**
+- `SMALL_ADDONS` - Small portion add-ons (for tacos)
+- `LARGE_ADDONS` - Large portion add-ons (for burritos, salads, nachos, plates)
+- `DRINK_SIZES` - Drink size options
+- `PREMIUM_PROTEINS` - Premium protein upgrades
+- `SAUCES` - Sauce options
+
+### **6. Modifiers Table** (`tacodelite-app-staging`)
+
+**Primary Key Structure:**
+- **PK (Partition Key):** `MODIFIER#{groupId}` (e.g., `MODIFIER#SMALL_ADDONS`)
+- **SK (Sort Key):** `MODIFIER#{modifierId}` (e.g., `MODIFIER#LETTUCE_SM`)
+
+**Attributes:**
+```json
+{
+  "pk": "MODIFIER#SMALL_ADDONS",
+  "sk": "MODIFIER#LETTUCE_SM",
+  "id": "LETTUCE_SM",
+  "name": "Lettuce",
+  "groupId": "SMALL_ADDONS",
+  "groupName": "Small Portion Add-ons",
+  "price": 0.50,
+  "sortOrder": 1,
+  "active": true,
+  "createdAt": "2025-01-15T12:00:00Z",
+  "updatedAt": "2025-01-15T12:00:00Z"
+}
+```
+
+**Menu Item with Modifier Groups:**
+```json
+{
+  "pk": "ITEM#1",
+  "sk": "ITEM#1",
+  "id": 1,
+  "name": "Taco",
+  "price": 3.50,
+  "modifierGroups": [
+    {
+      "groupId": "SMALL_ADDONS",
+      "groupName": "Small Portion Add-ons",
+      "required": false,
+      "multiSelect": true,
+      "min": 0,
+      "max": null
+    }
+  ],
+  "categoryId": 1,
+  "active": true
+}
+```
+
 ## 🔍 **Query Patterns**
 
 ### **Get All Menu Items by Category:**
@@ -169,6 +243,54 @@ const params = {
 
 // Note: The Lambda function further filters announcements based on startsAt and expiresAt
 // to only return announcements within their scheduled window
+```
+
+### **Get All Modifier Groups:**
+```javascript
+// Scan for all modifier groups
+const params = {
+  TableName: "tacodelite-app-staging",
+  FilterExpression: "begins_with(pk, :groupPrefix)",
+  ExpressionAttributeValues: {
+    ":groupPrefix": "MODIFIER_GROUP#"
+  }
+};
+```
+
+### **Get Modifier Group by ID:**
+```javascript
+// Get specific modifier group
+const params = {
+  TableName: "tacodelite-app-staging",
+  Key: {
+    pk: "MODIFIER_GROUP#SMALL_ADDONS",
+    sk: "MODIFIER_GROUP#SMALL_ADDONS"
+  }
+};
+```
+
+### **Get All Modifiers in a Group:**
+```javascript
+// Query all modifiers in a specific group
+const params = {
+  TableName: "tacodelite-app-staging",
+  KeyConditionExpression: "pk = :pk",
+  ExpressionAttributeValues: {
+    ":pk": "MODIFIER#SMALL_ADDONS"
+  }
+};
+```
+
+### **Get Modifier by ID:**
+```javascript
+// Get specific modifier
+const params = {
+  TableName: "tacodelite-app-staging",
+  Key: {
+    pk: "MODIFIER#SMALL_ADDONS",
+    sk: "MODIFIER#LETTUCE_SM"
+  }
+};
 ```
 
 ## 🚀 **Data Seeding**

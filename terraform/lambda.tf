@@ -88,6 +88,16 @@ locals {
   create_announcement_zip = length(tolist(fileset("../lambda", "createAnnouncement.*.zip"))) > 0 ? tolist(fileset("../lambda", "createAnnouncement.*.zip"))[0] : "createAnnouncement.zip"
   update_announcement_zip = length(tolist(fileset("../lambda", "updateAnnouncement.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateAnnouncement.*.zip"))[0] : "updateAnnouncement.zip"
   delete_announcement_zip = length(tolist(fileset("../lambda", "deleteAnnouncement.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteAnnouncement.*.zip"))[0] : "deleteAnnouncement.zip"
+  # Modifier Groups functions
+  get_modifier_groups_zip = length(tolist(fileset("../lambda", "getModifierGroups.*.zip"))) > 0 ? tolist(fileset("../lambda", "getModifierGroups.*.zip"))[0] : "getModifierGroups.zip"
+  create_modifier_group_zip = length(tolist(fileset("../lambda", "createModifierGroup.*.zip"))) > 0 ? tolist(fileset("../lambda", "createModifierGroup.*.zip"))[0] : "createModifierGroup.zip"
+  update_modifier_group_zip = length(tolist(fileset("../lambda", "updateModifierGroup.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateModifierGroup.*.zip"))[0] : "updateModifierGroup.zip"
+  delete_modifier_group_zip = length(tolist(fileset("../lambda", "deleteModifierGroup.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteModifierGroup.*.zip"))[0] : "deleteModifierGroup.zip"
+  # Modifiers functions
+  get_modifiers_zip = length(tolist(fileset("../lambda", "getModifiers.*.zip"))) > 0 ? tolist(fileset("../lambda", "getModifiers.*.zip"))[0] : "getModifiers.zip"
+  create_modifier_zip = length(tolist(fileset("../lambda", "createModifier.*.zip"))) > 0 ? tolist(fileset("../lambda", "createModifier.*.zip"))[0] : "createModifier.zip"
+  update_modifier_zip = length(tolist(fileset("../lambda", "updateModifier.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateModifier.*.zip"))[0] : "updateModifier.zip"
+  delete_modifier_zip = length(tolist(fileset("../lambda", "deleteModifier.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteModifier.*.zip"))[0] : "deleteModifier.zip"
   # Auth functions are not using checksums, keeping static paths
   auth_login_zip         = "login.zip"
   auth_verify_zip        = "verify.zip"
@@ -660,6 +670,168 @@ resource "aws_lambda_function" "update_announcement" {
 resource "aws_lambda_function" "delete_announcement" {
   filename         = "../lambda/${local.delete_announcement_zip}"
   function_name    = "${var.app_name}-${var.environment}-delete-announcement"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+# Modifier Groups Lambda Functions
+resource "aws_lambda_function" "get_modifier_groups" {
+  filename         = "../lambda/${local.get_modifier_groups_zip}"
+  function_name    = "${var.app_name}-${var.environment}-get-modifier-groups"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "create_modifier_group" {
+  filename         = "../lambda/${local.create_modifier_group_zip}"
+  function_name    = "${var.app_name}-${var.environment}-create-modifier-group"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "update_modifier_group" {
+  filename         = "../lambda/${local.update_modifier_group_zip}"
+  function_name    = "${var.app_name}-${var.environment}-update-modifier-group"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "delete_modifier_group" {
+  filename         = "../lambda/${local.delete_modifier_group_zip}"
+  function_name    = "${var.app_name}-${var.environment}-delete-modifier-group"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+# Modifiers Lambda Functions
+resource "aws_lambda_function" "get_modifiers" {
+  filename         = "../lambda/${local.get_modifiers_zip}"
+  function_name    = "${var.app_name}-${var.environment}-get-modifiers"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "create_modifier" {
+  filename         = "../lambda/${local.create_modifier_zip}"
+  function_name    = "${var.app_name}-${var.environment}-create-modifier"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "update_modifier" {
+  filename         = "../lambda/${local.update_modifier_zip}"
+  function_name    = "${var.app_name}-${var.environment}-update-modifier"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+resource "aws_lambda_function" "delete_modifier" {
+  filename         = "../lambda/${local.delete_modifier_zip}"
+  function_name    = "${var.app_name}-${var.environment}-delete-modifier"
   role            = aws_iam_role.lambda_role.arn
   handler         = "index.handler"
   runtime         = "nodejs20.x"

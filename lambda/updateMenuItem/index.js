@@ -109,7 +109,8 @@ exports.handler = async (event) => {
                     active: body.active,
                     vegetarian: body.vegetarian,
                     description: body.description,
-                    categoryId: newCategoryId
+                    categoryId: newCategoryId,
+                    modifierGroups: body.modifierGroups || []
                 }
             };
             const putCommand = new PutCommand(putParams);
@@ -122,7 +123,7 @@ exports.handler = async (event) => {
                     pk: existingItem.pk,
                     sk: existingItem.sk
                 },
-                UpdateExpression: 'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id',
+                UpdateExpression: 'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id, #modifierGroups = :modifierGroups',
                 ExpressionAttributeNames: {
                     '#name': 'name',
                     '#price': 'price',
@@ -130,7 +131,8 @@ exports.handler = async (event) => {
                     '#vegetarian': 'vegetarian',
                     '#description': 'description',
                     '#categoryId': 'categoryId',
-                    '#id': 'id'
+                    '#id': 'id',
+                    '#modifierGroups': 'modifierGroups'
                 },
                 ExpressionAttributeValues: {
                     ':name': body.name,
@@ -139,7 +141,8 @@ exports.handler = async (event) => {
                     ':vegetarian': body.vegetarian,
                     ':description': body.description,
                     ':categoryId': body.categoryId,
-                    ':id': parseInt(itemIdNumber)
+                    ':id': parseInt(itemIdNumber),
+                    ':modifierGroups': body.modifierGroups || []
                 },
                 ReturnValues: 'ALL_NEW'
             };
