@@ -135,6 +135,16 @@ This document describes the DynamoDB table structure and data models for the Tac
 - `PREMIUM_PROTEINS` - Premium protein upgrades
 - `SAUCES` - Sauce options
 
+**Modifier Price Types:**
+- `addon` - Extra charge modifier (e.g., "Add Cheese +$0.50")
+- `included` - No charge modifier (e.g., "Lettuce" included in salad)
+- `removal` - Removal option (e.g., "No Onions" to remove default onions)
+
+**Default Selections:**
+- `defaultSelected: true` - Modifier is pre-selected for customers (can be unchecked)
+- `defaultSelected: false` - Modifier is not pre-selected (customer must choose)
+- `defaultSelections: []` - Array of modifier IDs that are pre-selected for specific menu items
+
 ### **6. Modifiers Table** (`tacodelite-app-staging`)
 
 **Primary Key Structure:**
@@ -151,6 +161,8 @@ This document describes the DynamoDB table structure and data models for the Tac
   "groupId": "SMALL_ADDONS",
   "groupName": "Small Portion Add-ons",
   "price": 0.50,
+  "priceType": "addon",
+  "defaultSelected": false,
   "sortOrder": 1,
   "active": true,
   "createdAt": "2025-01-15T12:00:00Z",
@@ -173,7 +185,8 @@ This document describes the DynamoDB table structure and data models for the Tac
       "required": false,
       "multiSelect": true,
       "min": 0,
-      "max": null
+      "max": null,
+      "defaultSelections": []
     }
   ],
   "categoryId": 1,

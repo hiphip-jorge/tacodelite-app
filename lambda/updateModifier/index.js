@@ -58,6 +58,18 @@ exports.handler = async (event) => {
             expressionAttributeValues[':price'] = parseFloat(body.price);
         }
 
+        if (body.priceType !== undefined) {
+            updateExpressions.push('#priceType = :priceType');
+            expressionAttributeNames['#priceType'] = 'priceType';
+            expressionAttributeValues[':priceType'] = body.priceType;
+        }
+
+        if (body.defaultSelected !== undefined) {
+            updateExpressions.push('#defaultSelected = :defaultSelected');
+            expressionAttributeNames['#defaultSelected'] = 'defaultSelected';
+            expressionAttributeValues[':defaultSelected'] = body.defaultSelected;
+        }
+
         if (body.sortOrder !== undefined) {
             updateExpressions.push('#sortOrder = :sortOrder');
             expressionAttributeNames['#sortOrder'] = 'sortOrder';

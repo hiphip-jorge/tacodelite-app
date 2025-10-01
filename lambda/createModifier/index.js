@@ -71,6 +71,8 @@ exports.handler = async (event) => {
             groupId: body.groupId,
             groupName: groupResult.Item.name,
             price: parseFloat(body.price) || 0,
+            priceType: body.priceType || 'addon', // 'addon' | 'included' | 'removal'
+            defaultSelected: body.defaultSelected || false,
             sortOrder: body.sortOrder || 0,
             active: body.active !== undefined ? body.active : true,
             createdAt: now,
