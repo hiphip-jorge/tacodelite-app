@@ -31,7 +31,7 @@ const AnnouncementBanner = () => {
 
             return () => clearInterval(interval);
         }
-    }, [announcements.length, isHovered]);
+    }, [announcements.length, isHovered, currentIndex]); // Reset timer when index changes (manual or auto)
 
     // Keyboard navigation
     useEffect(() => {
