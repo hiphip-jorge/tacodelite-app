@@ -8,11 +8,18 @@ const AnnouncementBanner = () => {
     const [isVisible, setIsVisible] = useState(true);
     const [dismissedAnnouncements, setDismissedAnnouncements] = useState(new Set());
     const [isHovered, setIsHovered] = useState(false);
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
 
     useEffect(() => {
         loadDismissedAnnouncements();
         loadAnnouncements();
     }, []);
+
+    // Calculate visible announcements (filter out dismissed)
+    const visibleAnnouncements = announcements.filter(
+        announcement => !dismissedAnnouncements.has(announcement.id)
+    );
 
     useEffect(() => {
         if (announcements.length > 1 && !isHovered) {
@@ -25,6 +32,29 @@ const AnnouncementBanner = () => {
             return () => clearInterval(interval);
         }
     }, [announcements.length, isHovered]);
+
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            const visibleCount = visibleAnnouncements.length;
+            if (visibleCount <= 1) return;
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                setCurrentIndex((prevIndex) =>
+                    prevIndex === 0 ? visibleCount - 1 : prevIndex - 1
+                );
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                setCurrentIndex((prevIndex) =>
+                    (prevIndex + 1) % visibleCount
+                );
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [visibleAnnouncements.length]);
 
     const loadDismissedAnnouncements = () => {
         try {
@@ -53,6 +83,39 @@ const AnnouncementBanner = () => {
             setAnnouncements(activeAnnouncements);
         } catch (error) {
             console.error('Error loading announcements:', error);
+        }
+    };
+
+    // Touch gesture handlers
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+        const visibleCount = visibleAnnouncements.length;
+
+        if (visibleCount <= 1) return;
+
+        if (isLeftSwipe) {
+            // Swipe left - go to next
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % visibleCount);
+        } else if (isRightSwipe) {
+            // Swipe right - go to previous
+            setCurrentIndex((prevIndex) =>
+                prevIndex === 0 ? visibleCount - 1 : prevIndex - 1
+            );
         }
     };
 
@@ -119,11 +182,6 @@ const AnnouncementBanner = () => {
         }
     };
 
-    // Filter out dismissed announcements
-    const visibleAnnouncements = announcements.filter(
-        announcement => !dismissedAnnouncements.has(announcement.id)
-    );
-
     if (!isVisible || visibleAnnouncements.length === 0) {
         return null;
     }
@@ -141,6 +199,9 @@ const AnnouncementBanner = () => {
                 className={`${styles.bg} ${styles.text} shadow-lg`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
+                onTouchStart={onTouchStart}
+                onTouchMove={onTouchMove}
+                onTouchEnd={onTouchEnd}
             >
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between py-3">
