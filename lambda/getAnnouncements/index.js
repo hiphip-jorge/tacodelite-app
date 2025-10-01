@@ -60,6 +60,7 @@ exports.handler = async (event) => {
             message: item.message,
             type: item.type,
             active: item.active,
+            startsAt: item.startsAt,
             expiresAt: item.expiresAt,
             createdAt: item.createdAt,
             updatedAt: item.updatedAt,
@@ -69,23 +70,44 @@ exports.handler = async (event) => {
         // Sort by creation date (newest first)
         announcements.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        // Filter out expired announcements if activeOnly is true
+        // Filter out announcements outside their scheduled window if activeOnly is true
         const now = new Date();
         console.log('Current time:', now.toISOString());
         const filteredAnnouncements = activeOnly
             ? announcements.filter(announcement => {
-                if (!announcement.expiresAt) return true;
+                // Check if announcement has started
+                if (announcement.startsAt) {
+                    const startDate = new Date(announcement.startsAt);
+                    // Handle date-only format (YYYY-MM-DD)
+                    if (announcement.startsAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        // Date-only format: set to start of day
+                        startDate.setHours(0, 0, 0, 0);
+                    }
 
-                // Handle date-only expiration dates (YYYY-MM-DD format)
-                // Convert to end of day in local timezone to avoid timezone issues
-                const expirationDate = new Date(announcement.expiresAt);
-                if (announcement.expiresAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    // Date-only format: set to end of day in local timezone
-                    expirationDate.setHours(23, 59, 59, 999);
+                    if (now < startDate) {
+                        console.log(`Announcement ${announcement.id}: not started yet (startsAt=${announcement.startsAt})`);
+                        return false;
+                    }
                 }
 
-                console.log(`Announcement ${announcement.id}: expiresAt=${announcement.expiresAt}, expirationDate=${expirationDate.toISOString()}, isActive=${expirationDate > now}`);
-                return expirationDate > now;
+                // Check if announcement has expired
+                if (announcement.expiresAt) {
+                    const expirationDate = new Date(announcement.expiresAt);
+                    // Handle date-only expiration dates (YYYY-MM-DD format)
+                    // Convert to end of day in local timezone to avoid timezone issues
+                    if (announcement.expiresAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                        // Date-only format: set to end of day in local timezone
+                        expirationDate.setHours(23, 59, 59, 999);
+                    }
+
+                    if (expirationDate <= now) {
+                        console.log(`Announcement ${announcement.id}: expired (expiresAt=${announcement.expiresAt})`);
+                        return false;
+                    }
+                }
+
+                console.log(`Announcement ${announcement.id}: is active`);
+                return true;
             })
             : announcements;
 

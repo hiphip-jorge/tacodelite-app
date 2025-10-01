@@ -302,6 +302,97 @@ describe('AnnouncementService', () => {
             expect(fetch).toHaveBeenCalledTimes(1)
             expect(result).toEqual(mockAnnouncements)
         })
+
+        it('should filter out announcements that have not started yet', async () => {
+            const now = new Date()
+            const futureDate = new Date(now.getTime() + 24 * 60 * 60 * 1000) // 1 day from now
+            const pastDate = new Date(now.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
+
+            const mockAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'Future Announcement',
+                    message: 'This has not started yet',
+                    type: 'general',
+                    active: true,
+                    startsAt: futureDate.toISOString().split('T')[0], // Future date
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Active Announcement',
+                    message: 'This has already started',
+                    type: 'general',
+                    active: true,
+                    startsAt: pastDate.toISOString().split('T')[0], // Past date
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                },
+                {
+                    id: 'ANN003',
+                    title: 'No Start Date',
+                    message: 'This should also be active',
+                    type: 'general',
+                    active: true,
+                    startsAt: null,
+                    expiresAt: null,
+                    createdAt: '2024-01-03T00:00:00Z'
+                }
+            ]
+
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockAnnouncements
+            })
+
+            const result = await getActiveAnnouncements()
+
+            expect(result).toHaveLength(2)
+            expect(result.find(a => a.id === 'ANN001')).toBeUndefined() // Future announcement not included
+            expect(result.find(a => a.id === 'ANN002')).toBeDefined() // Started announcement included
+            expect(result.find(a => a.id === 'ANN003')).toBeDefined() // No start date included
+        })
+
+        it('should show announcements within scheduled window (startsAt to expiresAt)', async () => {
+            const now = new Date()
+            const pastDate = new Date(now.getTime() - 24 * 60 * 60 * 1000) // 1 day ago
+            const futureDate = new Date(now.getTime() + 24 * 60 * 60 * 1000) // 1 day from now
+            const veryFutureDate = new Date(now.getTime() + 48 * 60 * 60 * 1000) // 2 days from now
+
+            const mockAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'Active Scheduled Announcement',
+                    message: 'This is within the window',
+                    type: 'general',
+                    active: true,
+                    startsAt: pastDate.toISOString().split('T')[0],
+                    expiresAt: futureDate.toISOString().split('T')[0],
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Future Scheduled Announcement',
+                    message: 'This has not started yet',
+                    type: 'general',
+                    active: true,
+                    startsAt: futureDate.toISOString().split('T')[0],
+                    expiresAt: veryFutureDate.toISOString().split('T')[0],
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            fetch.mockResolvedValueOnce({
+                ok: true,
+                json: async () => mockAnnouncements
+            })
+
+            const result = await getActiveAnnouncements()
+
+            expect(result).toHaveLength(1)
+            expect(result[0].id).toBe('ANN001') // Only the active scheduled announcement
+        })
     })
 
     describe('clearAnnouncementsCache', () => {

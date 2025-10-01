@@ -30,7 +30,7 @@ exports.handler = async (event) => {
 
         // Parse request body
         const body = JSON.parse(event.body);
-        const { title, message, type = 'general', active = true, expiresAt } = body;
+        const { title, message, type = 'general', active = true, startsAt, expiresAt } = body;
 
         // Validate required fields
         if (!title || !message) {
@@ -42,6 +42,22 @@ exports.handler = async (event) => {
                     error: 'Title and message are required'
                 })
             };
+        }
+
+        // Validate date range if both startsAt and expiresAt are provided
+        if (startsAt && expiresAt) {
+            const startDate = new Date(startsAt);
+            const endDate = new Date(expiresAt);
+            if (startDate >= endDate) {
+                return {
+                    statusCode: 400,
+                    headers: getCorsHeaders(origin),
+                    body: JSON.stringify({
+                        success: false,
+                        error: 'Start date must be before expiration date'
+                    })
+                };
+            }
         }
 
         // Generate announcement ID
@@ -57,6 +73,7 @@ exports.handler = async (event) => {
             message,
             type, // info, warning, success, error
             active,
+            startsAt: startsAt || null,
             expiresAt: expiresAt || null,
             createdAt: timestamp,
             updatedAt: timestamp,
@@ -87,6 +104,7 @@ exports.handler = async (event) => {
                     message: announcement.message,
                     type: announcement.type,
                     active: announcement.active,
+                    startsAt: announcement.startsAt,
                     expiresAt: announcement.expiresAt,
                     createdAt: announcement.createdAt
                 }

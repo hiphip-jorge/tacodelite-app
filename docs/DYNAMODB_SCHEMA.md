@@ -69,6 +69,44 @@ This document describes the DynamoDB table structure and data models for the Tac
 }
 ```
 
+### **4. Announcements Table** (`tacodelite-app-staging`)
+
+**Primary Key Structure:**
+- **PK (Partition Key):** `ANNOUNCEMENT`
+- **SK (Sort Key):** `ANNOUNCEMENT#{announcementId}` (e.g., `ANNOUNCEMENT#ANN1234567890`)
+
+**Attributes:**
+```json
+{
+  "pk": "ANNOUNCEMENT",
+  "sk": "ANNOUNCEMENT#ANN1234567890",
+  "id": "ANN1234567890",
+  "title": "Holiday Hours",
+  "message": "We will be closed on Christmas Day",
+  "type": "hours",
+  "active": true,
+  "startsAt": "2024-12-20",
+  "expiresAt": "2024-12-26",
+  "createdAt": "2024-12-01T10:00:00Z",
+  "updatedAt": "2024-12-01T10:00:00Z",
+  "createdBy": "admin@tacodelite.com"
+}
+```
+
+**Announcement Types:**
+- `general` - General announcements
+- `holiday` - Holiday-related announcements
+- `hours` - Hours/special time announcements
+- `discount` - Discount or promotional announcements
+- `event` - Event announcements
+
+**Scheduled Announcements:**
+- `startsAt` (optional): Date when announcement should start showing (YYYY-MM-DD format)
+- `expiresAt` (optional): Date when announcement should stop showing (YYYY-MM-DD format)
+- If `startsAt` is null, announcement shows immediately when active
+- If `expiresAt` is null, announcement never expires
+- Announcements only display when current date is between `startsAt` (inclusive) and `expiresAt` (inclusive)
+
 ## 🔍 **Query Patterns**
 
 ### **Get All Menu Items by Category:**
@@ -115,6 +153,22 @@ const params = {
     ":active": true
   }
 };
+```
+
+### **Get Active Announcements:**
+```javascript
+// Get all active announcements
+const params = {
+  TableName: "tacodelite-app-staging",
+  FilterExpression: "begins_with(pk, :announcementPrefix) AND active = :active",
+  ExpressionAttributeValues: {
+    ":announcementPrefix": "ANNOUNCEMENT",
+    ":active": true
+  }
+};
+
+// Note: The Lambda function further filters announcements based on startsAt and expiresAt
+// to only return announcements within their scheduled window
 ```
 
 ## 🚀 **Data Seeding**

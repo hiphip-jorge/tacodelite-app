@@ -66,21 +66,41 @@ export const getActiveAnnouncements = async () => {
 
         const announcements = await response.json();
 
-        // Filter out expired announcements
+        // Filter out announcements outside their scheduled window
         const now = new Date();
         const activeAnnouncements = announcements.filter(announcement => {
             if (!announcement.active) return false;
-            if (!announcement.expiresAt) return true;
 
-            // Handle date-only expiration dates (YYYY-MM-DD format)
-            // Convert to end of day in local timezone to avoid timezone issues
-            const expirationDate = new Date(announcement.expiresAt);
-            if (announcement.expiresAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                // Date-only format: set to end of day in local timezone
-                expirationDate.setHours(23, 59, 59, 999);
+            // Check if announcement has started
+            if (announcement.startsAt) {
+                const startDate = new Date(announcement.startsAt);
+                // Handle date-only format (YYYY-MM-DD)
+                if (announcement.startsAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    // Date-only format: set to start of day
+                    startDate.setHours(0, 0, 0, 0);
+                }
+
+                if (now < startDate) {
+                    return false; // Announcement hasn't started yet
+                }
             }
 
-            return expirationDate > now;
+            // Check if announcement has expired
+            if (announcement.expiresAt) {
+                const expirationDate = new Date(announcement.expiresAt);
+                // Handle date-only expiration dates (YYYY-MM-DD format)
+                // Convert to end of day in local timezone to avoid timezone issues
+                if (announcement.expiresAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    // Date-only format: set to end of day in local timezone
+                    expirationDate.setHours(23, 59, 59, 999);
+                }
+
+                if (expirationDate <= now) {
+                    return false; // Announcement has expired
+                }
+            }
+
+            return true;
         });
 
         // Cache the results

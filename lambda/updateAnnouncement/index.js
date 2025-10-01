@@ -43,7 +43,23 @@ exports.handler = async (event) => {
 
         // Parse request body
         const body = JSON.parse(event.body);
-        const { title, message, type, active, expiresAt } = body;
+        const { title, message, type, active, startsAt, expiresAt } = body;
+
+        // Validate date range if both startsAt and expiresAt are provided
+        if (startsAt !== undefined && expiresAt !== undefined && startsAt && expiresAt) {
+            const startDate = new Date(startsAt);
+            const endDate = new Date(expiresAt);
+            if (startDate >= endDate) {
+                return {
+                    statusCode: 400,
+                    headers: getCorsHeaders(origin),
+                    body: JSON.stringify({
+                        success: false,
+                        error: 'Start date must be before expiration date'
+                    })
+                };
+            }
+        }
 
         // Check if announcement exists
         const getParams = {
@@ -95,6 +111,12 @@ exports.handler = async (event) => {
             updateExpressions.push('#active = :active');
             expressionAttributeNames['#active'] = 'active';
             expressionAttributeValues[':active'] = active;
+        }
+
+        if (startsAt !== undefined) {
+            updateExpressions.push('#startsAt = :startsAt');
+            expressionAttributeNames['#startsAt'] = 'startsAt';
+            expressionAttributeValues[':startsAt'] = startsAt;
         }
 
         if (expiresAt !== undefined) {
@@ -150,6 +172,7 @@ exports.handler = async (event) => {
                     message: result.Attributes.message,
                     type: result.Attributes.type,
                     active: result.Attributes.active,
+                    startsAt: result.Attributes.startsAt,
                     expiresAt: result.Attributes.expiresAt,
                     createdAt: result.Attributes.createdAt,
                     updatedAt: result.Attributes.updatedAt
