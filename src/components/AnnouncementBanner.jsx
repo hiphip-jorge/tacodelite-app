@@ -82,38 +82,38 @@ const AnnouncementBanner = () => {
         switch (type) {
             case 'holiday':
                 return {
-                    bg: 'bg-green-600',
-                    text: 'text-white',
+                    bg: 'bg-emerald-100 border border-emerald-200',
+                    text: 'text-emerald-900',
                     icon: '🎉'
                 };
             case 'general':
                 return {
-                    bg: 'bg-taco-blue-600',
-                    text: 'text-white',
+                    bg: 'bg-slate-100 border border-slate-200',
+                    text: 'text-slate-900',
                     icon: '📢'
                 };
             case 'hours':
                 return {
-                    bg: 'bg-red-600',
-                    text: 'text-white',
+                    bg: 'bg-orange-100 border border-orange-200',
+                    text: 'text-orange-900',
                     icon: '🕐'
                 };
             case 'discount':
                 return {
-                    bg: 'bg-yellow-600',
-                    text: 'text-white',
+                    bg: 'bg-amber-100 border border-amber-200',
+                    text: 'text-amber-900',
                     icon: '💰'
                 };
             case 'event':
                 return {
-                    bg: 'bg-pink-600',
-                    text: 'text-white',
+                    bg: 'bg-purple-100 border border-purple-200',
+                    text: 'text-purple-900',
                     icon: '🎪'
                 };
             default:
                 return {
-                    bg: 'bg-taco-blue-600',
-                    text: 'text-white',
+                    bg: 'bg-slate-100 border border-slate-200',
+                    text: 'text-slate-900',
                     icon: '📢'
                 };
         }
@@ -165,8 +165,8 @@ const AnnouncementBanner = () => {
                                             key={index}
                                             onClick={() => setCurrentIndex(index)}
                                             className={`w-2 h-2 rounded-full transition-colors ${index === currentIndex
-                                                ? 'bg-white'
-                                                : 'bg-white/50'
+                                                ? 'bg-gray-700'
+                                                : 'bg-gray-400'
                                                 }`}
                                         />
                                     ))}
@@ -176,7 +176,7 @@ const AnnouncementBanner = () => {
                             {/* Dismiss button */}
                             <button
                                 onClick={() => handleDismiss(currentAnnouncement.id)}
-                                className="ml-3 p-1 rounded-full hover:bg-black/20 transition-colors"
+                                className="ml-3 p-1 rounded-full hover:bg-gray-200 transition-colors"
                                 aria-label="Dismiss announcement"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
