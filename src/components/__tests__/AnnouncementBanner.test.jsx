@@ -283,4 +283,310 @@ describe('AnnouncementBanner', () => {
         })
     })
 
+    describe('Keyboard navigation', () => {
+        it('should navigate to next announcement when right arrow is pressed', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'First Announcement',
+                    message: 'First message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Second Announcement',
+                    message: 'Second message',
+                    type: 'hours',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+
+            // Simulate right arrow key press
+            fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+            await waitFor(() => {
+                expect(screen.getByText('Second Announcement')).toBeInTheDocument()
+            })
+        })
+
+        it('should navigate to previous announcement when left arrow is pressed', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'First Announcement',
+                    message: 'First message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Second Announcement',
+                    message: 'Second message',
+                    type: 'hours',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+
+            // Navigate to second, then back to first with left arrow
+            fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+            await waitFor(() => {
+                expect(screen.getByText('Second Announcement')).toBeInTheDocument()
+            })
+
+            fireEvent.keyDown(window, { key: 'ArrowLeft' })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+        })
+
+        it('should wrap around to last announcement when left arrow is pressed on first', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'First Announcement',
+                    message: 'First message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Second Announcement',
+                    message: 'Second message',
+                    type: 'hours',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+
+            // Press left arrow on first announcement - should wrap to last
+            fireEvent.keyDown(window, { key: 'ArrowLeft' })
+
+            await waitFor(() => {
+                expect(screen.getByText('Second Announcement')).toBeInTheDocument()
+            })
+        })
+
+        it('should not navigate when only one announcement is visible', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'Only Announcement',
+                    message: 'Only message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('Only Announcement')).toBeInTheDocument()
+            })
+
+            // Try to navigate - should stay on same announcement
+            fireEvent.keyDown(window, { key: 'ArrowRight' })
+
+            await waitFor(() => {
+                expect(screen.getByText('Only Announcement')).toBeInTheDocument()
+            })
+        })
+    })
+
+    describe('Touch gestures', () => {
+        it('should navigate to next announcement on swipe left', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'First Announcement',
+                    message: 'First message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Second Announcement',
+                    message: 'Second message',
+                    type: 'hours',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+
+            const banner = screen.getByText('First Announcement').closest('div').parentElement.parentElement
+
+            // Simulate swipe left (touchStart at 200, touchEnd at 100)
+            fireEvent.touchStart(banner, {
+                targetTouches: [{ clientX: 200 }]
+            })
+            fireEvent.touchMove(banner, {
+                targetTouches: [{ clientX: 100 }]
+            })
+            fireEvent.touchEnd(banner)
+
+            await waitFor(() => {
+                expect(screen.getByText('Second Announcement')).toBeInTheDocument()
+            })
+        })
+
+        it('should navigate to previous announcement on swipe right', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'First Announcement',
+                    message: 'First message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Second Announcement',
+                    message: 'Second message',
+                    type: 'hours',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+
+            const banner = screen.getByText('First Announcement').closest('div').parentElement.parentElement
+
+            // Simulate swipe right (touchStart at 100, touchEnd at 200)
+            fireEvent.touchStart(banner, {
+                targetTouches: [{ clientX: 100 }]
+            })
+            fireEvent.touchMove(banner, {
+                targetTouches: [{ clientX: 200 }]
+            })
+            fireEvent.touchEnd(banner)
+
+            await waitFor(() => {
+                expect(screen.getByText('Second Announcement')).toBeInTheDocument()
+            })
+        })
+
+        it('should not navigate on small swipe (less than minimum distance)', async () => {
+            const testAnnouncements = [
+                {
+                    id: 'ANN001',
+                    title: 'First Announcement',
+                    message: 'First message',
+                    type: 'general',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-01T00:00:00Z'
+                },
+                {
+                    id: 'ANN002',
+                    title: 'Second Announcement',
+                    message: 'Second message',
+                    type: 'hours',
+                    active: true,
+                    expiresAt: null,
+                    createdAt: '2024-01-02T00:00:00Z'
+                }
+            ]
+
+            getActiveAnnouncements.mockResolvedValueOnce(testAnnouncements)
+
+            await act(async () => {
+                render(<AnnouncementBanner />)
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+
+            const banner = screen.getByText('First Announcement').closest('div').parentElement.parentElement
+
+            // Simulate small swipe (only 30 pixels - less than 50px minimum)
+            fireEvent.touchStart(banner, {
+                targetTouches: [{ clientX: 100 }]
+            })
+            fireEvent.touchMove(banner, {
+                targetTouches: [{ clientX: 130 }]
+            })
+            fireEvent.touchEnd(banner)
+
+            // Should still be on first announcement
+            await waitFor(() => {
+                expect(screen.getByText('First Announcement')).toBeInTheDocument()
+            })
+        })
+    })
+
 })
