@@ -46,11 +46,11 @@ const MODIFIER_GROUPS = [
         max: null
     },
 
-    // Premium add-ons for tacos and smaller items
+    // Small add-ons for tacos and smaller items
     {
-        id: 'PREMIUM_ADDONS',
-        name: 'Premium Add-ons',
-        description: 'Premium ingredients for tacos and smaller items',
+        id: 'SMALL_ADDONS',
+        name: 'Small Add-ons',
+        description: 'Small add-ons for tacos and smaller items',
         sortOrder: 3,
         required: false,
         multiSelect: true,
@@ -129,8 +129,8 @@ const MODIFIERS = {
         { id: 'HOMEMADE_BEANS', name: 'Homemade Beans', price: 0, priceType: 'included', defaultSelected: false, sortOrder: 3 }
     ],
 
-    // Premium add-ons for tacos and smaller items
-    PREMIUM_ADDONS: [
+    // Small add-ons for tacos and smaller items
+    SMALL_ADDONS: [
         { id: 'TOMATOES', name: 'Tomatoes', price: 0.50, priceType: 'addon', defaultSelected: false, sortOrder: 1 },
         { id: 'SOUR_CREAM', name: 'Sour Cream', price: 0.50, priceType: 'addon', defaultSelected: false, sortOrder: 2 },
         { id: 'GUACAMOLE', name: 'Guacamole', price: 1.50, priceType: 'addon', defaultSelected: false, sortOrder: 3 },
@@ -210,33 +210,33 @@ const MENU_ITEM_MODIFIERS = {
 
     // Taco items - base tacos get basic modifiers, supreme gets premium
     6: { // taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE']
         }
     },
     7: { // supreme taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE'],
-            'PREMIUM_ADDONS': ['TOMATOES', 'SOUR_CREAM']
+            'SMALL_ADDONS': ['TOMATOES', 'SOUR_CREAM']
         }
     },
     8: { // soft taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE']
         }
     },
     9: { // soft taco supreme
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE'],
-            'PREMIUM_ADDONS': ['TOMATOES', 'SOUR_CREAM']
+            'SMALL_ADDONS': ['TOMATOES', 'SOUR_CREAM']
         }
     },
     10: { // fajita soft taco
@@ -248,34 +248,34 @@ const MENU_ITEM_MODIFIERS = {
         }
     },
     11: { // taco delite
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS']
         }
     },
     12: { // taco delite supreme
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-            'PREMIUM_ADDONS': ['TOMATOES', 'SOUR_CREAM']
+            'SMALL_ADDONS': ['TOMATOES', 'SOUR_CREAM']
         }
     },
     13: { // taco delite w/ queso
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-            'PREMIUM_ADDONS': ['QUESO']
+            'SMALL_ADDONS': ['QUESO']
         }
     },
     14: { // taco delite w/ guac
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'PREMIUM_ADDONS'],
+        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
         defaultSelections: {
             'PROTEIN_CHOICES': ['GROUND_BEEF'],
             'BASE_TOPPINGS': ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-            'PREMIUM_ADDONS': ['GUACAMOLE']
+            'SMALL_ADDONS': ['GUACAMOLE']
         }
     },
 
