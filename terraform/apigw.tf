@@ -943,6 +943,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.post_modifiers,
     aws_api_gateway_integration.put_modifier,
     aws_api_gateway_integration.delete_modifier,
+    aws_api_gateway_integration.get_activities,
+    aws_api_gateway_integration.options_activities,
 
     aws_api_gateway_method.options_categories,
     aws_api_gateway_method.options_menu_items,
@@ -983,6 +985,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method.delete_modifier,
     aws_api_gateway_method.options_modifiers,
     aws_api_gateway_method.options_modifier,
+    aws_api_gateway_method.get_activities,
+    aws_api_gateway_method.options_activities,
     aws_api_gateway_method_response.options_categories,
     aws_api_gateway_method_response.options_menu_items,
     aws_api_gateway_method_response.options_search,
@@ -1029,6 +1033,7 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration_response.options_users,
     aws_api_gateway_integration_response.options_user,
     aws_api_gateway_integration_response.options_announcements,
+    aws_api_gateway_integration_response.options_activities,
     aws_api_gateway_integration_response.options_announcement,
     aws_api_gateway_integration_response.options_admin,
     aws_api_gateway_integration_response.get_menu_version,
@@ -1071,7 +1076,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_lambda_permission.get_modifiers,
     aws_lambda_permission.create_modifier,
     aws_lambda_permission.update_modifier,
-    aws_lambda_permission.delete_modifier
+    aws_lambda_permission.delete_modifier,
+    aws_lambda_permission.get_activities
   ]
 
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -1120,6 +1126,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_method.delete_announcement.id,
       aws_api_gateway_method.options_announcements.id,
       aws_api_gateway_method.options_announcement.id,
+      aws_api_gateway_method.get_activities.id,
+      aws_api_gateway_method.options_activities.id,
       aws_api_gateway_method.get_modifier_groups.id,
       aws_api_gateway_method.post_modifier_groups.id,
       aws_api_gateway_method.put_modifier_group.id,
@@ -1172,6 +1180,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_integration.post_announcements.id,
       aws_api_gateway_integration.put_announcement.id,
       aws_api_gateway_integration.delete_announcement.id,
+      aws_api_gateway_integration.get_activities.id,
+      aws_api_gateway_integration.options_activities.id,
       aws_api_gateway_integration.get_modifier_groups.id,
       aws_api_gateway_integration.post_modifier_groups.id,
       aws_api_gateway_integration.put_modifier_group.id,
@@ -2698,9 +2708,9 @@ resource "aws_api_gateway_method_response" "options_activities" {
   status_code = "200"
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = true
-    "method.response.header.Access-Control-Allow-Methods" = true
-    "method.response.header.Access-Control-Allow-Origin"  = true
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+    "method.response.header.Access-Control-Allow-Origin"  = false
   }
 }
 
