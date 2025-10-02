@@ -100,6 +100,8 @@ locals {
   create_modifier_zip = length(tolist(fileset("../lambda", "createModifier.*.zip"))) > 0 ? tolist(fileset("../lambda", "createModifier.*.zip"))[0] : "createModifier.zip"
   update_modifier_zip = length(tolist(fileset("../lambda", "updateModifier.*.zip"))) > 0 ? tolist(fileset("../lambda", "updateModifier.*.zip"))[0] : "updateModifier.zip"
   delete_modifier_zip = length(tolist(fileset("../lambda", "deleteModifier.*.zip"))) > 0 ? tolist(fileset("../lambda", "deleteModifier.*.zip"))[0] : "deleteModifier.zip"
+  # Activities functions
+  get_activities_zip = length(tolist(fileset("../lambda", "getActivities.*.zip"))) > 0 ? tolist(fileset("../lambda", "getActivities.*.zip"))[0] : "getActivities.zip"
   # Auth functions are not using checksums, keeping static paths
   auth_login_zip         = "login.zip"
   auth_verify_zip        = "verify.zip"
@@ -842,6 +844,27 @@ resource "aws_lambda_function" "delete_modifier" {
   environment {
     variables = {
       DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  depends_on = [
+    aws_iam_role_policy.lambda_policy
+  ]
+}
+
+# Activities Lambda Functions
+resource "aws_lambda_function" "get_activities" {
+  filename         = "../lambda/${local.get_activities_zip}"
+  function_name    = "${var.app_name}-${var.environment}-get-activities"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.activities.name
       ALLOWED_ORIGINS = var.allowed_origins
     }
   }

@@ -2246,6 +2246,13 @@ resource "aws_api_gateway_resource" "modifier" {
   path_part   = "{id}"
 }
 
+# Activities resource
+resource "aws_api_gateway_resource" "activities" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
+  path_part   = "activities"
+}
+
 # CORS Support - OPTIONS method for modifier-groups
 resource "aws_api_gateway_method" "options_modifier_groups" {
   rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
@@ -2674,6 +2681,84 @@ resource "aws_api_gateway_integration" "delete_modifier" {
   uri                    = aws_lambda_function.delete_modifier.invoke_arn
 }
 
+# Activities API Gateway Methods
+
+# CORS Support - OPTIONS method for activities
+resource "aws_api_gateway_method" "options_activities" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.activities.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "options_activities" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.activities.id
+  http_method = aws_api_gateway_method.options_activities.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+resource "aws_api_gateway_integration" "options_activities" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.activities.id
+  http_method = aws_api_gateway_method.options_activities.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "options_activities" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.activities.id
+  http_method = aws_api_gateway_method.options_activities.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET, OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+}
+
+# GET method for activities
+resource "aws_api_gateway_method" "get_activities" {
+  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id   = aws_api_gateway_resource.activities.id
+  http_method   = "GET"
+  authorization = "NONE"
+}
+
+resource "aws_api_gateway_method_response" "get_activities" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.activities.id
+  http_method = aws_api_gateway_method.get_activities.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Origin"  = false
+    "method.response.header.Access-Control-Allow-Headers" = false
+    "method.response.header.Access-Control-Allow-Methods" = false
+  }
+}
+
+resource "aws_api_gateway_integration" "get_activities" {
+  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
+  resource_id = aws_api_gateway_resource.activities.id
+  http_method = aws_api_gateway_method.get_activities.http_method
+
+  integration_http_method = "POST"
+  type                   = "AWS_PROXY"
+  uri                    = aws_lambda_function.get_activities.invoke_arn
+}
+
 # Lambda Permissions for Modifier Groups
 resource "aws_lambda_permission" "get_modifier_groups" {
   statement_id  = "AllowExecutionFromAPIGateway-get-modifier-groups"
@@ -2736,6 +2821,15 @@ resource "aws_lambda_permission" "delete_modifier" {
   statement_id  = "AllowExecutionFromAPIGateway-delete-modifier"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.delete_modifier.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+# Lambda Permissions for Activities
+resource "aws_lambda_permission" "get_activities" {
+  statement_id  = "AllowExecutionFromAPIGateway-get-activities"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.get_activities.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
 }
