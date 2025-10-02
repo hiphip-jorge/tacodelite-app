@@ -239,6 +239,9 @@ package_lambda_with_checksum "createModifier" "createModifier"
 package_lambda_with_checksum "updateModifier" "updateModifier"
 package_lambda_with_checksum "deleteModifier" "deleteModifier"
 
+# Activities functions
+package_lambda_with_checksum "getActivities" "getActivities"
+
 echo "✅ Lambda packaging complete!"
 
 # Verify all required zip files exist
@@ -279,6 +282,7 @@ required_files_with_checksums=(
     "createModifier.*.zip"
     "updateModifier.*.zip"
     "deleteModifier.*.zip"
+    "getActivities.*.zip"
 )
 
 # Check other Lambda functions (none - all use checksums now)

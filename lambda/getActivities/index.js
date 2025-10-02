@@ -31,10 +31,8 @@ exports.handler = async (event) => {
         const queryParams = event.queryStringParameters || {};
         const limit = parseInt(queryParams.limit) || 10; // Default to 10 recent activities
 
-        // Determine table name based on environment
-        const tableName = process.env.AWS_LAMBDA_FUNCTION_NAME?.includes('staging')
-            ? 'tacodelite-app-activities-staging'
-            : 'tacodelite-app-activities-production';
+        // Use the table name from environment variable
+        const tableName = process.env.DYNAMODB_TABLE;
 
         // Scan for activities
         const params = {
