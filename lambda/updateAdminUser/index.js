@@ -1,5 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { logActivity } = require('./shared/logActivity');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -139,6 +140,17 @@ exports.handler = async (event) => {
 
         const result = await docClient.send(updateCommand);
         console.log('✅ Admin user updated successfully');
+
+        // Log activity
+        await logActivity(
+            'user',
+            'updated',
+            updateData.email || 'Unknown User',
+            userId,
+            null, // userId
+            null, // userName
+            event // Pass event to extract user info from headers
+        );
 
         // Return success response (without password if it exists)
         const updatedUser = result.Attributes;

@@ -1,6 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, DeleteCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
+const { logActivity } = require('./shared/logActivity');
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
@@ -53,6 +54,24 @@ exports.handler = async (event) => {
             };
         }
 
+        // Get category info before deletion for activity logging
+        const getCategoryParams = {
+            TableName: process.env.CATEGORIES_TABLE,
+            Key: {
+                pk: `CATEGORY#${categoryId}`
+            }
+        };
+
+        const categoryResult = await docClient.send(new QueryCommand({
+            TableName: process.env.CATEGORIES_TABLE,
+            KeyConditionExpression: 'pk = :pk',
+            ExpressionAttributeValues: {
+                ':pk': `CATEGORY#${categoryId}`
+            }
+        }));
+
+        const category = categoryResult.Items && categoryResult.Items.length > 0 ? categoryResult.Items[0] : null;
+
         // Delete the category
         const deleteParams = {
             TableName: process.env.CATEGORIES_TABLE,
@@ -66,6 +85,17 @@ exports.handler = async (event) => {
 
         // Increment menu version after successful deletion
         const versionInfo = await incrementMenuVersion();
+
+        // Log activity
+        await logActivity(
+            'category',
+            'deleted',
+            category?.name || 'Unknown Category',
+            categoryId,
+            null, // userId
+            null, // userName
+            event // Pass event to extract user info from headers
+        );
 
         console.log('✅ Category deleted successfully:', categoryId);
 

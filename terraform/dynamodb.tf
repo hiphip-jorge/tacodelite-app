@@ -89,3 +89,40 @@ resource "aws_dynamodb_table" "users" {
     Purpose     = "User management"
   }
 }
+
+# Activities Table for activity logging
+resource "aws_dynamodb_table" "activities" {
+  name           = "${var.app_name}-activities-${var.environment}"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "pk"
+  range_key      = "sk"
+
+  attribute {
+    name = "pk"
+    type = "S"
+  }
+
+  attribute {
+    name = "sk"
+    type = "S"
+  }
+
+  attribute {
+    name = "timestamp"
+    type = "S"
+  }
+
+  # Global Secondary Index for querying activities by timestamp
+  global_secondary_index {
+    name            = "timestamp-index"
+    hash_key        = "pk"
+    range_key       = "timestamp"
+    projection_type = "ALL"
+  }
+
+  tags = {
+    Name        = "${var.app_name}-activities-${var.environment}"
+    Environment = var.environment
+    Purpose     = "Activity logging"
+  }
+}

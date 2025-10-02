@@ -1,6 +1,7 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('../shared/menuVersionUtils');
+const { logActivity } = require('../shared/logActivity');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -85,6 +86,17 @@ exports.handler = async (event) => {
 
         // Increment menu version after successful creation
         const versionInfo = await incrementMenuVersion();
+
+        // Log activity
+        await logActivity(
+            'category',
+            'created',
+            body.name,
+            newCategoryId.toString(),
+            null, // userId
+            null, // userName
+            event // Pass event to extract user info from headers
+        );
 
         return {
             statusCode: 201,

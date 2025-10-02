@@ -1,5 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const { logActivity } = require('./shared/logActivity');
 
 const client = new DynamoDBClient({});
 const dynamodb = DynamoDBDocumentClient.from(client);
@@ -91,6 +92,17 @@ exports.handler = async (event) => {
         };
 
         await dynamodb.send(new DeleteCommand(deleteParams));
+
+        // Log activity
+        await logActivity(
+            'user',
+            'deleted',
+            userResult.Item.email,
+            userId,
+            null, // userId
+            null, // userName
+            event // Pass event to extract user info from headers
+        );
 
         console.log('✅ Admin user deleted successfully:', userId);
 

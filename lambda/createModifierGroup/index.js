@@ -1,5 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const { logActivity } = require('./shared/logActivity');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -63,6 +64,17 @@ exports.handler = async (event) => {
         });
 
         await docClient.send(command);
+
+        // Log activity
+        await logActivity(
+            'modifier_group',
+            'created',
+            body.name,
+            groupId,
+            null, // userId
+            null, // userName
+            event // Pass event to extract user info from headers
+        );
 
         return {
             statusCode: 201,

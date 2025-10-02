@@ -45,7 +45,9 @@ resource "aws_iam_role_policy" "lambda_policy" {
           aws_dynamodb_table.menu_categories.arn,
           aws_dynamodb_table.admin_users.arn,
           aws_dynamodb_table.users.arn,
-          "${aws_dynamodb_table.admin_users.arn}/index/*"
+          aws_dynamodb_table.activities.arn,
+          "${aws_dynamodb_table.admin_users.arn}/index/*",
+          "${aws_dynamodb_table.activities.arn}/index/*"
         ]
       },
       {

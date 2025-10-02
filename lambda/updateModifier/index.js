@@ -1,5 +1,6 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { logActivity } = require('./shared/logActivity');
 
 const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
 const docClient = DynamoDBDocumentClient.from(client);
@@ -109,6 +110,17 @@ exports.handler = async (event) => {
         });
 
         const result = await docClient.send(command);
+
+        // Log activity
+        await logActivity(
+            'modifier',
+            'updated',
+            body.name || result.Attributes?.name || 'Unknown Modifier',
+            modifierId,
+            null, // userId
+            null, // userName
+            event // Pass event to extract user info from headers
+        );
 
         return {
             statusCode: 200,
