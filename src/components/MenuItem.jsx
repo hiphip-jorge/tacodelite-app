@@ -1,12 +1,15 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const MenuItem = ({ item, index }) => {
+const MenuItem = ({ item = {}, index }) => {
     const formatPrice = price => {
-        return `$${price.toFixed(2)}`;
+        if (price === undefined || price === null || isNaN(price))
+            return '$0.00';
+        return `$${parseFloat(price).toFixed(2)}`;
     };
 
     const formatName = name => {
+        if (!name) return '';
         return name
             .split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -14,6 +17,7 @@ const MenuItem = ({ item, index }) => {
     };
 
     const getItemInitials = name => {
+        if (!name) return '';
         return name
             .split(' ')
             .map(word => word.charAt(0).toUpperCase())
