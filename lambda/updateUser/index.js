@@ -1,32 +1,39 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    UpdateCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
 const client = new DynamoDBClient({});
 const dynamodb = DynamoDBDocumentClient.from(client);
 
 // Helper function to get CORS headers
-const getCorsHeaders = (origin) => {
-    const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['*'];
+const getCorsHeaders = origin => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',')
+        : ['*'];
 
     // If origin is in allowed list, return it; otherwise return first allowed origin
     if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
         return {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+            'Access-Control-Allow-Headers':
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'PUT, OPTIONS',
         };
     } else {
         return {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': allowedOrigins[0],
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+            'Access-Control-Allow-Headers':
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'PUT, OPTIONS',
         };
     }
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         console.log('Event received:', JSON.stringify(event, null, 2));
 
@@ -38,7 +45,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: getCorsHeaders(origin),
-                body: ''
+                body: '',
             };
         }
 
@@ -51,13 +58,17 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'User ID is required'
-                })
+                    error: 'User ID is required',
+                }),
             };
         }
 
         // Parse request body
-        const body = event.body ? (typeof event.body === 'string' ? JSON.parse(event.body) : event.body) : {};
+        const body = event.body
+            ? typeof event.body === 'string'
+                ? JSON.parse(event.body)
+                : event.body
+            : {};
 
         // Validate required fields
         if (!body.email || !body.name) {
@@ -66,8 +77,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Email and name are required'
-                })
+                    error: 'Email and name are required',
+                }),
             };
         }
 
@@ -118,11 +129,11 @@ exports.handler = async (event) => {
         const params = {
             TableName: process.env.USERS_TABLE,
             Key: {
-                pk: `USER#${userId}`
+                pk: `USER#${userId}`,
             },
             UpdateExpression: `SET ${updateExpression.join(', ')}`,
             ExpressionAttributeValues: expressionAttributeValues,
-            ReturnValues: 'ALL_NEW'
+            ReturnValues: 'ALL_NEW',
         };
 
         // Add expression attribute names if any
@@ -143,7 +154,7 @@ exports.handler = async (event) => {
             createdAt: result.Attributes.createdAt,
             lastOrder: result.Attributes.lastOrder,
             active: result.Attributes.active !== false,
-            updatedAt: result.Attributes.updatedAt
+            updatedAt: result.Attributes.updatedAt,
         };
 
         return {
@@ -151,10 +162,9 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: true,
-                user: updatedUser
-            })
+                user: updatedUser,
+            }),
         };
-
     } catch (error) {
         console.error('Update user error:', error);
         return {
@@ -162,8 +172,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

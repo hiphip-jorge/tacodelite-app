@@ -1,9 +1,9 @@
 {
-  "name": "update-category",
-  "version": "1.0.0",
-  "description": "Lambda function to update categories",
-  "main": "index.js",
-  "engines": {
-    "node": ">=20.0.0"
-  }
+    "name": "update-category",
+    "version": "1.0.0",
+    "description": "Lambda function to update categories",
+    "main": "index.js",
+    "engines": {
+        "node": ">=20.0.0"
+    }
 }

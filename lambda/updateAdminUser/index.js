@@ -1,23 +1,31 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    UpdateCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const ADMIN_USERS_TABLE = process.env.ADMIN_USERS_TABLE;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || 'https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com,https://tacodelitewestplano.com';
+const ALLOWED_ORIGINS =
+    process.env.ALLOWED_ORIGINS ||
+    'https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,https://staging.tacodelitewestplano.com,https://tacodelitewestplano.com';
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     console.log('🚀 Update Admin User Lambda triggered');
     console.log('📝 Event:', JSON.stringify(event, null, 2));
 
     // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': ALLOWED_ORIGINS,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'PUT,OPTIONS',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     };
 
     try {
@@ -27,7 +35,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ message: 'CORS preflight successful' })
+                body: JSON.stringify({ message: 'CORS preflight successful' }),
             };
         }
 
@@ -40,8 +48,8 @@ exports.handler = async (event) => {
                 headers,
                 body: JSON.stringify({
                     error: 'User ID is required',
-                    details: 'Missing user ID in path parameters'
-                })
+                    details: 'Missing user ID in path parameters',
+                }),
             };
         }
 
@@ -56,8 +64,8 @@ exports.handler = async (event) => {
                 headers,
                 body: JSON.stringify({
                     error: 'Invalid JSON in request body',
-                    details: parseError.message
-                })
+                    details: parseError.message,
+                }),
             };
         }
 
@@ -71,8 +79,8 @@ exports.handler = async (event) => {
                 headers,
                 body: JSON.stringify({
                     error: 'No valid update fields provided',
-                    validFields: ['name', 'email', 'permissions', 'active']
-                })
+                    validFields: ['name', 'email', 'permissions', 'active'],
+                }),
             };
         }
 
@@ -85,8 +93,8 @@ exports.handler = async (event) => {
                     statusCode: 400,
                     headers,
                     body: JSON.stringify({
-                        error: 'Invalid email format'
-                    })
+                        error: 'Invalid email format',
+                    }),
                 };
             }
         }
@@ -128,15 +136,20 @@ exports.handler = async (event) => {
         const updateCommand = new UpdateCommand({
             TableName: ADMIN_USERS_TABLE,
             Key: {
-                pk: `ADMIN#${userId}`
+                pk: `ADMIN#${userId}`,
             },
             UpdateExpression: `SET ${updateExpressions.join(', ')}`,
             ExpressionAttributeNames: expressionAttributeNames,
             ExpressionAttributeValues: expressionAttributeValues,
-            ReturnValues: 'ALL_NEW'
+            ReturnValues: 'ALL_NEW',
         });
 
-        console.log('📝 Updating admin user:', userId, 'with data:', updateData);
+        console.log(
+            '📝 Updating admin user:',
+            userId,
+            'with data:',
+            updateData
+        );
 
         const result = await docClient.send(updateCommand);
         console.log('✅ Admin user updated successfully');
@@ -163,10 +176,9 @@ exports.handler = async (event) => {
             headers,
             body: JSON.stringify({
                 message: 'Admin user updated successfully',
-                user: updatedUser
-            })
+                user: updatedUser,
+            }),
         };
-
     } catch (error) {
         console.error('❌ Error updating admin user:', error);
 
@@ -175,8 +187,8 @@ exports.handler = async (event) => {
             headers,
             body: JSON.stringify({
                 error: 'Failed to update admin user',
-                details: error.message
-            })
+                details: error.message,
+            }),
         };
     }
 };

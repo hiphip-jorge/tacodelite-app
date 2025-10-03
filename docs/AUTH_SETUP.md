@@ -5,12 +5,14 @@ This guide covers setting up authentication for the Taco Delite admin panel.
 ## 🏗️ **Architecture Overview**
 
 ### **Components:**
+
 1. **Admin Users Table** - DynamoDB table for storing admin user accounts
 2. **Login Lambda** - Handles user authentication and JWT token generation
 3. **Verify Lambda** - Validates JWT tokens for protected routes
 4. **Admin App** - React frontend with authentication hooks
 
 ### **Authentication Flow:**
+
 1. User enters credentials on `/admin/login`
 2. Login Lambda validates credentials against DynamoDB
 3. If valid, returns JWT token with user info
@@ -73,11 +75,13 @@ npm run build
 After seeding, you'll have these accounts:
 
 **Production (secure):**
+
 - The script generates a secure random 16-character password
 - Credentials are displayed only once during seeding
 - Save them securely and share only with authorized personnel
 
 **Development (testing):**
+
 - **Admin:** `admin@tacodelite.com` / `password123`
 - Only use for development/testing environments
 
@@ -89,29 +93,32 @@ After seeding, you'll have these accounts:
 
 ```json
 {
-  "pk": "ADMIN#001",
-  "email": "admin@tacodelite.com",
-  "name": "Admin User",
-  "passwordHash": "$2a$12$...", // bcrypt hash
-  "role": "admin",
-  "active": true,
-  "createdAt": "2024-01-15T12:00:00Z",
-  "lastLogin": "2024-01-15T14:30:00Z"
+    "pk": "ADMIN#001",
+    "email": "admin@tacodelite.com",
+    "name": "Admin User",
+    "passwordHash": "$2a$12$...", // bcrypt hash
+    "role": "admin",
+    "active": true,
+    "createdAt": "2024-01-15T12:00:00Z",
+    "lastLogin": "2024-01-15T14:30:00Z"
 }
 ```
 
 ### **User Roles:**
+
 - **admin** - Full access to all features
 - **manager** - Limited access (can be customized)
 
 ## 🔧 **API Endpoints**
 
 ### **Login**
+
 - **URL:** `POST /admin/login`
 - **Body:** `{ "email": "...", "password": "..." }`
 - **Response:** `{ "success": true, "token": "...", "user": {...} }`
 
 ### **Verify Token**
+
 - **URL:** `GET /admin/verify`
 - **Headers:** `Authorization: Bearer <token>`
 - **Response:** `{ "success": true, "user": {...} }`
@@ -119,27 +126,32 @@ After seeding, you'll have these accounts:
 ## 🛡️ **Security Considerations**
 
 ### **1. JWT Secret**
+
 - Use a strong, random secret key
 - Store in environment variables
 - Rotate periodically
 
 ### **2. Password Security**
+
 - Passwords are hashed with bcrypt (12 rounds)
 - Enforce strong password policies
 - Implement password reset functionality
 
 ### **3. Token Management**
+
 - Tokens expire after 24 hours
 - Store tokens securely in localStorage
 - Implement token refresh mechanism
 
 ### **4. CORS Configuration**
+
 - Restrict origins to your domain
 - Configure proper headers
 
 ## 🔄 **Adding New Admin Users**
 
 ### **Via Script:**
+
 ```javascript
 // Add to seed-admin-users.js
 {
@@ -153,6 +165,7 @@ After seeding, you'll have these accounts:
 ```
 
 ### **Via AWS Console:**
+
 1. Navigate to DynamoDB console
 2. Find your admin users table
 3. Add new item with required fields
@@ -163,32 +176,34 @@ After seeding, you'll have these accounts:
 ### **Common Issues:**
 
 1. **"Invalid credentials"**
-   - Check if user exists in DynamoDB
-   - Verify password hash is correct
-   - Ensure user is active
+    - Check if user exists in DynamoDB
+    - Verify password hash is correct
+    - Ensure user is active
 
 2. **"Token verification failed"**
-   - Check JWT secret matches
-   - Verify token hasn't expired
-   - Ensure user still exists and is active
+    - Check JWT secret matches
+    - Verify token hasn't expired
+    - Ensure user still exists and is active
 
 3. **CORS errors**
-   - Check allowed origins configuration
-   - Verify API Gateway CORS settings
+    - Check allowed origins configuration
+    - Verify API Gateway CORS settings
 
 4. **Lambda function errors**
-   - Check CloudWatch logs
-   - Verify environment variables
-   - Ensure IAM permissions
+    - Check CloudWatch logs
+    - Verify environment variables
+    - Ensure IAM permissions
 
 ## 📝 **Environment Variables**
 
 ### **Required Variables:**
+
 - `JWT_SECRET` - Secret key for JWT signing
 - `ADMIN_USERS_TABLE` - DynamoDB table name
 - `ALLOWED_ORIGINS` - CORS origins
 
 ### **Example .env file:**
+
 ```env
 JWT_SECRET=your-super-secret-key-here
 ADMIN_USERS_TABLE=tacodelite-app-admin-users-staging

@@ -1,20 +1,27 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, DeleteCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    DeleteCommand,
+    GetCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const getCorsHeaders = (origin, additionalHeaders = {}) => {
     return {
         'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
-        ...additionalHeaders
+        ...additionalHeaders,
     };
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         console.log('Event received:', JSON.stringify(event, null, 2));
 
@@ -25,7 +32,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: getCorsHeaders(origin),
-                body: ''
+                body: '',
             };
         }
 
@@ -37,8 +44,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Announcement ID is required'
-                })
+                    error: 'Announcement ID is required',
+                }),
             };
         }
 
@@ -47,8 +54,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
                 pk: 'ANNOUNCEMENT',
-                sk: `ANNOUNCEMENT#${announcementId}`
-            }
+                sk: `ANNOUNCEMENT#${announcementId}`,
+            },
         };
 
         const getCommand = new GetCommand(getParams);
@@ -60,8 +67,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Announcement not found'
-                })
+                    error: 'Announcement not found',
+                }),
             };
         }
 
@@ -70,8 +77,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
                 pk: 'ANNOUNCEMENT',
-                sk: `ANNOUNCEMENT#${announcementId}`
-            }
+                sk: `ANNOUNCEMENT#${announcementId}`,
+            },
         };
 
         const deleteCommand = new DeleteCommand(deleteParams);
@@ -93,14 +100,13 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: getCorsHeaders(origin, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }),
             body: JSON.stringify({
                 success: true,
-                message: 'Announcement deleted successfully'
-            })
+                message: 'Announcement deleted successfully',
+            }),
         };
-
     } catch (error) {
         console.error('Delete announcement error:', error);
         const origin = event.headers?.origin || event.headers?.Origin || '*';
@@ -109,8 +115,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

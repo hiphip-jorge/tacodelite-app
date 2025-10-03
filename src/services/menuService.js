@@ -1,15 +1,18 @@
 // Menu service for fetching data from DynamoDB via Lambda APIs
 // TODO: Update API_BASE_URL with your actual API Gateway URL after deployment
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
 
 // Toggle this to true to use mock data instead of API calls
-const USE_MOCK_DATA = import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
+const USE_MOCK_DATA =
+    import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === 'true';
 
 // Cache duration (in milliseconds) - Optimized for menu that changes 3-5 times per year
 const CACHE_DURATION = {
-    VERSION: 24 * 60 * 60 * 1000,      // 24 hours (check version daily)
-    DATA: 30 * 24 * 60 * 60 * 1000    // 30 days (menu items/categories cached for a month)
+    VERSION: 24 * 60 * 60 * 1000, // 24 hours (check version daily)
+    DATA: 30 * 24 * 60 * 60 * 1000, // 30 days (menu items/categories cached for a month)
 };
 
 // Cache configuration
@@ -18,52 +21,254 @@ const CACHE_KEYS = {
     CATEGORIES: 'menu_categories',
     MENU_ITEMS: 'menu_items',
     CATEGORIES_ETAG: 'categories_etag',
-    MENU_ITEMS_ETAG: 'menu_items_etag'
+    MENU_ITEMS_ETAG: 'menu_items_etag',
 };
 
 // Mock data for development
 const mockCategories = [
-    { pk: 'CATEGORY#1', name: 'Breakfast', description: 'Start your day right' },
+    {
+        pk: 'CATEGORY#1',
+        name: 'Breakfast',
+        description: 'Start your day right',
+    },
     { pk: 'CATEGORY#2', name: 'Tacos', description: 'Authentic Mexican tacos' },
-    { pk: 'CATEGORY#3', name: 'Burritos', description: 'Hearty burrito options' },
+    {
+        pk: 'CATEGORY#3',
+        name: 'Burritos',
+        description: 'Hearty burrito options',
+    },
     { pk: 'CATEGORY#4', name: 'Nachos', description: 'Loaded nacho dishes' },
-    { pk: 'CATEGORY#5', name: 'Salads', description: 'Fresh and healthy options' },
-    { pk: 'CATEGORY#6', name: 'Quesadillas', description: 'Cheesy quesadilla delights' },
-    { pk: 'CATEGORY#7', name: 'Tostadas', description: 'Crispy tostada options' },
+    {
+        pk: 'CATEGORY#5',
+        name: 'Salads',
+        description: 'Fresh and healthy options',
+    },
+    {
+        pk: 'CATEGORY#6',
+        name: 'Quesadillas',
+        description: 'Cheesy quesadilla delights',
+    },
+    {
+        pk: 'CATEGORY#7',
+        name: 'Tostadas',
+        description: 'Crispy tostada options',
+    },
     { pk: 'CATEGORY#8', name: 'Sides', description: 'Perfect accompaniments' },
     { pk: 'CATEGORY#9', name: 'Extras', description: 'Additional menu items' },
     { pk: 'CATEGORY#10', name: 'Chips-n-Stuff', description: 'Chips and dips' },
-    { pk: 'CATEGORY#11', name: 'Dinners', description: 'Complete dinner plates' },
+    {
+        pk: 'CATEGORY#11',
+        name: 'Dinners',
+        description: 'Complete dinner plates',
+    },
     { pk: 'CATEGORY#12', name: 'Family', description: 'Family-sized portions' },
     { pk: 'CATEGORY#13', name: 'Desserts', description: 'Sweet endings' },
-    { pk: 'CATEGORY#14', name: 'Drinks', description: 'Refreshing beverages' }
+    { pk: 'CATEGORY#14', name: 'Drinks', description: 'Refreshing beverages' },
 ];
 
 const mockMenuItems = [
-    { pk: 'ITEM#1', categoryId: 1, name: 'breakfast taco', description: 'A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99', price: 3.50, vegetarian: false, active: true },
-    { pk: 'ITEM#2', categoryId: 1, name: 'breakfast burrito', description: 'A soft 10in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99', price: 5.50, vegetarian: false, active: true },
-    { pk: 'ITEM#3', categoryId: 1, name: 'breakfast bowl', description: 'A bowl of your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99', price: 5.50, vegetarian: false, active: true },
-    { pk: 'ITEM#4', categoryId: 1, name: 'side of bacon', description: 'A cup of fresh cooked bacon', price: 2.00, vegetarian: false, active: true },
-    { pk: 'ITEM#5', categoryId: 1, name: 'side of potato', description: 'A cup of fresh cut potatoes', price: 2.00, vegetarian: true, active: true },
-    { pk: 'ITEM#6', categoryId: 2, name: 'taco', description: 'A crispy shell, ground beef, lettuce, and shredded cheese', price: 2.39, vegetarian: false, active: true },
-    { pk: 'ITEM#7', categoryId: 2, name: 'supreme taco', description: 'A crispy shell, ground beef, lettuce, tomatoes, sour cream, and shredded cheese', price: 2.99, vegetarian: false, active: true },
-    { pk: 'ITEM#8', categoryId: 2, name: 'soft taco', description: 'A soft tortilla, ground beef, lettuce, and shredded cheese', price: 2.79, vegetarian: false, active: true },
-    { pk: 'ITEM#9', categoryId: 2, name: 'soft taco supreme', description: 'A soft tortilla, ground beef, lettuce, tomatoes, sour cream, and shredded cheese', price: 2.99, vegetarian: false, active: true },
-    { pk: 'ITEM#10', categoryId: 2, name: 'fajita soft taco', description: 'Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese', price: 3.99, vegetarian: false, active: true },
-    { pk: 'ITEM#11', categoryId: 2, name: 'taco delite', description: 'A crispy shell wrapped in a flour tortilla with beans, ground beef, lettuce, and shredded cheese', price: 3.29, vegetarian: false, active: true },
-    { pk: 'ITEM#12', categoryId: 2, name: 'taco delite supreme', description: 'A crispy shell wrapped in a flour tortilla with beans, ground beef, lettuce, tomatoes, sour cream, and shredded cheese', price: 3.99, vegetarian: false, active: true },
-    { pk: 'ITEM#13', categoryId: 2, name: 'taco delite w/ queso', description: 'A crispy shell wrapped in a flour tortilla with beans and queso, ground beef, lettuce, and shredded cheese', price: 3.99, vegetarian: false, active: true },
-    { pk: 'ITEM#14', categoryId: 2, name: 'taco delite w/ guac', description: 'A crispy shell wrapped in a flour tortilla with beans and guac made from scratch, ground beef, lettuce, and shredded cheese', price: 3.99, vegetarian: false, active: true },
-    { pk: 'ITEM#15', categoryId: 3, name: 'bean burrito', description: 'A 10in flour tortilla, homemade beans, our special burrito sauce, and shredded cheese', price: 3.09, vegetarian: true, active: true },
-    { pk: 'ITEM#16', categoryId: 3, name: 'meat burrito', description: 'A 10in flour tortilla, ground beef, our special burrito sauce, and shredded cheese', price: 5.99, vegetarian: false, active: true },
-    { pk: 'ITEM#17', categoryId: 3, name: 'combo burrito', description: 'A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, and shredded cheese', price: 6.75, vegetarian: false, active: true },
-    { pk: 'ITEM#18', categoryId: 3, name: 'super burrito', description: 'A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, lettuce, tomatoes, sour cream, and shredded cheese', price: 7.99, vegetarian: false, active: true },
-    { pk: 'ITEM#19', categoryId: 3, name: 'fajita burrito', description: 'A 10in flour tortilla, Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese', price: 7.99, vegetarian: false, active: true },
-    { pk: 'ITEM#20', categoryId: 3, name: 'melt burrito', description: 'A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, smothered in queso, and topped with lettuce, tomatoes, sour cream', price: 9.99, vegetarian: false, active: true }
+    {
+        pk: 'ITEM#1',
+        categoryId: 1,
+        name: 'breakfast taco',
+        description:
+            'A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99',
+        price: 3.5,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#2',
+        categoryId: 1,
+        name: 'breakfast burrito',
+        description:
+            'A soft 10in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99',
+        price: 5.5,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#3',
+        categoryId: 1,
+        name: 'breakfast bowl',
+        description:
+            'A bowl of your choice of filling (egg and sausage or chorizo), and shredded cheese | add fresh cut potatoes or bacon for $0.50 or both for $0.99',
+        price: 5.5,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#4',
+        categoryId: 1,
+        name: 'side of bacon',
+        description: 'A cup of fresh cooked bacon',
+        price: 2.0,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#5',
+        categoryId: 1,
+        name: 'side of potato',
+        description: 'A cup of fresh cut potatoes',
+        price: 2.0,
+        vegetarian: true,
+        active: true,
+    },
+    {
+        pk: 'ITEM#6',
+        categoryId: 2,
+        name: 'taco',
+        description:
+            'A crispy shell, ground beef, lettuce, and shredded cheese',
+        price: 2.39,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#7',
+        categoryId: 2,
+        name: 'supreme taco',
+        description:
+            'A crispy shell, ground beef, lettuce, tomatoes, sour cream, and shredded cheese',
+        price: 2.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#8',
+        categoryId: 2,
+        name: 'soft taco',
+        description:
+            'A soft tortilla, ground beef, lettuce, and shredded cheese',
+        price: 2.79,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#9',
+        categoryId: 2,
+        name: 'soft taco supreme',
+        description:
+            'A soft tortilla, ground beef, lettuce, tomatoes, sour cream, and shredded cheese',
+        price: 2.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#10',
+        categoryId: 2,
+        name: 'fajita soft taco',
+        description:
+            'Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese',
+        price: 3.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#11',
+        categoryId: 2,
+        name: 'taco delite',
+        description:
+            'A crispy shell wrapped in a flour tortilla with beans, ground beef, lettuce, and shredded cheese',
+        price: 3.29,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#12',
+        categoryId: 2,
+        name: 'taco delite supreme',
+        description:
+            'A crispy shell wrapped in a flour tortilla with beans, ground beef, lettuce, tomatoes, sour cream, and shredded cheese',
+        price: 3.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#13',
+        categoryId: 2,
+        name: 'taco delite w/ queso',
+        description:
+            'A crispy shell wrapped in a flour tortilla with beans and queso, ground beef, lettuce, and shredded cheese',
+        price: 3.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#14',
+        categoryId: 2,
+        name: 'taco delite w/ guac',
+        description:
+            'A crispy shell wrapped in a flour tortilla with beans and guac made from scratch, ground beef, lettuce, and shredded cheese',
+        price: 3.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#15',
+        categoryId: 3,
+        name: 'bean burrito',
+        description:
+            'A 10in flour tortilla, homemade beans, our special burrito sauce, and shredded cheese',
+        price: 3.09,
+        vegetarian: true,
+        active: true,
+    },
+    {
+        pk: 'ITEM#16',
+        categoryId: 3,
+        name: 'meat burrito',
+        description:
+            'A 10in flour tortilla, ground beef, our special burrito sauce, and shredded cheese',
+        price: 5.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#17',
+        categoryId: 3,
+        name: 'combo burrito',
+        description:
+            'A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, and shredded cheese',
+        price: 6.75,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#18',
+        categoryId: 3,
+        name: 'super burrito',
+        description:
+            'A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, lettuce, tomatoes, sour cream, and shredded cheese',
+        price: 7.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#19',
+        categoryId: 3,
+        name: 'fajita burrito',
+        description:
+            'A 10in flour tortilla, Marinated fajitas (chicken or steak), sauteed bell peppers and onions, and shredded cheese',
+        price: 7.99,
+        vegetarian: false,
+        active: true,
+    },
+    {
+        pk: 'ITEM#20',
+        categoryId: 3,
+        name: 'melt burrito',
+        description:
+            'A 10in flour tortilla, homemade beans, ground beef, our special burrito sauce, smothered in queso, and topped with lettuce, tomatoes, sour cream',
+        price: 9.99,
+        vegetarian: false,
+        active: true,
+    },
 ];
 
 // Helper function to simulate API delay
-const simulateDelay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const simulateDelay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Cache utility functions
 const cacheUtils = {
@@ -94,7 +299,7 @@ const cacheUtils = {
         try {
             const cacheData = {
                 data,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
             localStorage.setItem(key, JSON.stringify(cacheData));
         } catch (error) {
@@ -130,7 +335,7 @@ const cacheUtils = {
             const cacheData = {
                 data,
                 etag,
-                timestamp: Date.now()
+                timestamp: Date.now(),
             };
             localStorage.setItem(key, JSON.stringify(cacheData));
         } catch (error) {
@@ -150,7 +355,7 @@ const cacheUtils = {
     // Clear all menu-related cache
     clearAll() {
         Object.values(CACHE_KEYS).forEach(key => this.clear(key));
-    }
+    },
 };
 
 // Helper function to make API calls with ETag support
@@ -158,7 +363,7 @@ const apiCall = async (endpoint, options = {}) => {
     try {
         const headers = {
             'Content-Type': 'application/json',
-            ...options.headers
+            ...options.headers,
         };
 
         // Add If-None-Match header if ETag is provided
@@ -168,7 +373,7 @@ const apiCall = async (endpoint, options = {}) => {
 
         const response = await fetch(`${API_BASE_URL}${endpoint}`, {
             headers,
-            ...options
+            ...options,
         });
 
         // Handle 304 Not Modified response
@@ -177,12 +382,14 @@ const apiCall = async (endpoint, options = {}) => {
                 data: null, // No data needed, use cached version
                 etag: response.headers.get('ETag'),
                 version: response.headers.get('X-Menu-Version'),
-                cached: true
+                cached: true,
             };
         }
 
         if (!response.ok) {
-            throw new Error(`API call failed: ${response.status} ${response.statusText}`);
+            throw new Error(
+                `API call failed: ${response.status} ${response.statusText}`
+            );
         }
 
         const data = await response.json();
@@ -190,7 +397,7 @@ const apiCall = async (endpoint, options = {}) => {
             data,
             etag: response.headers.get('ETag'),
             version: response.headers.get('X-Menu-Version'),
-            cached: false
+            cached: false,
         };
     } catch (error) {
         console.error('API call error:', error);
@@ -214,12 +421,16 @@ async function isCacheValid() {
     try {
         // Check if we have a cached version
         const cachedVersion = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
-        const versionTimestamp = cacheUtils.get(`${CACHE_KEYS.MENU_VERSION}_timestamp`);
+        const versionTimestamp = cacheUtils.get(
+            `${CACHE_KEYS.MENU_VERSION}_timestamp`
+        );
 
         // If no cached version, we need to check the current version
         // to ensure we don't use stale data after a menu update
         if (!cachedVersion) {
-            console.log('🔄 No cached version - checking current menu version...');
+            console.log(
+                '🔄 No cached version - checking current menu version...'
+            );
             const currentVersion = await getMenuVersion();
             // Cache the current version for future checks
             cacheUtils.set(CACHE_KEYS.MENU_VERSION, currentVersion);
@@ -234,21 +445,37 @@ async function isCacheValid() {
         const VERSION_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
         if (versionCacheAge < VERSION_CACHE_DURATION) {
-            console.log('✅ Version cache is fresh - using cached data (version:', cachedVersion, ')');
+            console.log(
+                '✅ Version cache is fresh - using cached data (version:',
+                cachedVersion,
+                ')'
+            );
             return true;
         }
 
         // Version cache is stale, check current version
-        console.log('🔄 Version cache is stale, checking current menu version...');
+        console.log(
+            '🔄 Version cache is stale, checking current menu version...'
+        );
         const currentVersion = await getMenuVersion();
 
         if (currentVersion !== cachedVersion) {
-            console.log('🔄 Menu version changed from', cachedVersion, 'to', currentVersion, '- invalidating cache');
+            console.log(
+                '🔄 Menu version changed from',
+                cachedVersion,
+                'to',
+                currentVersion,
+                '- invalidating cache'
+            );
             return false; // Version changed, need fresh data
         }
 
         // Version is same, update timestamp and cache is valid
-        console.log('✅ Version unchanged - updating timestamp and using cached data (version:', cachedVersion, ')');
+        console.log(
+            '✅ Version unchanged - updating timestamp and using cached data (version:',
+            cachedVersion,
+            ')'
+        );
         cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, now);
         return true;
     } catch (error) {
@@ -289,13 +516,15 @@ export async function getCategories() {
 
         console.log('🌐 Fetching fresh categories data');
         const response = await apiCall('/categories', {
-            etag: existingCache.etag || undefined
+            etag: existingCache.etag || undefined,
         });
 
         let categories;
         if (response.cached) {
             // Server returned 304, use cached data
-            console.log('📦 Server confirmed cache is valid - using cached categories');
+            console.log(
+                '📦 Server confirmed cache is valid - using cached categories'
+            );
             categories = existingCache.data;
         } else {
             // Server returned new data
@@ -303,7 +532,11 @@ export async function getCategories() {
             categories = response.data || [];
 
             // Cache the new data with ETag
-            cacheUtils.setWithETag(CACHE_KEYS.CATEGORIES, categories, response.etag);
+            cacheUtils.setWithETag(
+                CACHE_KEYS.CATEGORIES,
+                categories,
+                response.etag
+            );
 
             // Update the cached menu version
             const currentVersion = await getMenuVersion();
@@ -370,13 +603,15 @@ export async function getMenuItems() {
 
         console.log('🌐 Fetching fresh menu items data');
         const response = await apiCall('/menu-items', {
-            etag: existingCache.etag || undefined
+            etag: existingCache.etag || undefined,
         });
 
         let menuItems;
         if (response.cached) {
             // Server returned 304, use cached data
-            console.log('📦 Server confirmed cache is valid - using cached menu items');
+            console.log(
+                '📦 Server confirmed cache is valid - using cached menu items'
+            );
             menuItems = existingCache.data;
         } else {
             // Server returned new data
@@ -384,7 +619,11 @@ export async function getMenuItems() {
             menuItems = response.data || [];
 
             // Cache the new data with ETag
-            cacheUtils.setWithETag(CACHE_KEYS.MENU_ITEMS, menuItems, response.etag);
+            cacheUtils.setWithETag(
+                CACHE_KEYS.MENU_ITEMS,
+                menuItems,
+                response.etag
+            );
 
             // Update the cached menu version
             const currentVersion = await getMenuVersion();
@@ -419,7 +658,9 @@ export async function getMenuItemsByCategory(categoryId) {
             return mockMenuItems;
         }
 
-        const filteredItems = mockMenuItems.filter(item => item.categoryId === categoryId);
+        const filteredItems = mockMenuItems.filter(
+            item => item.categoryId === categoryId
+        );
         return filteredItems;
     }
 
@@ -432,16 +673,22 @@ export async function getMenuItemsByCategory(categoryId) {
         // Get all menu items from cache and filter by category
         const allMenuItems = await getMenuItems();
         const categoryIdNumber = parseInt(categoryId);
-        const filteredItems = allMenuItems.filter(item => item.categoryId === categoryIdNumber);
+        const filteredItems = allMenuItems.filter(
+            item => item.categoryId === categoryIdNumber
+        );
 
-        console.log(`📦 Filtered ${filteredItems.length} items for category ${categoryId} from cached data`);
+        console.log(
+            `📦 Filtered ${filteredItems.length} items for category ${categoryId} from cached data`
+        );
         return filteredItems;
     } catch (error) {
         console.error('Failed to fetch menu items by category:', error);
         // Fallback to API call if cache fails
         console.log('🔄 Falling back to API call for menu items by category');
         try {
-            const response = await apiCall(`/menu-items-by-category?categoryId=${categoryId}`);
+            const response = await apiCall(
+                `/menu-items-by-category?categoryId=${categoryId}`
+            );
             // Handle both response formats:
             // 1. Old format: {success: true, data: [...], ...}
             // 2. New format: [...] (direct array)
@@ -475,9 +722,10 @@ export async function searchMenuItems(query) {
         console.log('🔶 Using mock search data');
         await simulateDelay(400); // Simulate network delay
 
-        const searchResults = mockMenuItems.filter(item =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
+        const searchResults = mockMenuItems.filter(
+            item =>
+                item.name.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase())
         );
         return searchResults;
     }
@@ -487,20 +735,24 @@ export async function searchMenuItems(query) {
         // This is more efficient than making a separate API call
         const allMenuItems = await getMenuItems();
 
-        const searchResults = allMenuItems.filter(item =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
+        const searchResults = allMenuItems.filter(
+            item =>
+                item.name.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase())
         );
 
-        console.log(`🔍 Found ${searchResults.length} items matching "${query}"`);
+        console.log(
+            `🔍 Found ${searchResults.length} items matching "${query}"`
+        );
         return searchResults;
     } catch (error) {
         console.error('Failed to search menu items:', error);
         // Fallback to mock data if API fails
         console.log('🔶 Falling back to mock search data');
-        const searchResults = mockMenuItems.filter(item =>
-            item.name.toLowerCase().includes(query.toLowerCase()) ||
-            item.description.toLowerCase().includes(query.toLowerCase())
+        const searchResults = mockMenuItems.filter(
+            item =>
+                item.name.toLowerCase().includes(query.toLowerCase()) ||
+                item.description.toLowerCase().includes(query.toLowerCase())
         );
         return searchResults;
     }
@@ -535,9 +787,13 @@ export const cacheManager = {
         const versionCache = cacheUtils.get(CACHE_KEYS.MENU_VERSION);
 
         return {
-            categories: categoriesCache.data ? `Cached (${categoriesCache.data.length} items, ETag: ${categoriesCache.etag?.substring(0, 8)}...)` : 'Not cached',
-            menuItems: menuItemsCache.data ? `Cached (${menuItemsCache.data.length} items, ETag: ${menuItemsCache.etag?.substring(0, 8)}...)` : 'Not cached',
-            version: versionCache ? `Version ${versionCache}` : 'Not cached'
+            categories: categoriesCache.data
+                ? `Cached (${categoriesCache.data.length} items, ETag: ${categoriesCache.etag?.substring(0, 8)}...)`
+                : 'Not cached',
+            menuItems: menuItemsCache.data
+                ? `Cached (${menuItemsCache.data.length} items, ETag: ${menuItemsCache.etag?.substring(0, 8)}...)`
+                : 'Not cached',
+            version: versionCache ? `Version ${versionCache}` : 'Not cached',
         };
     },
 
@@ -551,5 +807,5 @@ export const cacheManager = {
     forceRefresh: async () => {
         cacheUtils.clearAll();
         console.log('🔄 Cache cleared - will fetch fresh data on next request');
-    }
+    },
 };

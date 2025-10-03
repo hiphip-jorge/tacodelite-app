@@ -5,7 +5,9 @@
  * This script demonstrates the menu version-based caching system
  */
 
-const API_BASE_URL = process.env.API_BASE_URL || 'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL =
+    process.env.API_BASE_URL ||
+    'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
 
 async function testCaching() {
     console.log('🧪 Testing Menu Caching Solution');
@@ -34,18 +36,22 @@ async function testCaching() {
         console.log('3️⃣ Testing conditional request (should return 304)...');
         const categoriesResponse2 = await fetch(`${API_BASE_URL}/categories`, {
             headers: {
-                'If-None-Match': etag1
-            }
+                'If-None-Match': etag1,
+            },
         });
 
         console.log(`   📊 Status: ${categoriesResponse2.status}`);
         if (categoriesResponse2.status === 304) {
             console.log('   ✅ Cache hit! Server returned 304 Not Modified');
         } else {
-            console.log('   ⚠️ Unexpected response - cache might not be working');
+            console.log(
+                '   ⚠️ Unexpected response - cache might not be working'
+            );
         }
         console.log(`   🏷️ ETag: ${categoriesResponse2.headers.get('ETag')}`);
-        console.log(`   🔢 Version: ${categoriesResponse2.headers.get('X-Menu-Version')}\n`);
+        console.log(
+            `   🔢 Version: ${categoriesResponse2.headers.get('X-Menu-Version')}\n`
+        );
 
         // Test 4: Get menu items with ETag support
         console.log('4️⃣ Testing menu items endpoint with ETag...');
@@ -62,30 +68,35 @@ async function testCaching() {
         console.log('5️⃣ Testing conditional request for menu items...');
         const itemsResponse2 = await fetch(`${API_BASE_URL}/menu-items`, {
             headers: {
-                'If-None-Match': itemsEtag1
-            }
+                'If-None-Match': itemsEtag1,
+            },
         });
 
         console.log(`   📊 Status: ${itemsResponse2.status}`);
         if (itemsResponse2.status === 304) {
             console.log('   ✅ Cache hit! Server returned 304 Not Modified');
         } else {
-            console.log('   ⚠️ Unexpected response - cache might not be working');
+            console.log(
+                '   ⚠️ Unexpected response - cache might not be working'
+            );
         }
         console.log(`   🏷️ ETag: ${itemsResponse2.headers.get('ETag')}`);
-        console.log(`   🔢 Version: ${itemsResponse2.headers.get('X-Menu-Version')}\n`);
+        console.log(
+            `   🔢 Version: ${itemsResponse2.headers.get('X-Menu-Version')}\n`
+        );
 
         console.log('🎉 Caching test completed successfully!');
         console.log('\n📋 Summary:');
         console.log('   • Menu version system is working');
         console.log('   • ETags are being generated and returned');
-        console.log('   • Conditional requests return 304 when data is unchanged');
+        console.log(
+            '   • Conditional requests return 304 when data is unchanged'
+        );
         console.log('   • Cache-Control headers are set appropriately');
         console.log('\n💡 Next steps:');
         console.log('   • Deploy the updated Lambda functions');
         console.log('   • Test the frontend caching in the browser');
         console.log('   • Monitor cache hit rates and performance');
-
     } catch (error) {
         console.error('❌ Test failed:', error.message);
         console.error('\n🔧 Troubleshooting:');

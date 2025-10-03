@@ -4,37 +4,43 @@ const { DynamoDBDocumentClient, GetCommand } = require('@aws-sdk/lib-dynamodb');
 
 const client = new DynamoDBClient({});
 const dynamodb = DynamoDBDocumentClient.from(client);
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const JWT_SECRET =
+    process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
 // Helper function to get CORS headers
-const getCorsHeaders = (origin) => {
-    const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['*'];
+const getCorsHeaders = origin => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',')
+        : ['*'];
 
     // If origin is in allowed list, return it; otherwise return first allowed origin
     if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
         return {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+            'Access-Control-Allow-Headers':
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         };
     } else {
         return {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': allowedOrigins[0],
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+            'Access-Control-Allow-Headers':
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         };
     }
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         // Get the origin from the request headers
         const origin = event.headers?.origin || event.headers?.Origin || '*';
 
         // Get token from Authorization header
-        const authHeader = event.headers.Authorization || event.headers.authorization;
+        const authHeader =
+            event.headers.Authorization || event.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return {
@@ -42,8 +48,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'No valid authorization token provided'
-                })
+                    error: 'No valid authorization token provided',
+                }),
             };
         }
 
@@ -59,8 +65,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Invalid or expired token'
-                })
+                    error: 'Invalid or expired token',
+                }),
             };
         }
 
@@ -68,8 +74,8 @@ exports.handler = async (event) => {
         const params = {
             TableName: process.env.ADMIN_USERS_TABLE,
             Key: {
-                pk: decoded.userId
-            }
+                pk: decoded.userId,
+            },
         };
 
         const result = await dynamodb.send(new GetCommand(params));
@@ -80,8 +86,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'User not found'
-                })
+                    error: 'User not found',
+                }),
             };
         }
 
@@ -94,8 +100,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Account is deactivated'
-                })
+                    error: 'Account is deactivated',
+                }),
             };
         }
 
@@ -110,11 +116,10 @@ exports.handler = async (event) => {
                     name: user.name,
                     role: user.role,
                     permissions: user.permissions || [],
-                    lastLogin: user.lastLogin
-                }
-            })
+                    lastLogin: user.lastLogin,
+                },
+            }),
         };
-
     } catch (error) {
         console.error('Token verification error:', error);
         return {
@@ -122,8 +127,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

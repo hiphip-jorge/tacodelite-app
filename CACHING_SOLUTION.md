@@ -9,21 +9,24 @@ This document describes the implementation of a comprehensive caching solution f
 ### Backend (Lambda Functions)
 
 #### 1. Menu Version Management
+
 - **Location**: `lambda/shared/menuVersionUtils.js`
 - **Purpose**: Centralized utility for incrementing menu version
 - **Usage**: Called by all Lambda functions that modify menu data
 
 #### 2. Modified Lambda Functions
+
 The following Lambda functions now increment the menu version when menu data changes:
 
 - `createCategory` - Increments version when new category is created
-- `updateCategory` - Increments version when category is updated  
+- `updateCategory` - Increments version when category is updated
 - `deleteCategory` - Increments version when category is deleted
 - `createMenuItem` - Increments version when new menu item is created
 - `updateMenuItem` - Increments version when menu item is updated
 - `deleteMenuItem` - Increments version when menu item is deleted
 
 #### 3. Enhanced GET Endpoints
+
 Both `getMenuItems` and `getCategories` Lambda functions now support:
 
 - **ETag Generation**: Creates MD5 hash of menu version + data
@@ -35,11 +38,13 @@ Both `getMenuItems` and `getCategories` Lambda functions now support:
 ### Frontend (React Service)
 
 #### 1. Enhanced Cache Utilities
+
 - **ETag Support**: Stores and retrieves data with ETags
 - **Version Checking**: Validates cache against current menu version
 - **Fallback Strategy**: Uses expired cache if API fails
 
 #### 2. Smart Caching Logic
+
 - **Cache Validation**: Checks menu version before using cached data
 - **Conditional Requests**: Sends `If-None-Match` header with cached ETag
 - **Efficient Search**: Uses cached menu items for local filtering
@@ -48,6 +53,7 @@ Both `getMenuItems` and `getCategories` Lambda functions now support:
 ## How It Works
 
 ### 1. Initial Request
+
 ```
 Client → GET /menu-items
 Server → 200 OK + ETag + X-Menu-Version + Cache-Control
@@ -55,6 +61,7 @@ Client → Stores data + ETag + version in localStorage
 ```
 
 ### 2. Subsequent Requests
+
 ```
 Client → GET /menu-items + If-None-Match: "abc123"
 Server → Checks if data changed
@@ -63,6 +70,7 @@ Client → Uses cached data (304) OR updates cache (200)
 ```
 
 ### 3. Menu Data Changes
+
 ```
 Admin → POST /menu-items (create new item)
 Server → Creates item + increments menu version
@@ -73,18 +81,21 @@ Client → Cache becomes invalid (version mismatch)
 ## Benefits
 
 ### Performance Improvements
+
 - **Reduced API Calls**: 304 responses save bandwidth and processing
 - **Faster Load Times**: Cached data loads instantly
 - **Lower Server Load**: Fewer database queries
 - **Better UX**: Instant responses for repeated requests
 
 ### Cache Efficiency
+
 - **Version-Based Invalidation**: Only refreshes when menu actually changes
 - **ETag Validation**: Ensures data consistency
 - **Graceful Degradation**: Falls back to expired cache if API fails
 - **Smart Search**: Local filtering instead of server requests
 
 ### Developer Experience
+
 - **Debugging Tools**: `cacheManager.getCacheInfo()` shows cache status
 - **Manual Control**: `cacheManager.forceRefresh()` for testing
 - **Clear Logging**: Console messages show cache hits/misses
@@ -93,33 +104,37 @@ Client → Cache becomes invalid (version mismatch)
 ## Configuration
 
 ### Cache Duration
+
 ```javascript
 const CACHE_DURATION = {
-    VERSION: 24 * 60 * 60 * 1000,      // 24 hours
-    DATA: 30 * 24 * 60 * 60 * 1000    // 30 days
+    VERSION: 24 * 60 * 60 * 1000, // 24 hours
+    DATA: 30 * 24 * 60 * 60 * 1000, // 30 days
 };
 ```
 
 ### Cache Keys
+
 ```javascript
 const CACHE_KEYS = {
     MENU_VERSION: 'menu_version',
     CATEGORIES: 'menu_categories',
     MENU_ITEMS: 'menu_items',
     CATEGORIES_ETAG: 'categories_etag',
-    MENU_ITEMS_ETAG: 'menu_items_etag'
+    MENU_ITEMS_ETAG: 'menu_items_etag',
 };
 ```
 
 ## Testing
 
 ### Manual Testing
+
 1. Run the test script: `node test-caching.js`
 2. Check browser console for cache hit/miss messages
 3. Use `cacheManager.getCacheInfo()` to inspect cache state
 4. Test with network throttling to see performance difference
 
 ### Expected Behavior
+
 - **First Load**: Fresh API call, data cached
 - **Subsequent Loads**: 304 responses, cached data used
 - **After Menu Changes**: Cache invalidated, fresh data fetched
@@ -128,6 +143,7 @@ const CACHE_KEYS = {
 ## Deployment
 
 ### Backend
+
 - [ ] Run `./scripts/build-lambda.sh` to create zip files with checksums
 - [ ] Deploy with `terraform apply` (Terraform automatically detects checksum files)
 - [ ] Verify `MENU_VERSION` record exists in DynamoDB
@@ -135,6 +151,7 @@ const CACHE_KEYS = {
 - [ ] Confirm version incrementing works
 
 ### Frontend
+
 - [ ] Deploy updated service code
 - [ ] Clear existing localStorage cache
 - [ ] Test cache behavior in browser
@@ -143,12 +160,14 @@ const CACHE_KEYS = {
 ## Monitoring
 
 ### Key Metrics
+
 - **Cache Hit Rate**: Percentage of 304 responses
 - **API Call Reduction**: Fewer requests to menu endpoints
 - **Load Time Improvement**: Faster page loads
 - **Error Rate**: Fallback effectiveness
 
 ### Debugging
+
 ```javascript
 // Check cache status
 console.log(cacheManager.getCacheInfo());
@@ -163,6 +182,7 @@ cacheManager.clearCategories();
 ## Future Enhancements
 
 ### Potential Improvements
+
 - **Service Worker**: Offline caching with background sync
 - **Compression**: Gzip/Brotli compression for cached data
 - **CDN Integration**: Edge caching for global performance
@@ -170,6 +190,7 @@ cacheManager.clearCategories();
 - **A/B Testing**: Different cache strategies
 
 ### Scalability Considerations
+
 - **Cache Size Limits**: Monitor localStorage usage
 - **Memory Management**: Cleanup old cache entries
 - **Version Conflicts**: Handle concurrent updates

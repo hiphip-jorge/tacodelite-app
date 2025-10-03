@@ -1,56 +1,78 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand, ScanCommand, DeleteCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    UpdateCommand,
+    ScanCommand,
+    DeleteCommand,
+    PutCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 // CORS headers helper function
 const getCorsHeaders = (origin, additionalHeaders = {}) => {
     const allowedOrigins = (process.env.ALLOWED_ORIGINS || '').split(',');
-    const allowedOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0] || '*';
+    const allowedOrigin = allowedOrigins.includes(origin)
+        ? origin
+        : allowedOrigins[0] || '*';
 
     return {
         'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'PUT,OPTIONS',
-        ...additionalHeaders
+        ...additionalHeaders,
     };
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         // Get the item ID from path parameters
         const itemId = event.pathParameters?.id;
         const body = JSON.parse(event.body);
 
         if (!itemId) {
-            const origin = event.headers?.origin || event.headers?.Origin || '*';
+            const origin =
+                event.headers?.origin || event.headers?.Origin || '*';
             return {
                 statusCode: 400,
                 headers: getCorsHeaders(origin, {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 }),
-                body: JSON.stringify({ error: 'Item ID is required' })
+                body: JSON.stringify({ error: 'Item ID is required' }),
             };
         }
 
         // Validate required fields
-        const requiredFields = ['name', 'price', 'active', 'vegetarian', 'description', 'categoryId'];
-        const missingFields = requiredFields.filter(field => body[field] === undefined);
+        const requiredFields = [
+            'name',
+            'price',
+            'active',
+            'vegetarian',
+            'description',
+            'categoryId',
+        ];
+        const missingFields = requiredFields.filter(
+            field => body[field] === undefined
+        );
 
         if (missingFields.length > 0) {
-            const origin = event.headers?.origin || event.headers?.Origin || '*';
+            const origin =
+                event.headers?.origin || event.headers?.Origin || '*';
             return {
                 statusCode: 400,
                 headers: getCorsHeaders(origin, {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 }),
                 body: JSON.stringify({
                     error: 'Missing required fields',
-                    missingFields
-                })
+                    missingFields,
+                }),
             };
         }
 
@@ -61,24 +83,25 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             FilterExpression: '#id = :id',
             ExpressionAttributeNames: {
-                '#id': 'id'
+                '#id': 'id',
             },
             ExpressionAttributeValues: {
-                ':id': parseInt(itemIdNumber)
-            }
+                ':id': parseInt(itemIdNumber),
+            },
         };
 
         const scanCommand = new ScanCommand(scanParams);
         const scanResult = await docClient.send(scanCommand);
 
         if (!scanResult.Items || scanResult.Items.length === 0) {
-            const origin = event.headers?.origin || event.headers?.Origin || '*';
+            const origin =
+                event.headers?.origin || event.headers?.Origin || '*';
             return {
                 statusCode: 404,
                 headers: getCorsHeaders(origin, {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
                 }),
-                body: JSON.stringify({ error: 'Menu item not found' })
+                body: JSON.stringify({ error: 'Menu item not found' }),
             };
         }
 
@@ -93,8 +116,8 @@ exports.handler = async (event) => {
                 TableName: process.env.DYNAMODB_TABLE,
                 Key: {
                     pk: existingItem.pk,
-                    sk: existingItem.sk
-                }
+                    sk: existingItem.sk,
+                },
             };
             await docClient.send(new DeleteCommand(deleteParams));
 
@@ -111,8 +134,8 @@ exports.handler = async (event) => {
                     vegetarian: body.vegetarian,
                     description: body.description,
                     categoryId: newCategoryId,
-                    modifierGroups: body.modifierGroups || []
-                }
+                    modifierGroups: body.modifierGroups || [],
+                },
             };
             const putCommand = new PutCommand(putParams);
             await docClient.send(putCommand);
@@ -122,9 +145,10 @@ exports.handler = async (event) => {
                 TableName: process.env.DYNAMODB_TABLE,
                 Key: {
                     pk: existingItem.pk,
-                    sk: existingItem.sk
+                    sk: existingItem.sk,
                 },
-                UpdateExpression: 'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id, #modifierGroups = :modifierGroups',
+                UpdateExpression:
+                    'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id, #modifierGroups = :modifierGroups',
                 ExpressionAttributeNames: {
                     '#name': 'name',
                     '#price': 'price',
@@ -133,7 +157,7 @@ exports.handler = async (event) => {
                     '#description': 'description',
                     '#categoryId': 'categoryId',
                     '#id': 'id',
-                    '#modifierGroups': 'modifierGroups'
+                    '#modifierGroups': 'modifierGroups',
                 },
                 ExpressionAttributeValues: {
                     ':name': body.name,
@@ -143,9 +167,9 @@ exports.handler = async (event) => {
                     ':description': body.description,
                     ':categoryId': body.categoryId,
                     ':id': parseInt(itemIdNumber),
-                    ':modifierGroups': body.modifierGroups || []
+                    ':modifierGroups': body.modifierGroups || [],
                 },
-                ReturnValues: 'ALL_NEW'
+                ReturnValues: 'ALL_NEW',
             };
 
             const updateCommand = new UpdateCommand(updateParams);
@@ -170,12 +194,12 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: getCorsHeaders(origin, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }),
             body: JSON.stringify({
                 message: 'Menu item updated successfully',
-                version: versionInfo?.version || 'unknown'
-            })
+                version: versionInfo?.version || 'unknown',
+            }),
         };
     } catch (error) {
         console.error('Error updating menu item:', error);
@@ -183,12 +207,12 @@ exports.handler = async (event) => {
         return {
             statusCode: 500,
             headers: getCorsHeaders(origin, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }),
             body: JSON.stringify({
                 error: 'Failed to update menu item',
-                message: error.message
-            })
+                message: error.message,
+            }),
         };
     }
 };

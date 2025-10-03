@@ -1,7 +1,12 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    UpdateCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 /**
@@ -14,24 +19,28 @@ async function incrementMenuVersion() {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
                 pk: 'MENU_VERSION',
-                sk: 'MENU_VERSION'
+                sk: 'MENU_VERSION',
             },
-            UpdateExpression: 'SET #version = if_not_exists(#version, :initialVersion) + :increment, #timestamp = :timestamp',
+            UpdateExpression:
+                'SET #version = if_not_exists(#version, :initialVersion) + :increment, #timestamp = :timestamp',
             ExpressionAttributeNames: {
                 '#version': 'version',
-                '#timestamp': 'timestamp'
+                '#timestamp': 'timestamp',
             },
             ExpressionAttributeValues: {
                 ':initialVersion': 0,
                 ':increment': 1,
-                ':timestamp': new Date().toISOString()
+                ':timestamp': new Date().toISOString(),
             },
-            ReturnValues: 'ALL_NEW'
+            ReturnValues: 'ALL_NEW',
         };
 
         const command = new UpdateCommand(params);
         const response = await docClient.send(command);
-        console.log('Menu version incremented to:', response.Attributes.version);
+        console.log(
+            'Menu version incremented to:',
+            response.Attributes.version
+        );
         return response.Attributes;
     } catch (error) {
         console.error('Error incrementing menu version:', error);
@@ -41,5 +50,5 @@ async function incrementMenuVersion() {
 }
 
 module.exports = {
-    incrementMenuVersion
+    incrementMenuVersion,
 };

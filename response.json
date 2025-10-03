@@ -1,1 +1,9 @@
-{"statusCode":200,"headers":{"Access-Control-Allow-Origin":"*","Access-Control-Allow-Headers":"Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token","Access-Control-Allow-Methods":"GET, OPTIONS"},"body":"[{\"id\":\"1759369731990\",\"type\":\"menu_item\",\"action\":\"updated\",\"item\":\"breakfast taco\",\"itemId\":\"1\",\"userId\":null,\"userName\":null,\"timestamp\":\"2025-10-02T01:48:51.990Z\",\"createdAt\":\"2025-10-02T01:48:51.990Z\",\"time\":\"19h ago\"}]"}
+{
+    "statusCode": 200,
+    "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+        "Access-Control-Allow-Methods": "GET, OPTIONS"
+    },
+    "body": "[{\"id\":\"1759369731990\",\"type\":\"menu_item\",\"action\":\"updated\",\"item\":\"breakfast taco\",\"itemId\":\"1\",\"userId\":null,\"userName\":null,\"timestamp\":\"2025-10-02T01:48:51.990Z\",\"createdAt\":\"2025-10-02T01:48:51.990Z\",\"time\":\"19h ago\"}]"
+}

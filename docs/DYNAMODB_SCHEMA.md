@@ -7,93 +7,102 @@ This document describes the DynamoDB table structure and data models for the Tac
 ### **1. Menu Items Table** (`tacodelite-app-menu-items-staging`)
 
 **Primary Key Structure:**
+
 - **PK (Partition Key):** `ITEM#{categoryId}` (e.g., `ITEM#1`, `ITEM#2`)
 - **SK (Sort Key):** `ITEM#{itemId}` (e.g., `ITEM#1`, `ITEM#2`)
 
 **Attributes:**
+
 ```json
 {
-  "pk": "ITEM#1",
-  "sk": "ITEM#1",
-  "id": 1,
-  "name": "breakfast taco",
-  "price": 3.50,
-  "active": true,
-  "vegetarian": false,
-  "description": "A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese add fresh cut potatoes or bacon for $0.50 or both for $0.99",
-  "categoryId": 1,
-  "categoryName": "Breakfast",
-  "alt": null,
-  "img": null,
-  "createdAt": "2024-01-15T12:00:00Z"
+    "pk": "ITEM#1",
+    "sk": "ITEM#1",
+    "id": 1,
+    "name": "breakfast taco",
+    "price": 3.5,
+    "active": true,
+    "vegetarian": false,
+    "description": "A soft 6in tortilla, your choice of filling (egg and sausage or chorizo), and shredded cheese add fresh cut potatoes or bacon for $0.50 or both for $0.99",
+    "categoryId": 1,
+    "categoryName": "Breakfast",
+    "alt": null,
+    "img": null,
+    "createdAt": "2024-01-15T12:00:00Z"
 }
 ```
 
 ### **2. Categories Table** (`tacodelite-app-categories-staging`)
 
 **Primary Key Structure:**
+
 - **PK (Partition Key):** `CATEGORY#{categoryId}` (e.g., `CATEGORY#1`, `CATEGORY#2`)
 
 **Attributes:**
+
 ```json
 {
-  "pk": "CATEGORY#1",
-  "name": "Breakfast",
-  "description": "Breakfast items including tacos, burritos, and bowls",
-  "sortOrder": 1,
-  "active": true,
-  "createdAt": "2024-01-15T12:00:00Z"
+    "pk": "CATEGORY#1",
+    "name": "Breakfast",
+    "description": "Breakfast items including tacos, burritos, and bowls",
+    "sortOrder": 1,
+    "active": true,
+    "createdAt": "2024-01-15T12:00:00Z"
 }
 ```
 
 ### **3. Users Table** (`tacodelite-app-users-staging`)
 
 **Primary Key Structure:**
+
 - **PK (Partition Key):** `USER#{userId}` (e.g., `USER#001`, `USER#002`)
 
 **Attributes:**
+
 ```json
 {
-  "pk": "USER#001",
-  "email": "john@example.com",
-  "name": "John Doe",
-  "phone": "555-1234",
-  "address": "123 Main St, Plano, TX",
-  "preferences": {
-    "spiceLevel": 2,
-    "vegetarian": false,
-    "allergies": ["shellfish"]
-  },
-  "createdAt": "2024-01-01T00:00:00Z",
-  "lastOrder": "2024-01-15T12:00:00Z"
+    "pk": "USER#001",
+    "email": "john@example.com",
+    "name": "John Doe",
+    "phone": "555-1234",
+    "address": "123 Main St, Plano, TX",
+    "preferences": {
+        "spiceLevel": 2,
+        "vegetarian": false,
+        "allergies": ["shellfish"]
+    },
+    "createdAt": "2024-01-01T00:00:00Z",
+    "lastOrder": "2024-01-15T12:00:00Z"
 }
 ```
 
 ### **4. Announcements Table** (`tacodelite-app-staging`)
 
 **Primary Key Structure:**
+
 - **PK (Partition Key):** `ANNOUNCEMENT`
 - **SK (Sort Key):** `ANNOUNCEMENT#{announcementId}` (e.g., `ANNOUNCEMENT#ANN1234567890`)
 
 **Attributes:**
+
 ```json
 {
-  "pk": "ANNOUNCEMENT",
-  "sk": "ANNOUNCEMENT#ANN1234567890",
-  "id": "ANN1234567890",
-  "title": "Holiday Hours",
-  "message": "We will be closed on Christmas Day",
-  "type": "hours",
-  "active": true,
-  "startsAt": "2024-12-20",
-  "expiresAt": "2024-12-26",
-  "createdAt": "2024-12-01T10:00:00Z",
-  "updatedAt": "2024-12-01T10:00:00Z",
-  "createdBy": "admin@tacodelite.com"
+    "pk": "ANNOUNCEMENT",
+    "sk": "ANNOUNCEMENT#ANN1234567890",
+    "id": "ANN1234567890",
+    "title": "Holiday Hours",
+    "message": "We will be closed on Christmas Day",
+    "type": "hours",
+    "active": true,
+    "startsAt": "2024-12-20",
+    "expiresAt": "2024-12-26",
+    "createdAt": "2024-12-01T10:00:00Z",
+    "updatedAt": "2024-12-01T10:00:00Z",
+    "createdBy": "admin@tacodelite.com"
 }
 ```
 
 **Announcement Types:**
+
 - `general` - General announcements
 - `holiday` - Holiday-related announcements
 - `hours` - Hours/special time announcements
@@ -101,6 +110,7 @@ This document describes the DynamoDB table structure and data models for the Tac
 - `event` - Event announcements
 
 **Scheduled Announcements:**
+
 - `startsAt` (optional): Date when announcement should start showing (YYYY-MM-DD format)
 - `expiresAt` (optional): Date when announcement should stop showing (YYYY-MM-DD format)
 - If `startsAt` is null, announcement shows immediately when active
@@ -110,25 +120,28 @@ This document describes the DynamoDB table structure and data models for the Tac
 ### **5. Modifier Groups Table** (`tacodelite-app-staging`)
 
 **Primary Key Structure:**
+
 - **PK (Partition Key):** `MODIFIER_GROUP#{groupId}` (e.g., `MODIFIER_GROUP#SMALL_ADDONS`)
 - **SK (Sort Key):** `MODIFIER_GROUP#{groupId}`
 
 **Attributes:**
+
 ```json
 {
-  "pk": "MODIFIER_GROUP#SMALL_ADDONS",
-  "sk": "MODIFIER_GROUP#SMALL_ADDONS",
-  "id": "SMALL_ADDONS",
-  "name": "Small Portion Add-ons",
-  "description": "For tacos and smaller items",
-  "sortOrder": 1,
-  "active": true,
-  "createdAt": "2025-01-15T12:00:00Z",
-  "updatedAt": "2025-01-15T12:00:00Z"
+    "pk": "MODIFIER_GROUP#SMALL_ADDONS",
+    "sk": "MODIFIER_GROUP#SMALL_ADDONS",
+    "id": "SMALL_ADDONS",
+    "name": "Small Portion Add-ons",
+    "description": "For tacos and smaller items",
+    "sortOrder": 1,
+    "active": true,
+    "createdAt": "2025-01-15T12:00:00Z",
+    "updatedAt": "2025-01-15T12:00:00Z"
 }
 ```
 
 **Example Modifier Groups:**
+
 - `SMALL_ADDONS` - Small portion add-ons (for tacos)
 - `LARGE_ADDONS` - Large portion add-ons (for burritos, salads, nachos, plates)
 - `DRINK_SIZES` - Drink size options
@@ -136,11 +149,13 @@ This document describes the DynamoDB table structure and data models for the Tac
 - `SAUCES` - Sauce options
 
 **Modifier Price Types:**
+
 - `addon` - Extra charge modifier (e.g., "Add Cheese +$0.50")
 - `included` - No charge modifier (e.g., "Lettuce" included in salad)
 - `removal` - Removal option (e.g., "No Onions" to remove default onions)
 
 **Default Selections:**
+
 - `defaultSelected: true` - Modifier is pre-selected for customers (can be unchecked)
 - `defaultSelected: false` - Modifier is not pre-selected (customer must choose)
 - `defaultSelections: []` - Array of modifier IDs that are pre-selected for specific menu items
@@ -148,110 +163,119 @@ This document describes the DynamoDB table structure and data models for the Tac
 ### **6. Modifiers Table** (`tacodelite-app-staging`)
 
 **Primary Key Structure:**
+
 - **PK (Partition Key):** `MODIFIER#{groupId}` (e.g., `MODIFIER#SMALL_ADDONS`)
 - **SK (Sort Key):** `MODIFIER#{modifierId}` (e.g., `MODIFIER#LETTUCE_SM`)
 
 **Attributes:**
+
 ```json
 {
-  "pk": "MODIFIER#SMALL_ADDONS",
-  "sk": "MODIFIER#LETTUCE_SM",
-  "id": "LETTUCE_SM",
-  "name": "Lettuce",
-  "groupId": "SMALL_ADDONS",
-  "groupName": "Small Portion Add-ons",
-  "price": 0.50,
-  "priceType": "addon",
-  "defaultSelected": false,
-  "sortOrder": 1,
-  "active": true,
-  "createdAt": "2025-01-15T12:00:00Z",
-  "updatedAt": "2025-01-15T12:00:00Z"
+    "pk": "MODIFIER#SMALL_ADDONS",
+    "sk": "MODIFIER#LETTUCE_SM",
+    "id": "LETTUCE_SM",
+    "name": "Lettuce",
+    "groupId": "SMALL_ADDONS",
+    "groupName": "Small Portion Add-ons",
+    "price": 0.5,
+    "priceType": "addon",
+    "defaultSelected": false,
+    "sortOrder": 1,
+    "active": true,
+    "createdAt": "2025-01-15T12:00:00Z",
+    "updatedAt": "2025-01-15T12:00:00Z"
 }
 ```
 
 **Menu Item with Modifier Groups:**
+
 ```json
 {
-  "pk": "ITEM#1",
-  "sk": "ITEM#1",
-  "id": 1,
-  "name": "Taco",
-  "price": 3.50,
-  "modifierGroups": [
-    {
-      "groupId": "SMALL_ADDONS",
-      "groupName": "Small Portion Add-ons",
-      "required": false,
-      "multiSelect": true,
-      "min": 0,
-      "max": null,
-      "defaultSelections": []
-    }
-  ],
-  "categoryId": 1,
-  "active": true
+    "pk": "ITEM#1",
+    "sk": "ITEM#1",
+    "id": 1,
+    "name": "Taco",
+    "price": 3.5,
+    "modifierGroups": [
+        {
+            "groupId": "SMALL_ADDONS",
+            "groupName": "Small Portion Add-ons",
+            "required": false,
+            "multiSelect": true,
+            "min": 0,
+            "max": null,
+            "defaultSelections": []
+        }
+    ],
+    "categoryId": 1,
+    "active": true
 }
 ```
 
 ## 🔍 **Query Patterns**
 
 ### **Get All Menu Items by Category:**
+
 ```javascript
 // Query all items in category 1
 const params = {
-  TableName: "tacodelite-app-menu-items-staging",
-  KeyConditionExpression: "pk = :pk",
-  ExpressionAttributeValues: {
-    ":pk": "ITEM#1"
-  }
+    TableName: 'tacodelite-app-menu-items-staging',
+    KeyConditionExpression: 'pk = :pk',
+    ExpressionAttributeValues: {
+        ':pk': 'ITEM#1',
+    },
 };
 ```
 
 ### **Get Menu Item by ID:**
+
 ```javascript
 // Get specific item
 const params = {
-  TableName: "tacodelite-app-menu-items-staging",
-  Key: {
-    pk: "ITEM#1",
-    sk: "ITEM#1"
-  }
+    TableName: 'tacodelite-app-menu-items-staging',
+    Key: {
+        pk: 'ITEM#1',
+        sk: 'ITEM#1',
+    },
 };
 ```
 
 ### **Get All Categories:**
+
 ```javascript
 // Scan categories table (small table, efficient)
 const params = {
-  TableName: "tacodelite-app-categories-staging"
+    TableName: 'tacodelite-app-categories-staging',
 };
 ```
 
 ### **Get Active Menu Items:**
+
 ```javascript
 // Get all active items in a category
 const params = {
-  TableName: "tacodelite-app-menu-items-staging",
-  KeyConditionExpression: "pk = :pk",
-  FilterExpression: "active = :active",
-  ExpressionAttributeValues: {
-    ":pk": "ITEM#1",
-    ":active": true
-  }
+    TableName: 'tacodelite-app-menu-items-staging',
+    KeyConditionExpression: 'pk = :pk',
+    FilterExpression: 'active = :active',
+    ExpressionAttributeValues: {
+        ':pk': 'ITEM#1',
+        ':active': true,
+    },
 };
 ```
 
 ### **Get Active Announcements:**
+
 ```javascript
 // Get all active announcements
 const params = {
-  TableName: "tacodelite-app-staging",
-  FilterExpression: "begins_with(pk, :announcementPrefix) AND active = :active",
-  ExpressionAttributeValues: {
-    ":announcementPrefix": "ANNOUNCEMENT",
-    ":active": true
-  }
+    TableName: 'tacodelite-app-staging',
+    FilterExpression:
+        'begins_with(pk, :announcementPrefix) AND active = :active',
+    ExpressionAttributeValues: {
+        ':announcementPrefix': 'ANNOUNCEMENT',
+        ':active': true,
+    },
 };
 
 // Note: The Lambda function further filters announcements based on startsAt and expiresAt
@@ -259,50 +283,54 @@ const params = {
 ```
 
 ### **Get All Modifier Groups:**
+
 ```javascript
 // Scan for all modifier groups
 const params = {
-  TableName: "tacodelite-app-staging",
-  FilterExpression: "begins_with(pk, :groupPrefix)",
-  ExpressionAttributeValues: {
-    ":groupPrefix": "MODIFIER_GROUP#"
-  }
+    TableName: 'tacodelite-app-staging',
+    FilterExpression: 'begins_with(pk, :groupPrefix)',
+    ExpressionAttributeValues: {
+        ':groupPrefix': 'MODIFIER_GROUP#',
+    },
 };
 ```
 
 ### **Get Modifier Group by ID:**
+
 ```javascript
 // Get specific modifier group
 const params = {
-  TableName: "tacodelite-app-staging",
-  Key: {
-    pk: "MODIFIER_GROUP#SMALL_ADDONS",
-    sk: "MODIFIER_GROUP#SMALL_ADDONS"
-  }
+    TableName: 'tacodelite-app-staging',
+    Key: {
+        pk: 'MODIFIER_GROUP#SMALL_ADDONS',
+        sk: 'MODIFIER_GROUP#SMALL_ADDONS',
+    },
 };
 ```
 
 ### **Get All Modifiers in a Group:**
+
 ```javascript
 // Query all modifiers in a specific group
 const params = {
-  TableName: "tacodelite-app-staging",
-  KeyConditionExpression: "pk = :pk",
-  ExpressionAttributeValues: {
-    ":pk": "MODIFIER#SMALL_ADDONS"
-  }
+    TableName: 'tacodelite-app-staging',
+    KeyConditionExpression: 'pk = :pk',
+    ExpressionAttributeValues: {
+        ':pk': 'MODIFIER#SMALL_ADDONS',
+    },
 };
 ```
 
 ### **Get Modifier by ID:**
+
 ```javascript
 // Get specific modifier
 const params = {
-  TableName: "tacodelite-app-staging",
-  Key: {
-    pk: "MODIFIER#SMALL_ADDONS",
-    sk: "MODIFIER#LETTUCE_SM"
-  }
+    TableName: 'tacodelite-app-staging',
+    Key: {
+        pk: 'MODIFIER#SMALL_ADDONS',
+        sk: 'MODIFIER#LETTUCE_SM',
+    },
 };
 ```
 
@@ -316,6 +344,7 @@ id,name,food_items
 ```
 
 **Features:**
+
 - **Automatic JSON parsing** of nested food_items arrays
 - **Batch processing** (25 items per batch for DynamoDB limits)
 - **Progress tracking** with category-by-category feedback
@@ -325,16 +354,19 @@ id,name,food_items
 ## 🎯 **Key Benefits**
 
 ### **1. Efficient Queries:**
+
 - **Partition Key:** `ITEM#{categoryId}` groups all items by category
 - **Sort Key:** `ITEM#{itemId}` provides unique identification
 - **Fast Retrieval:** Single query gets all items in a category
 
 ### **2. Flexible Schema:**
+
 - **Optional Fields:** `alt`, `img` can be null
 - **Rich Metadata:** Includes category names for easy display
 - **Extensible:** Easy to add new fields like `ingredients`, `allergens`
 
 ### **3. Cost Optimization:**
+
 - **Pay-per-request** billing
 - **Efficient storage** with proper key design
 - **Minimal read/write** operations

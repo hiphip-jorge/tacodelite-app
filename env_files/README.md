@@ -16,7 +16,7 @@ These files are referenced by terraform commands in package.json scripts:
 # Deploy to staging
 npm run deploy:staging
 
-# Deploy to production  
+# Deploy to production
 npm run deploy:production
 
 # Manual terraform commands

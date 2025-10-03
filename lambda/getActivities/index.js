@@ -1,18 +1,24 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    ScanCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
-const getCorsHeaders = (origin) => {
+const getCorsHeaders = origin => {
     return {
         'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-        'Access-Control-Allow-Methods': 'GET, OPTIONS'
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
     };
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         console.log('Event received:', JSON.stringify(event, null, 2));
 
@@ -23,7 +29,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: getCorsHeaders(origin),
-                body: ''
+                body: '',
             };
         }
 
@@ -39,8 +45,8 @@ exports.handler = async (event) => {
             TableName: tableName,
             FilterExpression: 'begins_with(pk, :activityPrefix)',
             ExpressionAttributeValues: {
-                ':activityPrefix': 'ACTIVITY#'
-            }
+                ':activityPrefix': 'ACTIVITY#',
+            },
         };
 
         const command = new ScanCommand(params);
@@ -56,15 +62,17 @@ exports.handler = async (event) => {
             userId: item.userId,
             userName: item.userName,
             timestamp: item.timestamp,
-            createdAt: item.createdAt
+            createdAt: item.createdAt,
         }));
 
         // Sort by timestamp (newest first) and limit results
-        activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        activities.sort(
+            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+        );
         const recentActivities = activities.slice(0, limit);
 
         // Format time for display
-        const formatTimeAgo = (timestamp) => {
+        const formatTimeAgo = timestamp => {
             const now = new Date();
             const activityTime = new Date(timestamp);
             const diffInSeconds = Math.floor((now - activityTime) / 1000);
@@ -86,15 +94,14 @@ exports.handler = async (event) => {
         // Add formatted time to each activity
         const formattedActivities = recentActivities.map(activity => ({
             ...activity,
-            time: formatTimeAgo(activity.timestamp)
+            time: formatTimeAgo(activity.timestamp),
         }));
 
         return {
             statusCode: 200,
             headers: getCorsHeaders(origin),
-            body: JSON.stringify(formattedActivities)
+            body: JSON.stringify(formattedActivities),
         };
-
     } catch (error) {
         console.error('Get activities error:', error);
         const origin = event.headers?.origin || event.headers?.Origin || '*';
@@ -103,8 +110,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

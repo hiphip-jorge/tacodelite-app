@@ -1,32 +1,39 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    ScanCommand,
+} = require('@aws-sdk/lib-dynamodb');
 
 const client = new DynamoDBClient({});
 const dynamodb = DynamoDBDocumentClient.from(client);
 
 // Helper function to get CORS headers
-const getCorsHeaders = (origin) => {
-    const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['*'];
+const getCorsHeaders = origin => {
+    const allowedOrigins = process.env.ALLOWED_ORIGINS
+        ? process.env.ALLOWED_ORIGINS.split(',')
+        : ['*'];
 
     // If origin is in allowed list, return it; otherwise return first allowed origin
     if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
         return {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': origin,
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS'
+            'Access-Control-Allow-Headers':
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
         };
     } else {
         return {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': allowedOrigins[0],
-            'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-            'Access-Control-Allow-Methods': 'GET, OPTIONS'
+            'Access-Control-Allow-Headers':
+                'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
         };
     }
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         console.log('Event received:', JSON.stringify(event, null, 2));
 
@@ -38,7 +45,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: getCorsHeaders(origin),
-                body: ''
+                body: '',
             };
         }
 
@@ -47,8 +54,8 @@ exports.handler = async (event) => {
             TableName: process.env.USERS_TABLE,
             FilterExpression: 'begins_with(pk, :userPrefix)',
             ExpressionAttributeValues: {
-                ':userPrefix': 'USER#'
-            }
+                ':userPrefix': 'USER#',
+            },
         };
 
         const result = await dynamodb.send(new ScanCommand(params));
@@ -63,7 +70,7 @@ exports.handler = async (event) => {
             preferences: item.preferences || {},
             createdAt: item.createdAt,
             lastOrder: item.lastOrder,
-            active: item.active !== false // Default to true if not specified
+            active: item.active !== false, // Default to true if not specified
         }));
 
         // Sort by creation date (newest first)
@@ -72,9 +79,8 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: getCorsHeaders(origin),
-            body: JSON.stringify(users)
+            body: JSON.stringify(users),
         };
-
     } catch (error) {
         console.error('Get users error:', error);
         return {
@@ -82,8 +88,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

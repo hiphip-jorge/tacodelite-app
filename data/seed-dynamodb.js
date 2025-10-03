@@ -1,14 +1,19 @@
 #!/usr/bin/env node
 
 // Seed DynamoDB tables with Taco Delite menu data from menu_rows.csv
-// Usage: 
+// Usage:
 //   ENVIRONMENT=staging node seed-dynamodb.js
 //   ENVIRONMENT=production node seed-dynamodb.js
 //   node seed-dynamodb.js (defaults to staging)
 //   node seed-dynamodb.js --clear (clears tables before seeding)
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { DynamoDBDocumentClient, PutCommand, ScanCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
+import {
+    DynamoDBDocumentClient,
+    PutCommand,
+    ScanCommand,
+    BatchWriteCommand,
+} from '@aws-sdk/lib-dynamodb';
 import { readFileSync } from 'fs';
 
 const client = new DynamoDBClient({ region: 'us-east-1' });
@@ -21,11 +26,11 @@ const environment = process.env.ENVIRONMENT || 'staging';
 const shouldClear = process.argv.includes('--clear');
 
 // Dynamic table names based on environment
-const getTableNames = (env) => ({
+const getTableNames = env => ({
     categories: `tacodelite-app-categories-${env}`,
     menuItems: `tacodelite-app-menu-items-${env}`,
     users: `tacodelite-app-users-${env}`,
-    adminUsers: `tacodelite-app-admin-users-${env}`
+    adminUsers: `tacodelite-app-admin-users-${env}`,
 });
 
 // Function to clear all items from a table
@@ -34,9 +39,11 @@ async function clearTable(tableName) {
         console.log(`🧹 Clearing table: ${tableName}`);
 
         // Scan all items
-        const scanResult = await docClient.send(new ScanCommand({
-            TableName: tableName
-        }));
+        const scanResult = await docClient.send(
+            new ScanCommand({
+                TableName: tableName,
+            })
+        );
 
         if (scanResult.Items && scanResult.Items.length > 0) {
             // Delete items in batches of 25 (DynamoDB limit)
@@ -47,16 +54,18 @@ async function clearTable(tableName) {
                     DeleteRequest: {
                         Key: {
                             pk: item.pk,
-                            sk: item.sk
-                        }
-                    }
+                            sk: item.sk,
+                        },
+                    },
                 }));
 
-                await docClient.send(new BatchWriteCommand({
-                    RequestItems: {
-                        [tableName]: deleteRequests
-                    }
-                }));
+                await docClient.send(
+                    new BatchWriteCommand({
+                        RequestItems: {
+                            [tableName]: deleteRequests,
+                        },
+                    })
+                );
             }
             console.log(`✓ Cleared ${items.length} items from ${tableName}`);
         } else {
@@ -93,12 +102,13 @@ async function loadMenuData() {
 
             // Add category if not already added
             if (!categoryMap.has(row.categoryId)) {
-                const categoryName = row.category || `Category ${row.categoryId}`;
+                const categoryName =
+                    row.category || `Category ${row.categoryId}`;
                 categories.push({
                     pk: `CATEGORY#${row.categoryId.toString().padStart(3, '0')}`,
                     id: parseInt(row.categoryId),
                     name: categoryName,
-                    description: `${categoryName} items`
+                    description: `${categoryName} items`,
                 });
                 categoryMap.set(row.categoryId, categoryName);
             }
@@ -114,7 +124,7 @@ async function loadMenuData() {
                 description: row.description,
                 price: parseFloat(row.price),
                 vegetarian: row.vegetarian === 'true',
-                active: row.active === 'true'
+                active: row.active === 'true',
             });
         }
 
@@ -148,17 +158,22 @@ function parseCSVLine(line) {
     return values;
 }
 
-
 async function seedDynamoDB() {
     try {
-        console.log(`🚀 Starting DynamoDB seeding for ${environment} environment...`);
+        console.log(
+            `🚀 Starting DynamoDB seeding for ${environment} environment...`
+        );
         if (shouldClear) {
-            console.log('🧹 Clear flag detected - will clear tables before seeding');
+            console.log(
+                '🧹 Clear flag detected - will clear tables before seeding'
+            );
         }
 
         // Validate environment
         if (!['staging', 'production'].includes(environment)) {
-            throw new Error(`Invalid environment: ${environment}. Must be 'staging' or 'production'`);
+            throw new Error(
+                `Invalid environment: ${environment}. Must be 'staging' or 'production'`
+            );
         }
 
         // Get dynamic table names
@@ -175,19 +190,28 @@ async function seedDynamoDB() {
         // Load menu data from CSV file
         console.log('📂 Loading menu data from CSV file...');
         const { categories, menuItems } = await loadMenuData();
-        console.log(`📊 Loaded ${categories.length} categories and ${menuItems.length} menu items`);
+        console.log(
+            `📊 Loaded ${categories.length} categories and ${menuItems.length} menu items`
+        );
 
         // Seed Categories
         console.log(`📂 Seeding Categories table: ${tables.categories}`);
         for (const category of categories) {
             try {
-                await docClient.send(new PutCommand({
-                    TableName: tables.categories,
-                    Item: category
-                }));
-                console.log(`✓ Seeded category: ${category.name} (ID: ${category.id})`);
+                await docClient.send(
+                    new PutCommand({
+                        TableName: tables.categories,
+                        Item: category,
+                    })
+                );
+                console.log(
+                    `✓ Seeded category: ${category.name} (ID: ${category.id})`
+                );
             } catch (error) {
-                console.error(`✗ Failed to seed category ${category.name}:`, error.message);
+                console.error(
+                    `✗ Failed to seed category ${category.name}:`,
+                    error.message
+                );
             }
         }
 
@@ -195,19 +219,25 @@ async function seedDynamoDB() {
         console.log(`🍽️ Seeding Menu Items table: ${tables.menuItems}`);
         for (const item of menuItems) {
             try {
-                await docClient.send(new PutCommand({
-                    TableName: tables.menuItems,
-                    Item: item
-                }));
+                await docClient.send(
+                    new PutCommand({
+                        TableName: tables.menuItems,
+                        Item: item,
+                    })
+                );
                 console.log(`✓ Seeded item: ${item.name}`);
             } catch (error) {
-                console.error(`✗ Failed to seed item ${item.name}:`, error.message);
+                console.error(
+                    `✗ Failed to seed item ${item.name}:`,
+                    error.message
+                );
             }
         }
 
         console.log(`🎉 ${environment} seeding completed successfully!`);
-        console.log(`📊 Seeded ${categories.length} categories and ${menuItems.length} menu items`);
-
+        console.log(
+            `📊 Seeded ${categories.length} categories and ${menuItems.length} menu items`
+        );
     } catch (error) {
         console.error('❌ Error seeding DynamoDB:', error);
     }

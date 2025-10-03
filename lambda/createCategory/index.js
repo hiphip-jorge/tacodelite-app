@@ -1,32 +1,42 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    PutCommand,
+    ScanCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('../shared/menuVersionUtils');
 const { logActivity } = require('../shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         const body = JSON.parse(event.body);
 
         // Validate required fields
         const requiredFields = ['name', 'description', 'active'];
-        const missingFields = requiredFields.filter(field => body[field] === undefined);
+        const missingFields = requiredFields.filter(
+            field => body[field] === undefined
+        );
 
         if (missingFields.length > 0) {
             return {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Missing required fields',
-                    missingFields
-                })
+                    missingFields,
+                }),
             };
         }
 
@@ -35,8 +45,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             FilterExpression: 'begins_with(pk, :categoryPrefix)',
             ExpressionAttributeValues: {
-                ':categoryPrefix': 'CATEGORY#'
-            }
+                ':categoryPrefix': 'CATEGORY#',
+            },
         };
 
         const scanCommand = new ScanCommand(scanParams);
@@ -73,12 +83,12 @@ exports.handler = async (event) => {
             description: body.description,
             sortOrder: body.sortOrder || newSortOrder, // Allow custom sortOrder or auto-generate
             active: body.active,
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
         };
 
         const putParams = {
             TableName: process.env.DYNAMODB_TABLE,
-            Item: categoryData
+            Item: categoryData,
         };
 
         const putCommand = new PutCommand(putParams);
@@ -102,15 +112,17 @@ exports.handler = async (event) => {
             statusCode: 201,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
             },
             body: JSON.stringify({
                 message: 'Category created successfully',
                 category: categoryData,
-                version: versionInfo?.version || 'unknown'
-            })
+                version: versionInfo?.version || 'unknown',
+            }),
         };
     } catch (error) {
         console.error('Error creating category:', error);
@@ -118,14 +130,16 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
             },
             body: JSON.stringify({
                 error: 'Internal server error',
-                message: error.message
-            })
+                message: error.message,
+            }),
         };
     }
 };

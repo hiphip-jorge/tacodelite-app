@@ -1,32 +1,49 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, PutCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    PutCommand,
+    ScanCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         const body = JSON.parse(event.body);
 
         // Validate required fields
-        const requiredFields = ['name', 'price', 'active', 'vegetarian', 'description', 'categoryId'];
-        const missingFields = requiredFields.filter(field => body[field] === undefined);
+        const requiredFields = [
+            'name',
+            'price',
+            'active',
+            'vegetarian',
+            'description',
+            'categoryId',
+        ];
+        const missingFields = requiredFields.filter(
+            field => body[field] === undefined
+        );
 
         if (missingFields.length > 0) {
             return {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'POST, OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Missing required fields',
-                    missingFields
-                })
+                    missingFields,
+                }),
             };
         }
 
@@ -35,8 +52,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             FilterExpression: 'begins_with(pk, :itemPrefix)',
             ExpressionAttributeValues: {
-                ':itemPrefix': 'ITEM#'
-            }
+                ':itemPrefix': 'ITEM#',
+            },
         };
 
         const scanCommand = new ScanCommand(scanParams);
@@ -56,10 +73,12 @@ exports.handler = async (event) => {
 
         // Get category name for the item
         const categoryParams = {
-            TableName: process.env.CATEGORIES_TABLE || process.env.DYNAMODB_TABLE.replace('menu-items', 'categories'),
+            TableName:
+                process.env.CATEGORIES_TABLE ||
+                process.env.DYNAMODB_TABLE.replace('menu-items', 'categories'),
             Key: {
-                pk: `CATEGORY#${categoryId}`
-            }
+                pk: `CATEGORY#${categoryId}`,
+            },
         };
 
         let categoryName = `Category ${categoryId}`;
@@ -89,12 +108,12 @@ exports.handler = async (event) => {
             alt: body.alt || null,
             img: body.img || null,
             modifierGroups: body.modifierGroups || [],
-            createdAt: new Date().toISOString()
+            createdAt: new Date().toISOString(),
         };
 
         const putParams = {
             TableName: process.env.DYNAMODB_TABLE,
-            Item: itemData
+            Item: itemData,
         };
 
         const putCommand = new PutCommand(putParams);
@@ -118,15 +137,17 @@ exports.handler = async (event) => {
             statusCode: 201,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
             },
             body: JSON.stringify({
                 message: 'Menu item created successfully',
                 item: itemData,
-                version: versionInfo?.version || 'unknown'
-            })
+                version: versionInfo?.version || 'unknown',
+            }),
         };
     } catch (error) {
         console.error('Error creating menu item:', error);
@@ -134,14 +155,16 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'POST, OPTIONS',
             },
             body: JSON.stringify({
                 error: 'Internal server error',
-                message: error.message
-            })
+                message: error.message,
+            }),
         };
     }
 };

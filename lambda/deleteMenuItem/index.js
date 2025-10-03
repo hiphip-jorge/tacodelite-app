@@ -1,12 +1,18 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    ScanCommand,
+    DeleteCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         const itemId = event.pathParameters?.id;
 
@@ -15,14 +21,16 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Item ID is required',
-                    message: 'Please provide a valid item ID'
-                })
+                    message: 'Please provide a valid item ID',
+                }),
             };
         }
 
@@ -32,8 +40,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             FilterExpression: 'sk = :itemId',
             ExpressionAttributeValues: {
-                ':itemId': `ITEM#${itemId}`
-            }
+                ':itemId': `ITEM#${itemId}`,
+            },
         };
 
         console.log('🔍 Scanning for item with ID:', itemId);
@@ -50,14 +58,16 @@ exports.handler = async (event) => {
                 statusCode: 404,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Menu item not found',
-                    message: `Item with ID ${itemId} does not exist`
-                })
+                    message: `Item with ID ${itemId} does not exist`,
+                }),
             };
         }
 
@@ -72,14 +82,16 @@ exports.handler = async (event) => {
                 statusCode: 500,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Invalid item structure',
-                    message: 'Could not determine category ID for the item'
-                })
+                    message: 'Could not determine category ID for the item',
+                }),
             };
         }
 
@@ -88,8 +100,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
                 pk: `ITEM#${categoryId}`,
-                sk: `ITEM#${itemId}`
-            }
+                sk: `ITEM#${itemId}`,
+            },
         };
 
         console.log('🗑️ Delete params:', JSON.stringify(deleteParams, null, 2));
@@ -118,15 +130,17 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
             },
             body: JSON.stringify({
                 message: 'Menu item deleted successfully',
                 deletedItemId: itemId,
-                version: versionInfo?.version || 'unknown'
-            })
+                version: versionInfo?.version || 'unknown',
+            }),
         };
     } catch (error) {
         console.error('Error deleting menu item:', error);
@@ -134,14 +148,16 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'DELETE, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
             },
             body: JSON.stringify({
                 error: 'Failed to delete menu item',
-                message: error.message
-            })
+                message: error.message,
+            }),
         };
     }
 };

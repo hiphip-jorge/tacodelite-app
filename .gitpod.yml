@@ -2,39 +2,39 @@
 # This configuration sets up a development environment for AWS deployment
 
 tasks:
-  - name: Setup Development Environment
-    init: |
-      echo "🚀 Setting up Taco Delite App development environment..."
-      echo "📦 Installing dependencies..."
-      npm install
-      echo "✅ Setup complete!"
-      echo "🌐 Start development server with: npm run dev"
-      echo "☁️ Deploy to AWS with: npm run deploy"
+    - name: Setup Development Environment
+      init: |
+          echo "🚀 Setting up Taco Delite App development environment..."
+          echo "📦 Installing dependencies..."
+          npm install
+          echo "✅ Setup complete!"
+          echo "🌐 Start development server with: npm run dev"
+          echo "☁️ Deploy to AWS with: npm run deploy"
 
-  - name: Start Development Server
-    command: npm run dev
-    openMode: split-right
+    - name: Start Development Server
+      command: npm run dev
+      openMode: split-right
 
 ports:
-  - port: 3000
-    onOpen: open-preview
-    visibility: public
+    - port: 3000
+      onOpen: open-preview
+      visibility: public
 
 github:
-  prebuilds:
-    # Enable prebuilds for all branches
-    branches: true
-    # Enable prebuilds for pull requests
-    pullRequests: true
-    # Enable prebuilds for the default branch
-    pullRequestsFromForks: true
+    prebuilds:
+        # Enable prebuilds for all branches
+        branches: true
+        # Enable prebuilds for pull requests
+        pullRequests: true
+        # Enable prebuilds for the default branch
+        pullRequestsFromForks: true
 
 vscode:
-  extensions:
-    - ms-vscode.vscode-typescript-next
-    - bradlc.vscode-tailwindcss
-    - esbenp.prettier-vscode
-    - ms-vscode.vscode-eslint
-    - hashicorp.terraform
-    - ms-vscode.vscode-json
-    - redhat.vscode-yaml
+    extensions:
+        - ms-vscode.vscode-typescript-next
+        - bradlc.vscode-tailwindcss
+        - esbenp.prettier-vscode
+        - ms-vscode.vscode-eslint
+        - hashicorp.terraform
+        - ms-vscode.vscode-json
+        - redhat.vscode-yaml

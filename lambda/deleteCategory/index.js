@@ -1,12 +1,16 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, DeleteCommand, QueryCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    DeleteCommand,
+    QueryCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 const { logActivity } = require('./shared/logActivity');
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     console.log('🗑️ Delete category request:', JSON.stringify(event, null, 2));
 
     try {
@@ -17,13 +21,15 @@ exports.handler = async (event) => {
             return {
                 statusCode: 400,
                 headers: {
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE,OPTIONS',
                 },
                 body: JSON.stringify({
-                    error: 'Category ID is required'
-                })
+                    error: 'Category ID is required',
+                }),
             };
         }
 
@@ -32,25 +38,29 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             KeyConditionExpression: 'pk = :pk',
             ExpressionAttributeValues: {
-                ':pk': `ITEM#${categoryId}`
-            }
+                ':pk': `ITEM#${categoryId}`,
+            },
         };
 
         console.log('🔍 Checking for menu items in category:', categoryId);
-        const itemsResult = await docClient.send(new QueryCommand(checkItemsParams));
+        const itemsResult = await docClient.send(
+            new QueryCommand(checkItemsParams)
+        );
 
         if (itemsResult.Items && itemsResult.Items.length > 0) {
             return {
                 statusCode: 400,
                 headers: {
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'DELETE,OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'DELETE,OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Cannot delete category that contains menu items',
-                    itemCount: itemsResult.Items.length
-                })
+                    itemCount: itemsResult.Items.length,
+                }),
             };
         }
 
@@ -62,22 +72,27 @@ exports.handler = async (event) => {
         //     }
         // };
 
-        const categoryResult = await docClient.send(new QueryCommand({
-            TableName: process.env.CATEGORIES_TABLE,
-            KeyConditionExpression: 'pk = :pk',
-            ExpressionAttributeValues: {
-                ':pk': `CATEGORY#${categoryId}`
-            }
-        }));
+        const categoryResult = await docClient.send(
+            new QueryCommand({
+                TableName: process.env.CATEGORIES_TABLE,
+                KeyConditionExpression: 'pk = :pk',
+                ExpressionAttributeValues: {
+                    ':pk': `CATEGORY#${categoryId}`,
+                },
+            })
+        );
 
-        const category = categoryResult.Items && categoryResult.Items.length > 0 ? categoryResult.Items[0] : null;
+        const category =
+            categoryResult.Items && categoryResult.Items.length > 0
+                ? categoryResult.Items[0]
+                : null;
 
         // Delete the category
         const deleteParams = {
             TableName: process.env.CATEGORIES_TABLE,
             Key: {
-                pk: `CATEGORY#${categoryId}`
-            }
+                pk: `CATEGORY#${categoryId}`,
+            },
         };
 
         console.log('🗑️ Deleting category:', categoryId);
@@ -102,31 +117,34 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: {
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'DELETE,OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'DELETE,OPTIONS',
             },
             body: JSON.stringify({
                 message: 'Category deleted successfully',
                 categoryId: categoryId,
-                version: versionInfo?.version || 'unknown'
-            })
+                version: versionInfo?.version || 'unknown',
+            }),
         };
-
     } catch (error) {
         console.error('❌ Error deleting category:', error);
 
         return {
             statusCode: 500,
             headers: {
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'DELETE,OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'DELETE,OPTIONS',
             },
             body: JSON.stringify({
                 error: 'Failed to delete category',
-                details: error.message
-            })
+                details: error.message,
+            }),
         };
     }
 };

@@ -5,17 +5,20 @@ This guide explains how to seed your DynamoDB tables with Taco Delite menu data.
 ## 🚀 **Quick Start**
 
 ### **1. Install Dependencies**
+
 ```bash
 npm install
 ```
 
 ### **2. Deploy Infrastructure**
+
 ```bash
 # Deploy DynamoDB tables
 terraform apply -var-file=staging.tfvars
 ```
 
 ### **3. Set Environment Variables**
+
 ```bash
 # Get table names from Terraform output
 export MENU_ITEMS_TABLE=$(terraform output -raw dynamodb_menu_items_table)
@@ -27,6 +30,7 @@ export CATEGORIES_TABLE=tacodelite-app-categories-staging
 ```
 
 ### **4. Run the Seeding Script**
+
 ```bash
 npm run seed:db
 ```
@@ -34,10 +38,12 @@ npm run seed:db
 ## 📊 **What Gets Created**
 
 ### **Categories Table:**
+
 - 14 predefined categories (Breakfast, Tacos, Burritos, etc.)
 - Each category has name, description, and sort order
 
 ### **Menu Items Table:**
+
 - **82 menu items** from your CSV file
 - Organized by category with proper DynamoDB keys
 - Includes price, vegetarian status, descriptions, and metadata
@@ -45,6 +51,7 @@ npm run seed:db
 ## 🔧 **Data Structure**
 
 ### **Categories:**
+
 ```
 pk: CATEGORY#1
 name: "Breakfast"
@@ -54,6 +61,7 @@ active: true
 ```
 
 ### **Menu Items:**
+
 ```
 pk: ITEM#1          (category ID)
 sk: ITEM#1           (item ID)
@@ -79,6 +87,7 @@ id,name,food_items
 ```
 
 **Key Features:**
+
 - **Nested JSON:** Each row contains a JSON array of food items
 - **Rich Metadata:** Includes alt text, images, and detailed descriptions
 - **Category Grouping:** Items are automatically grouped by category
@@ -86,13 +95,17 @@ id,name,food_items
 ## 🛠️ **Customization**
 
 ### **Modify Categories:**
+
 Edit the `categories` array in `seed-dynamodb.js` to add/remove categories.
 
 ### **Modify Data Transformation:**
+
 Update the `seedMenuItems()` function to change how JSON data is processed.
 
 ### **Add New Fields:**
+
 Extend the item structure to include additional fields like:
+
 - `ingredients` - List of ingredients
 - `allergens` - Allergy information
 - `spiceLevel` - Spice rating
@@ -101,19 +114,25 @@ Extend the item structure to include additional fields like:
 ## 🚨 **Troubleshooting**
 
 ### **CSV File Not Found:**
+
 Ensure `td-app/mocks/menu_categories_rows.csv` exists in the correct path.
 
 ### **JSON Parse Errors:**
+
 The script handles escaped quotes (`""`) automatically. If you have other JSON issues, check the CSV format.
 
 ### **Permission Errors:**
+
 Make sure your AWS credentials are configured:
+
 ```bash
 aws configure
 ```
 
 ### **Table Not Found:**
+
 Verify table names match your Terraform output:
+
 ```bash
 terraform output
 ```
@@ -121,6 +140,7 @@ terraform output
 ## 📈 **Next Steps**
 
 After seeding:
+
 1. **Verify data** in AWS DynamoDB console
 2. **Create Lambda functions** for CRUD operations
 3. **Update React app** to fetch from DynamoDB
@@ -149,6 +169,7 @@ aws dynamodb scan --table-name tacodelite-app-categories-staging --select COUNT
 ```
 
 **Expected Results:**
+
 - **Categories:** 14 items
 - **Menu Items:** 82 items
 - **Active Items:** Most items should be active=true

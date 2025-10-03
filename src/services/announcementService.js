@@ -1,6 +1,8 @@
 // Announcement service for fetching announcements from DynamoDB via Lambda APIs
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com/prod';
 
 // Cache duration for announcements (shorter than menu items since they change more frequently)
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -8,11 +10,11 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 // Cache configuration
 const CACHE_KEYS = {
     ANNOUNCEMENTS: 'announcements',
-    ANNOUNCEMENTS_TIMESTAMP: 'announcements_timestamp'
+    ANNOUNCEMENTS_TIMESTAMP: 'announcements_timestamp',
 };
 
 // Helper function to get cached data
-const getCachedData = (key) => {
+const getCachedData = key => {
     try {
         const cached = localStorage.getItem(key);
         return cached ? JSON.parse(cached) : null;
@@ -32,12 +34,12 @@ const setCachedData = (key, data) => {
 };
 
 // Helper function to check if cache is valid
-const isCacheValid = (timestampKey) => {
+const isCacheValid = timestampKey => {
     const timestamp = getCachedData(timestampKey);
     if (!timestamp) return false;
 
     const now = Date.now();
-    return (now - timestamp) < CACHE_DURATION;
+    return now - timestamp < CACHE_DURATION;
 };
 
 // Get active announcements
@@ -53,12 +55,15 @@ export const getActiveAnnouncements = async () => {
         }
 
         console.log('📢 Fetching announcements from API');
-        const response = await fetch(`${API_BASE_URL}/announcements?activeOnly=true`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await fetch(
+            `${API_BASE_URL}/announcements?activeOnly=true`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -107,9 +112,11 @@ export const getActiveAnnouncements = async () => {
         setCachedData(CACHE_KEYS.ANNOUNCEMENTS, activeAnnouncements);
         setCachedData(CACHE_KEYS.ANNOUNCEMENTS_TIMESTAMP, Date.now());
 
-        console.log('📢 Fetched and cached announcements:', activeAnnouncements.length);
+        console.log(
+            '📢 Fetched and cached announcements:',
+            activeAnnouncements.length
+        );
         return activeAnnouncements;
-
     } catch (error) {
         console.error('Error fetching announcements:', error);
 

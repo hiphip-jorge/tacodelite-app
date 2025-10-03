@@ -5,7 +5,8 @@ const bcrypt = require('bcryptjs');
 AWS.config.update({ region: 'us-east-1' });
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-const ADMIN_USERS_TABLE = process.env.ADMIN_USERS_TABLE || 'tacodelite-app-admin-users-staging';
+const ADMIN_USERS_TABLE =
+    process.env.ADMIN_USERS_TABLE || 'tacodelite-app-admin-users-staging';
 
 async function hashPassword(password) {
     return await bcrypt.hash(password, 12);
@@ -22,8 +23,8 @@ async function createAdminUser(userData) {
             role: userData.role,
             active: userData.active,
             createdAt: new Date().toISOString(),
-            lastLogin: null
-        }
+            lastLogin: null,
+        },
     };
 
     try {
@@ -38,7 +39,9 @@ async function createAdminUser(userData) {
 
 async function seedAdminUsersDev() {
     console.log('🌱 Seeding admin users for DEVELOPMENT...');
-    console.log('⚠️  WARNING: This uses predictable credentials for testing only!\n');
+    console.log(
+        '⚠️  WARNING: This uses predictable credentials for testing only!\n'
+    );
 
     const adminUsers = [
         {
@@ -47,8 +50,8 @@ async function seedAdminUsersDev() {
             name: 'Admin User',
             password: 'password123', // Development only - predictable for testing
             role: 'admin',
-            active: true
-        }
+            active: true,
+        },
     ];
 
     let successCount = 0;
@@ -56,12 +59,14 @@ async function seedAdminUsersDev() {
         const passwordHash = await hashPassword(user.password);
         const success = await createAdminUser({
             ...user,
-            passwordHash
+            passwordHash,
         });
         if (success) successCount++;
     }
 
-    console.log(`\n✅ Development admin users seeding complete! (${successCount}/${adminUsers.length} created)`);
+    console.log(
+        `\n✅ Development admin users seeding complete! (${successCount}/${adminUsers.length} created)`
+    );
 
     console.log('\n📋 DEVELOPMENT CREDENTIALS:');
     console.log('==========================');
@@ -72,7 +77,9 @@ async function seedAdminUsersDev() {
     console.log('\n⚠️  DEVELOPMENT ONLY:');
     console.log('  - These credentials are for development/testing only');
     console.log('  - DO NOT use in production');
-    console.log('  - Use seed-admin-users.js for production with secure credentials');
+    console.log(
+        '  - Use seed-admin-users.js for production with secure credentials'
+    );
 }
 
 // Run the seeding

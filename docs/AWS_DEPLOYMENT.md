@@ -5,12 +5,12 @@ This guide explains how to deploy the Taco Delite App to AWS using Terraform.
 ## Prerequisites
 
 1. **Terraform installed** (version >= 1.0)
-   - Download from: https://www.terraform.io/downloads.html
-   - Or use Homebrew: `brew install terraform`
+    - Download from: https://www.terraform.io/downloads.html
+    - Or use Homebrew: `brew install terraform`
 
 2. **AWS CLI installed and configured** with appropriate credentials
-   - Download from: https://aws.amazon.com/cli/
-   - Configure with: `aws configure`
+    - Download from: https://aws.amazon.com/cli/
+    - Configure with: `aws configure`
 
 3. **Node.js 18+** installed
 
@@ -63,6 +63,7 @@ npm run deploy
 ## Environment Configuration
 
 ### Staging Environment
+
 ```bash
 # Deploy to staging
 npm run deploy:staging
@@ -74,6 +75,7 @@ terraform apply -var-file=staging.tfvars
 ```
 
 ### Production Environment
+
 ```bash
 # Deploy to production
 npm run deploy:production
@@ -89,10 +91,10 @@ To use a custom domain:
 
 1. **Create ACM Certificate** in the same region as your CloudFront distribution
 2. **Update variables.tf**:
-   ```hcl
-   domain_name = "yourdomain.com"
-   certificate_arn = "arn:aws:acm:us-east-1:..."
-   ```
+    ```hcl
+    domain_name = "yourdomain.com"
+    certificate_arn = "arn:aws:acm:us-east-1:..."
+    ```
 3. **Deploy**: `terraform apply -var-file=staging.tfvars`
 
 ## Local Development
@@ -130,15 +132,18 @@ terraform destroy -var-file=staging.tfvars
 ## Troubleshooting
 
 ### Build Issues
+
 - Ensure all dependencies are installed: `npm install`
 - Check that Vite build completes successfully: `npm run build`
 
 ### Terraform Issues
+
 - Verify AWS credentials are properly configured
 - Check that you have the necessary AWS permissions
 - Ensure Terraform version is >= 1.0
 
 ### Deployment Issues
+
 - Check CloudWatch logs for any errors
 - Verify S3 bucket permissions
 - Check CloudFront distribution status
@@ -146,6 +151,7 @@ terraform destroy -var-file=staging.tfvars
 ## Architecture
 
 The app uses:
+
 - **Frontend**: Vite + React
 - **Static Hosting**: S3 with website hosting enabled
 - **CDN**: CloudFlare (free tier) for global distribution
@@ -167,14 +173,16 @@ The backend includes these Lambda functions:
 ### API Endpoints
 
 After deployment, your API will be available at:
+
 - **GET** `/menu-items` - Fetch all menu items
-- **GET** `/categories` - Fetch all categories  
+- **GET** `/categories` - Fetch all categories
 - **GET** `/search?query={searchTerm}` - Search menu items
 - **GET** `/menu-items?categoryId={id}` - Filter by category
 
 ### Lambda Deployment
 
 To deploy Lambda functions:
+
 ```bash
 # Package and prepare Lambda functions
 ./deploy-lambda.sh
@@ -193,6 +201,7 @@ After deploying to AWS S3:
 4. **Enable CloudFlare proxy** (orange cloud icon)
 
 **Benefits of CloudFlare Free Tier:**
+
 - 🌍 Global CDN (200+ locations)
 - 🔒 Free SSL/HTTPS certificates
 - 🛡️ DDoS protection

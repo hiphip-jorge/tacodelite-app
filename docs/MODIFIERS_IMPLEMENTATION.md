@@ -9,105 +9,114 @@ A complete modifier groups system has been implemented to support adding customi
 ### 1. **Database Schema** (Updated in `DYNAMODB_SCHEMA.md`)
 
 #### Modifier Groups
+
 - **Purpose**: Define types/categories of modifiers (e.g., "Small Portion Add-ons", "Large Portion Add-ons", "Drink Sizes")
 - **Structure**:
-  ```json
-  {
-    "pk": "MODIFIER_GROUP#SMALL_ADDONS",
-    "sk": "MODIFIER_GROUP#SMALL_ADDONS",
-    "id": "SMALL_ADDONS",
-    "name": "Small Portion Add-ons",
-    "description": "For tacos and smaller items",
-    "sortOrder": 1,
-    "active": true
-  }
-  ```
+    ```json
+    {
+        "pk": "MODIFIER_GROUP#SMALL_ADDONS",
+        "sk": "MODIFIER_GROUP#SMALL_ADDONS",
+        "id": "SMALL_ADDONS",
+        "name": "Small Portion Add-ons",
+        "description": "For tacos and smaller items",
+        "sortOrder": 1,
+        "active": true
+    }
+    ```
 
 #### Modifiers
+
 - **Purpose**: Individual add-ons/customizations within a group
 - **Structure**:
-  ```json
-  {
-    "pk": "MODIFIER#SMALL_ADDONS",
-    "sk": "MODIFIER#LETTUCE_SM",
-    "id": "LETTUCE_SM",
-    "name": "Lettuce",
-    "groupId": "SMALL_ADDONS",
-    "groupName": "Small Portion Add-ons",
-    "price": 0.50,
-    "sortOrder": 1,
-    "active": true
-  }
-  ```
+    ```json
+    {
+        "pk": "MODIFIER#SMALL_ADDONS",
+        "sk": "MODIFIER#LETTUCE_SM",
+        "id": "LETTUCE_SM",
+        "name": "Lettuce",
+        "groupId": "SMALL_ADDONS",
+        "groupName": "Small Portion Add-ons",
+        "price": 0.5,
+        "sortOrder": 1,
+        "active": true
+    }
+    ```
 
 #### Menu Items with Modifier Groups
+
 ```json
 {
-  "id": 1,
-  "name": "Taco",
-  "price": 3.50,
-  "modifierGroups": [
-    {
-      "groupId": "SMALL_ADDONS",
-      "groupName": "Small Portion Add-ons",
-      "required": false,
-      "multiSelect": true,
-      "min": 0,
-      "max": null
-    }
-  ]
+    "id": 1,
+    "name": "Taco",
+    "price": 3.5,
+    "modifierGroups": [
+        {
+            "groupId": "SMALL_ADDONS",
+            "groupName": "Small Portion Add-ons",
+            "required": false,
+            "multiSelect": true,
+            "min": 0,
+            "max": null
+        }
+    ]
 }
 ```
 
 ### 2. **Lambda Functions** (8 New Functions)
 
 #### Modifier Groups APIs
+
 - **`getModifierGroups`** - GET `/modifier-groups`
 - **`createModifierGroup`** - POST `/modifier-groups`
 - **`updateModifierGroup`** - PUT `/modifier-groups/{id}`
 - **`deleteModifierGroup`** - DELETE `/modifier-groups/{id}`
 
 #### Modifiers APIs
+
 - **`getModifiers`** - GET `/modifiers?groupId={groupId}` (optional filter)
 - **`createModifier`** - POST `/modifiers`
 - **`updateModifier`** - PUT `/modifiers/{id}`
 - **`deleteModifier`** - DELETE `/modifiers/{id}?groupId={groupId}`
 
 #### Updated Menu Item Lambdas
+
 - **`createMenuItem`** - Now supports `modifierGroups` array
 - **`updateMenuItem`** - Now supports `modifierGroups` array
 
 ### 3. **Admin Pages** (tacodelite-admin)
 
 #### New Pages Created
+
 1. **`/modifier-groups`** - Manage modifier groups
-   - Create/Edit/Delete modifier groups
-   - Set sort order and active status
-   - View all groups in a table
+    - Create/Edit/Delete modifier groups
+    - Set sort order and active status
+    - View all groups in a table
 
 2. **`/modifiers`** - Manage individual modifiers
-   - Create/Edit/Delete modifiers
-   - Assign to modifier groups
-   - Set prices and sort order
-   - Filter by group
+    - Create/Edit/Delete modifiers
+    - Assign to modifier groups
+    - Set prices and sort order
+    - Filter by group
 
 #### Updated Pages
+
 1. **`/menu-items/new`** - Added modifier group selection
-   - Checkbox list of available modifier groups
-   - Auto-populates with default settings (optional, multi-select)
+    - Checkbox list of available modifier groups
+    - Auto-populates with default settings (optional, multi-select)
 
 2. **`/menu-items/:id/edit`** - Added modifier group selection
-   - Shows currently assigned groups
-   - Allow adding/removing groups
+    - Shows currently assigned groups
+    - Allow adding/removing groups
 
 ### 4. **API Service Updates** (tacodelite-admin)
 
 Added functions in `/src/services/apiService.js`:
+
 - `getModifierGroups()`
 - `createModifierGroup(groupData)`
 - `updateModifierGroup(groupId, groupData)`
 - `deleteModifierGroup(groupId)`
-- `getModifiers(groupId?)` 
+- `getModifiers(groupId?)`
 - `createModifier(modifierData)`
 - `updateModifier(modifierId, modifierData)`
 - `deleteModifier(modifierId, groupId)`
@@ -115,6 +124,7 @@ Added functions in `/src/services/apiService.js`:
 ### 5. **Routing** (tacodelite-admin)
 
 Updated `App.jsx` to include:
+
 ```jsx
 <Route path="/modifier-groups" element={<ProtectedRoute><ModifierGroups /></ProtectedRoute>} />
 <Route path="/modifiers" element={<ProtectedRoute><Modifiers /></ProtectedRoute>} />
@@ -147,12 +157,14 @@ cd /Users/jorgeperez/Development/tacodelite-app
 Add the following routes to your API Gateway:
 
 **Modifier Groups:**
+
 - `GET /modifier-groups` → `getModifierGroups`
 - `POST /modifier-groups` → `createModifierGroup`
 - `PUT /modifier-groups/{id}` → `updateModifierGroup`
 - `DELETE /modifier-groups/{id}` → `deleteModifierGroup`
 
 **Modifiers:**
+
 - `GET /modifiers` → `getModifiers` (supports `?groupId=` query param)
 - `POST /modifiers` → `createModifier`
 - `PUT /modifiers/{id}` → `updateModifier`
@@ -167,25 +179,26 @@ Add Lambda function definitions in your Terraform configuration for the new func
 Once deployed, use the admin panel to create your modifier groups:
 
 **Suggested Initial Groups:**
+
 1. **Small Portion Add-ons** (SMALL_ADDONS)
-   - For: Tacos
-   - Examples: Lettuce (sm), Tomatoes (sm), Onions (sm), Cheese (sm)
+    - For: Tacos
+    - Examples: Lettuce (sm), Tomatoes (sm), Onions (sm), Cheese (sm)
 
 2. **Large Portion Add-ons** (LARGE_ADDONS)
-   - For: Burritos, Salads, Nachos, Plates
-   - Examples: Lettuce (lg), Tomatoes (lg), Guacamole, Sour Cream
+    - For: Burritos, Salads, Nachos, Plates
+    - Examples: Lettuce (lg), Tomatoes (lg), Guacamole, Sour Cream
 
 3. **Drink Sizes** (DRINK_SIZES)
-   - For: Beverages
-   - Examples: Small, Medium, Large
+    - For: Beverages
+    - Examples: Small, Medium, Large
 
 4. **Premium Proteins** (PREMIUM_PROTEINS)
-   - For: All items
-   - Examples: Grilled Chicken (+$2), Steak (+$3), Shrimp (+$4)
+    - For: All items
+    - Examples: Grilled Chicken (+$2), Steak (+$3), Shrimp (+$4)
 
 5. **Sauces** (SAUCES)
-   - For: All items
-   - Examples: Mild Salsa, Hot Salsa, Verde, Habanero
+    - For: All items
+    - Examples: Mild Salsa, Hot Salsa, Verde, Habanero
 
 ### 5. **Deploy Admin Panel**
 
@@ -202,22 +215,22 @@ npm run build
 ### For Admins
 
 1. **Navigate to Modifier Groups** (`/modifier-groups`)
-   - Click "New Group"
-   - Enter ID (e.g., "SMALL_ADDONS"), Name, Description
-   - Set sort order
-   - Click "Create"
+    - Click "New Group"
+    - Enter ID (e.g., "SMALL_ADDONS"), Name, Description
+    - Set sort order
+    - Click "Create"
 
 2. **Navigate to Modifiers** (`/modifiers`)
-   - Click "New Modifier"
-   - Enter ID (e.g., "LETTUCE_SM"), Name, Price
-   - Select the modifier group
-   - Click "Create"
+    - Click "New Modifier"
+    - Enter ID (e.g., "LETTUCE_SM"), Name, Price
+    - Select the modifier group
+    - Click "Create"
 
 3. **Assign to Menu Items** (`/menu-items`)
-   - Edit any menu item
-   - Scroll to "Modifier Groups" section
-   - Check the groups that apply to this item
-   - Save changes
+    - Edit any menu item
+    - Scroll to "Modifier Groups" section
+    - Check the groups that apply to this item
+    - Save changes
 
 ### Data Flow
 
@@ -231,6 +244,7 @@ npm run build
 ### Why "Modifier Groups" vs Single Modifiers?
 
 This approach allows:
+
 - **Reusability**: Same modifier (lettuce) in different contexts (small vs large portions) with different prices
 - **Flexibility**: Easy to manage which groups apply to which items
 - **Scalability**: Future features like "required" groups, min/max selections
@@ -245,6 +259,7 @@ This approach allows:
 ### Future Enhancements
 
 The current schema supports (but doesn't yet use):
+
 - `required`: Make modifier selection mandatory
 - `multiSelect`: Allow multiple selections from a group
 - `min/max`: Set selection limits (e.g., "Choose 2-4 toppings")
@@ -254,6 +269,7 @@ These can be implemented in the ordering UI when you're ready to add ordering fu
 ## Files Created/Modified
 
 ### Created Files (Lambda)
+
 - `/lambda/getModifierGroups/index.js`
 - `/lambda/createModifierGroup/index.js`
 - `/lambda/updateModifierGroup/index.js`
@@ -264,24 +280,27 @@ These can be implemented in the ordering UI when you're ready to add ordering fu
 - `/lambda/deleteModifier/index.js`
 
 ### Created Files (Admin)
+
 - `/tacodelite-admin/src/pages/ModifierGroups.jsx`
 - `/tacodelite-admin/src/pages/Modifiers.jsx`
 
 ### Modified Files (Lambda)
+
 - `/lambda/createMenuItem/index.js` - Added modifierGroups support
 - `/lambda/updateMenuItem/index.js` - Added modifierGroups support
 
 ### Modified Files (Admin)
+
 - `/tacodelite-admin/src/App.jsx` - Added routes
 - `/tacodelite-admin/src/services/apiService.js` - Added API functions
 - `/tacodelite-admin/src/pages/MenuItemEdit.jsx` - Added modifier group UI
 - `/tacodelite-admin/src/pages/MenuItemNew.jsx` - Added modifier group UI
 
 ### Modified Files (Documentation)
+
 - `/docs/DYNAMODB_SCHEMA.md` - Added modifier groups and modifiers schema
 - `/docs/MODIFIERS_IMPLEMENTATION.md` - This file
 
 ## Questions?
 
 If you have any questions about the implementation or need help with deployment, feel free to ask!
-

@@ -1,12 +1,18 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, PutCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    GetCommand,
+    PutCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { incrementMenuVersion } = require('./shared/menuVersionUtils');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         // Get the category ID from path parameters
         const categoryId = event.pathParameters?.id;
@@ -17,31 +23,37 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'PUT, OPTIONS',
                 },
-                body: JSON.stringify({ error: 'Category ID is required' })
+                body: JSON.stringify({ error: 'Category ID is required' }),
             };
         }
 
         // Validate required fields
         const requiredFields = ['name', 'active'];
-        const missingFields = requiredFields.filter(field => body[field] === undefined);
+        const missingFields = requiredFields.filter(
+            field => body[field] === undefined
+        );
 
         if (missingFields.length > 0) {
             return {
                 statusCode: 400,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'PUT, OPTIONS',
                 },
                 body: JSON.stringify({
                     error: 'Missing required fields',
-                    missingFields
-                })
+                    missingFields,
+                }),
             };
         }
 
@@ -49,8 +61,8 @@ exports.handler = async (event) => {
         const getParams = {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
-                pk: `CATEGORY#${categoryId}`
-            }
+                pk: `CATEGORY#${categoryId}`,
+            },
         };
 
         const getCommand = new GetCommand(getParams);
@@ -61,11 +73,13 @@ exports.handler = async (event) => {
                 statusCode: 404,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                    'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+                    'Access-Control-Allow-Origin':
+                        process.env.ALLOWED_ORIGINS || '*',
+                    'Access-Control-Allow-Headers':
+                        'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                    'Access-Control-Allow-Methods': 'PUT, OPTIONS',
                 },
-                body: JSON.stringify({ error: 'Category not found' })
+                body: JSON.stringify({ error: 'Category not found' }),
             };
         }
 
@@ -74,12 +88,12 @@ exports.handler = async (event) => {
             ...existingCategory.Item,
             name: body.name,
             active: body.active,
-            id: parseInt(categoryId)
+            id: parseInt(categoryId),
         };
 
         const putParams = {
             TableName: process.env.DYNAMODB_TABLE,
-            Item: updatedCategory
+            Item: updatedCategory,
         };
 
         const putCommand = new PutCommand(putParams);
@@ -103,15 +117,17 @@ exports.handler = async (event) => {
             statusCode: 200,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'PUT, OPTIONS',
             },
             body: JSON.stringify({
                 message: 'Category updated successfully',
                 category: updatedCategory,
-                version: versionInfo?.version || 'unknown'
-            })
+                version: versionInfo?.version || 'unknown',
+            }),
         };
     } catch (error) {
         console.error('Error updating category:', error);
@@ -119,14 +135,16 @@ exports.handler = async (event) => {
             statusCode: 500,
             headers: {
                 'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || '*',
-                'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
-                'Access-Control-Allow-Methods': 'PUT, OPTIONS'
+                'Access-Control-Allow-Origin':
+                    process.env.ALLOWED_ORIGINS || '*',
+                'Access-Control-Allow-Headers':
+                    'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+                'Access-Control-Allow-Methods': 'PUT, OPTIONS',
             },
             body: JSON.stringify({
                 error: 'Failed to update category',
-                message: error.message
-            })
+                message: error.message,
+            }),
         };
     }
 };

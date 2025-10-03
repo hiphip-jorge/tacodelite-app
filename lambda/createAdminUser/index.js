@@ -2,22 +2,27 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const ADMIN_USERS_TABLE = process.env.ADMIN_USERS_TABLE;
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS || 'https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,,https://staging.tacodelitewestplano.com';
+const ALLOWED_ORIGINS =
+    process.env.ALLOWED_ORIGINS ||
+    'https://localhost:3000,https://localhost:5173,http://localhost:3000,http://localhost:5173,,https://staging.tacodelitewestplano.com';
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     console.log('🚀 Create Admin User Lambda triggered');
     console.log('📝 Event:', JSON.stringify(event, null, 2));
 
     // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': ALLOWED_ORIGINS,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'POST,OPTIONS',
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
     };
 
     try {
@@ -27,7 +32,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers,
-                body: JSON.stringify({ message: 'CORS preflight successful' })
+                body: JSON.stringify({ message: 'CORS preflight successful' }),
             };
         }
 
@@ -42,8 +47,8 @@ exports.handler = async (event) => {
                 headers,
                 body: JSON.stringify({
                     error: 'Invalid JSON in request body',
-                    details: parseError.message
-                })
+                    details: parseError.message,
+                }),
             };
         }
 
@@ -57,8 +62,8 @@ exports.handler = async (event) => {
                 headers,
                 body: JSON.stringify({
                     error: 'Missing required fields',
-                    required: ['name', 'email', 'password']
-                })
+                    required: ['name', 'email', 'password'],
+                }),
             };
         }
 
@@ -70,8 +75,8 @@ exports.handler = async (event) => {
                 statusCode: 400,
                 headers,
                 body: JSON.stringify({
-                    error: 'Invalid email format'
-                })
+                    error: 'Invalid email format',
+                }),
             };
         }
 
@@ -89,7 +94,7 @@ exports.handler = async (event) => {
             role: 'admin',
             active: true,
             createdAt: new Date().toISOString(),
-            lastLogin: null
+            lastLogin: null,
         };
 
         console.log('📝 Creating admin user:', newUser);
@@ -97,7 +102,7 @@ exports.handler = async (event) => {
         // Save to DynamoDB
         const putCommand = new PutCommand({
             TableName: ADMIN_USERS_TABLE,
-            Item: newUser
+            Item: newUser,
         });
 
         await docClient.send(putCommand);
@@ -123,10 +128,9 @@ exports.handler = async (event) => {
             headers,
             body: JSON.stringify({
                 message: 'Admin user created successfully',
-                user: userResponse
-            })
+                user: userResponse,
+            }),
         };
-
     } catch (error) {
         console.error('❌ Error creating admin user:', error);
 
@@ -135,8 +139,8 @@ exports.handler = async (event) => {
             headers,
             body: JSON.stringify({
                 error: 'Failed to create admin user',
-                details: error.message
-            })
+                details: error.message,
+            }),
         };
     }
 };

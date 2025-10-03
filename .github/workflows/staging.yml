@@ -1,219 +1,219 @@
 name: Deploy to Staging
 
 on:
-  push:
-    branches: [ staging ]
-  pull_request:
-    branches: [ staging ]
+    push:
+        branches: [staging]
+    pull_request:
+        branches: [staging]
 
 env:
-  NODE_VERSION: '20'
-  AWS_REGION: 'us-east-1'
+    NODE_VERSION: '20'
+    AWS_REGION: 'us-east-1'
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    outputs:
-      build-complete: ${{ steps.build.outputs.complete }}
-      terraform-complete: ${{ steps.terraform.outputs.complete }}
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    setup:
+        runs-on: ubuntu-latest
+        outputs:
+            build-complete: ${{ steps.build.outputs.complete }}
+            terraform-complete: ${{ steps.terraform.outputs.complete }}
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: '1.6.0'
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: 'npm'
 
-    - name: Install dependencies
-      id: deps
-      run: npm ci
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: '1.6.0'
 
-    - name: Build Lambda functions
-      run: |
-        echo "📦 Building Lambda functions..."
-        ./scripts/build-lambda.sh
+            - name: Install dependencies
+              id: deps
+              run: npm ci
 
-    - name: Build staging app
-      id: build
-      run: |
-        npm run build:staging
-        echo "complete=true" >> $GITHUB_OUTPUT
-      env:
-        VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
-        VITE_USE_MOCK: "false"
-        VITE_ENVIRONMENT: "staging"
-        VITE_APP_NAME: "Taco Delite"
+            - name: Build Lambda functions
+              run: |
+                  echo "📦 Building Lambda functions..."
+                  ./scripts/build-lambda.sh
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+            - name: Build staging app
+              id: build
+              run: |
+                  npm run build:staging
+                  echo "complete=true" >> $GITHUB_OUTPUT
+              env:
+                  VITE_API_URL: 'https://staging.tacodelitewestplano.com/prod'
+                  VITE_USE_MOCK: 'false'
+                  VITE_ENVIRONMENT: 'staging'
+                  VITE_APP_NAME: 'Taco Delite'
 
-    - name: Terraform init
-      id: terraform
-      run: |
-        # Initialize Terraform (no plan to avoid state lock issues)
-        terraform -chdir=terraform init
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ env.AWS_REGION }}
 
-        # Select staging workspace
-        terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
-        echo "complete=true" >> $GITHUB_OUTPUT
+            - name: Terraform init
+              id: terraform
+              run: |
+                  # Initialize Terraform (no plan to avoid state lock issues)
+                  terraform -chdir=terraform init
 
-  test:
-    needs: setup
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/staging'  # Only run on staging branch pushes
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+                  # Select staging workspace
+                  terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
+                  echo "complete=true" >> $GITHUB_OUTPUT
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+    test:
+        needs: setup
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/staging' # Only run on staging branch pushes
 
-    - name: Install dependencies
-      run: npm ci
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-    - name: Run tests
-      run: |
-        echo "🧪 Running test suite..."
-        npm test -- --run --reporter=verbose
-      env:
-        VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
-        VITE_USE_MOCK: "false"
-        VITE_ENVIRONMENT: "staging"
-        VITE_APP_NAME: "Taco Delite"
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: 'npm'
 
-    - name: Test coverage
-      run: |
-        echo "📊 Generating test coverage report..."
-        npm run test:coverage
+            - name: Install dependencies
+              run: npm ci
 
-  deploy-staging:
-    needs: [setup, test]
-    runs-on: ubuntu-latest
-    environment: staging  # Manual approval required
-    if: github.ref == 'refs/heads/staging'  # Only run on staging branch pushes
+            - name: Run tests
+              run: |
+                  echo "🧪 Running test suite..."
+                  npm test -- --run --reporter=verbose
+              env:
+                  VITE_API_URL: 'https://staging.tacodelitewestplano.com/prod'
+                  VITE_USE_MOCK: 'false'
+                  VITE_ENVIRONMENT: 'staging'
+                  VITE_APP_NAME: 'Taco Delite'
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+            - name: Test coverage
+              run: |
+                  echo "📊 Generating test coverage report..."
+                  npm run test:coverage
 
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: '1.6.0'
+    deploy-staging:
+        needs: [setup, test]
+        runs-on: ubuntu-latest
+        environment: staging # Manual approval required
+        if: github.ref == 'refs/heads/staging' # Only run on staging branch pushes
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ env.NODE_VERSION }}
-        cache: 'npm'
+            - name: Setup Terraform
+              uses: hashicorp/setup-terraform@v3
+              with:
+                  terraform_version: '1.6.0'
 
-    - name: Install dependencies
-      run: npm ci
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                  aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws-region: ${{ env.AWS_REGION }}
 
-    - name: Build staging app
-      run: |
-        npm run build:staging
-      env:
-        VITE_API_URL: "https://staging.tacodelitewestplano.com/prod"
-        VITE_USE_MOCK: "false"
-        VITE_ENVIRONMENT: "staging"
-        VITE_APP_NAME: "Taco Delite"
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ env.NODE_VERSION }}
+                  cache: 'npm'
 
-    - name: Build Lambda functions
-      run: |
-        echo "📦 Building Lambda functions..."
-        chmod +x scripts/build-lambda.sh
-        ./scripts/build-lambda.sh
+            - name: Install dependencies
+              run: npm ci
 
-    - name: Deploy infrastructure
-      run: |
-        echo "🚀 Deploying to STAGING environment..."
-        
-        # Function to clean up locks on exit
-        cleanup_locks() {
-            echo "🧹 Cleaning up any remaining state locks..."
-            EXISTING_LOCKS=$(aws dynamodb scan --table-name tacodelite-terraform-locks --region us-east-1 --query 'Items[?contains(Info.S, `staging`)].LockID.S' --output text 2>/dev/null || echo "")
-            if [ -n "$EXISTING_LOCKS" ]; then
-                for lock_id in $EXISTING_LOCKS; do
-                    aws dynamodb delete-item \
-                        --table-name tacodelite-terraform-locks \
-                        --region us-east-1 \
-                        --key "{\"LockID\":{\"S\":\"$lock_id\"}}" \
-                        2>/dev/null && echo "✅ Lock cleared on cleanup: $lock_id"
-                done
-            fi
-        }
-        
-        # Set up trap to clean up locks on script exit/failure
-        trap cleanup_locks EXIT
-        
-        # Initialize Terraform
-        terraform -chdir=terraform init
-        
-        # Clear any potential stale locks
-        echo "🔓 Checking for stale state locks..."
-        EXISTING_LOCKS=$(aws dynamodb scan --table-name tacodelite-terraform-locks --region us-east-1 --query 'Items[?contains(Info.S, `staging`)].LockID.S' --output text 2>/dev/null || echo "")
-        if [ -n "$EXISTING_LOCKS" ]; then
-            echo "⚠️  Found existing staging locks, clearing..."
-            for lock_id in $EXISTING_LOCKS; do
-                aws dynamodb delete-item \
-                    --table-name tacodelite-terraform-locks \
-                    --region us-east-1 \
-                    --key "{\"LockID\":{\"S\":\"$lock_id\"}}" \
-                    2>/dev/null && echo "✅ Lock cleared: $lock_id"
-            done
-        fi
-        
-        # Select staging workspace
-        terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
-        
-        # Plan the changes
-        echo "📋 Planning Terraform changes..."
-        terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars -out=tfplan
-        
-        # Show plan summary
-        echo "📊 Plan Summary:"
-        terraform -chdir=terraform show -no-color tfplan | head -20
-        echo "... (see full plan above)"
-        
-        # Apply the plan
-        echo "🚀 Applying Terraform changes..."
-        terraform -chdir=terraform apply tfplan
+            - name: Build staging app
+              run: |
+                  npm run build:staging
+              env:
+                  VITE_API_URL: 'https://staging.tacodelitewestplano.com/prod'
+                  VITE_USE_MOCK: 'false'
+                  VITE_ENVIRONMENT: 'staging'
+                  VITE_APP_NAME: 'Taco Delite'
 
-    - name: Upload static assets
-      run: |
-        echo "📤 Uploading static assets..."
-        # Get S3 bucket name from Terraform output
-        BUCKET_NAME=$(terraform -chdir=terraform output -raw s3_bucket_name)
-        echo "📦 S3 Bucket: $BUCKET_NAME"
-        
-        # Upload using the bucket name directly
-        S3_BUCKET_NAME="$BUCKET_NAME" ./scripts/upload-static.sh --environment staging
+            - name: Build Lambda functions
+              run: |
+                  echo "📦 Building Lambda functions..."
+                  chmod +x scripts/build-lambda.sh
+                  ./scripts/build-lambda.sh
 
-    - name: Get deployment info
-      run: |
-        echo "📋 Deployment Summary:"
-        terraform -chdir=terraform output
+            - name: Deploy infrastructure
+              run: |
+                  echo "🚀 Deploying to STAGING environment..."
+
+                  # Function to clean up locks on exit
+                  cleanup_locks() {
+                      echo "🧹 Cleaning up any remaining state locks..."
+                      EXISTING_LOCKS=$(aws dynamodb scan --table-name tacodelite-terraform-locks --region us-east-1 --query 'Items[?contains(Info.S, `staging`)].LockID.S' --output text 2>/dev/null || echo "")
+                      if [ -n "$EXISTING_LOCKS" ]; then
+                          for lock_id in $EXISTING_LOCKS; do
+                              aws dynamodb delete-item \
+                                  --table-name tacodelite-terraform-locks \
+                                  --region us-east-1 \
+                                  --key "{\"LockID\":{\"S\":\"$lock_id\"}}" \
+                                  2>/dev/null && echo "✅ Lock cleared on cleanup: $lock_id"
+                          done
+                      fi
+                  }
+
+                  # Set up trap to clean up locks on script exit/failure
+                  trap cleanup_locks EXIT
+
+                  # Initialize Terraform
+                  terraform -chdir=terraform init
+
+                  # Clear any potential stale locks
+                  echo "🔓 Checking for stale state locks..."
+                  EXISTING_LOCKS=$(aws dynamodb scan --table-name tacodelite-terraform-locks --region us-east-1 --query 'Items[?contains(Info.S, `staging`)].LockID.S' --output text 2>/dev/null || echo "")
+                  if [ -n "$EXISTING_LOCKS" ]; then
+                      echo "⚠️  Found existing staging locks, clearing..."
+                      for lock_id in $EXISTING_LOCKS; do
+                          aws dynamodb delete-item \
+                              --table-name tacodelite-terraform-locks \
+                              --region us-east-1 \
+                              --key "{\"LockID\":{\"S\":\"$lock_id\"}}" \
+                              2>/dev/null && echo "✅ Lock cleared: $lock_id"
+                      done
+                  fi
+
+                  # Select staging workspace
+                  terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
+
+                  # Plan the changes
+                  echo "📋 Planning Terraform changes..."
+                  terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars -out=tfplan
+
+                  # Show plan summary
+                  echo "📊 Plan Summary:"
+                  terraform -chdir=terraform show -no-color tfplan | head -20
+                  echo "... (see full plan above)"
+
+                  # Apply the plan
+                  echo "🚀 Applying Terraform changes..."
+                  terraform -chdir=terraform apply tfplan
+
+            - name: Upload static assets
+              run: |
+                  echo "📤 Uploading static assets..."
+                  # Get S3 bucket name from Terraform output
+                  BUCKET_NAME=$(terraform -chdir=terraform output -raw s3_bucket_name)
+                  echo "📦 S3 Bucket: $BUCKET_NAME"
+
+                  # Upload using the bucket name directly
+                  S3_BUCKET_NAME="$BUCKET_NAME" ./scripts/upload-static.sh --environment staging
+
+            - name: Get deployment info
+              run: |
+                  echo "📋 Deployment Summary:"
+                  terraform -chdir=terraform output

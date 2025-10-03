@@ -1,13 +1,17 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig(() => {
     // Determine output directory based on environment
-    const environment = process.env.VITE_ENVIRONMENT || 'development'
-    const outDir = environment === 'production' ? 'dist/production' :
-        environment === 'staging' ? 'dist/staging' : 'dist'
+    const environment = process.env.VITE_ENVIRONMENT || 'development';
+    const outDir =
+        environment === 'production'
+            ? 'dist/production'
+            : environment === 'staging'
+              ? 'dist/staging'
+              : 'dist';
 
     return {
         plugins: [react()],
@@ -36,5 +40,5 @@ export default defineConfig(() => {
             assetsDir: 'assets',
             manifest: true,
         },
-    }
-})
+    };
+});

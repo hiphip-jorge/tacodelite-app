@@ -1,5 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getCategories, getMenuItems, searchMenuItems, getMenuItemsByCategory, cacheManager } from '../services/menuService';
+import {
+    getCategories,
+    getMenuItems,
+    searchMenuItems,
+    getMenuItemsByCategory,
+    cacheManager,
+} from '../services/menuService';
 
 export const useMenu = () => {
     const [categories, setCategories] = useState([]);
@@ -61,7 +67,12 @@ export const useMenu = () => {
             return;
         }
 
-        console.log('Filter useEffect triggered - selectedCategory:', selectedCategory, 'searchQuery:', searchQuery);
+        console.log(
+            'Filter useEffect triggered - selectedCategory:',
+            selectedCategory,
+            'searchQuery:',
+            searchQuery
+        );
 
         const filterItems = async () => {
             try {
@@ -78,8 +89,15 @@ export const useMenu = () => {
                     items = [...menuItems]; // Create a copy to avoid reference issues
                 } else {
                     // Filter by category - extract numeric part from PK (e.g., "CATEGORY#4" -> 4)
-                    const categoryNumber = parseInt(selectedCategory.replace('CATEGORY#', ''));
-                    console.log('Filtering by category:', selectedCategory, '->', categoryNumber);
+                    const categoryNumber = parseInt(
+                        selectedCategory.replace('CATEGORY#', '')
+                    );
+                    console.log(
+                        'Filtering by category:',
+                        selectedCategory,
+                        '->',
+                        categoryNumber
+                    );
                     items = await getMenuItemsByCategory(categoryNumber);
                     console.log('Category API returned items:', items);
                 }
@@ -106,10 +124,14 @@ export const useMenu = () => {
 
                 // Only update state if this is still the current category (prevents race conditions)
                 if (currentCategoryRef.current === selectedCategory) {
-                    console.log('Category still matches, updating filtered items');
+                    console.log(
+                        'Category still matches, updating filtered items'
+                    );
                     setFilteredItems(sortedItems);
                 } else {
-                    console.log('Category changed during API call, ignoring result');
+                    console.log(
+                        'Category changed during API call, ignoring result'
+                    );
                 }
             } catch (err) {
                 setError('Failed to filter menu items');
@@ -120,17 +142,20 @@ export const useMenu = () => {
         };
 
         filterItems();
-
     }, [selectedCategory, searchQuery, menuItems]);
 
     // Debug: Log when filteredItems changes
     useEffect(() => {
-        console.log('filteredItems state changed:', filteredItems.length, 'items');
+        console.log(
+            'filteredItems state changed:',
+            filteredItems.length,
+            'items'
+        );
         console.log('Current selectedCategory:', selectedCategory);
     }, [filteredItems, selectedCategory]);
 
     // Handle category selection
-    const handleCategoryChange = useCallback((categoryId) => {
+    const handleCategoryChange = useCallback(categoryId => {
         console.log('Category changed to:', categoryId);
 
         setSelectedCategory(categoryId);
@@ -138,7 +163,7 @@ export const useMenu = () => {
     }, []);
 
     // Handle search
-    const handleSearch = useCallback((query) => {
+    const handleSearch = useCallback(query => {
         setSearchQuery(query);
         setSelectedCategory('all'); // Reset category when searching
     }, []);
@@ -150,45 +175,67 @@ export const useMenu = () => {
     }, []);
 
     // Get category name by ID
-    const getCategoryName = useCallback((categoryId) => {
-        if (categoryId === 'all') return 'All Items';
-        if (!categoryId || typeof categoryId !== 'string') return 'Unknown';
-        // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
-        const categoryNumber = parseInt(categoryId.replace('CATEGORY#', ''));
-        const category = categories.find(cat => cat.pk === `CATEGORY#${categoryNumber}`);
-        return category ? category.name : 'Unknown';
-    }, [categories]);
+    const getCategoryName = useCallback(
+        categoryId => {
+            if (categoryId === 'all') return 'All Items';
+            if (!categoryId || typeof categoryId !== 'string') return 'Unknown';
+            // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
+            const categoryNumber = parseInt(
+                categoryId.replace('CATEGORY#', '')
+            );
+            const category = categories.find(
+                cat => cat.pk === `CATEGORY#${categoryNumber}`
+            );
+            return category ? category.name : 'Unknown';
+        },
+        [categories]
+    );
 
     // Get category description by ID
-    const getCategoryDescription = useCallback((categoryId) => {
-        if (categoryId === 'all') return '';
-        if (!categoryId || typeof categoryId !== 'string') return '';
-        // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
-        const categoryNumber = parseInt(categoryId.replace('CATEGORY#', ''));
-        const category = categories.find(cat => cat.pk === `CATEGORY#${categoryNumber}`);
-        return category ? category.description : '';
-    }, [categories]);
+    const getCategoryDescription = useCallback(
+        categoryId => {
+            if (categoryId === 'all') return '';
+            if (!categoryId || typeof categoryId !== 'string') return '';
+            // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
+            const categoryNumber = parseInt(
+                categoryId.replace('CATEGORY#', '')
+            );
+            const category = categories.find(
+                cat => cat.pk === `CATEGORY#${categoryNumber}`
+            );
+            return category ? category.description : '';
+        },
+        [categories]
+    );
 
     // Get items count for a category
-    const getCategoryItemCount = useCallback((categoryId) => {
-        if (categoryId === 'all') {
-            return menuItems.length;
-        }
-        if (!categoryId || typeof categoryId !== 'string') {
-            return 0;
-        }
-        // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
-        const categoryNumber = parseInt(categoryId.replace('CATEGORY#', ''));
+    const getCategoryItemCount = useCallback(
+        categoryId => {
+            if (categoryId === 'all') {
+                return menuItems.length;
+            }
+            if (!categoryId || typeof categoryId !== 'string') {
+                return 0;
+            }
+            // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
+            const categoryNumber = parseInt(
+                categoryId.replace('CATEGORY#', '')
+            );
 
-        // Debug: Log the first few menu items to see their structure
-        if (menuItems.length > 0) {
-            console.log('First menu item structure:', menuItems[0]);
-            console.log('Looking for categoryId:', categoryNumber);
-            console.log('Available categoryIds:', [...new Set(menuItems.map(item => item.categoryId))]);
-        }
+            // Debug: Log the first few menu items to see their structure
+            if (menuItems.length > 0) {
+                console.log('First menu item structure:', menuItems[0]);
+                console.log('Looking for categoryId:', categoryNumber);
+                console.log('Available categoryIds:', [
+                    ...new Set(menuItems.map(item => item.categoryId)),
+                ]);
+            }
 
-        return menuItems.filter(item => item.categoryId === categoryNumber).length;
-    }, [menuItems]);
+            return menuItems.filter(item => item.categoryId === categoryNumber)
+                .length;
+        },
+        [menuItems]
+    );
 
     // Get vegetarian items count
     const getVegetarianCount = useCallback(() => {
@@ -202,7 +249,7 @@ export const useMenu = () => {
         const prices = filteredItems.map(item => item.price);
         return {
             min: Math.min(...prices),
-            max: Math.max(...prices)
+            max: Math.max(...prices),
         };
     }, [filteredItems]);
 
@@ -212,18 +259,27 @@ export const useMenu = () => {
     }, [filteredItems]);
 
     // Create setters that match what Menu.jsx expects
-    const setSearchTerm = useCallback((term) => {
-        handleSearch(term);
-    }, [handleSearch]);
+    const setSearchTerm = useCallback(
+        term => {
+            handleSearch(term);
+        },
+        [handleSearch]
+    );
 
-    const setSelectedCategoryAction = useCallback((categoryId) => {
-        handleCategoryChange(categoryId);
-    }, [handleCategoryChange]);
+    const setSelectedCategoryAction = useCallback(
+        categoryId => {
+            handleCategoryChange(categoryId);
+        },
+        [handleCategoryChange]
+    );
 
     // Create getItemCount function that matches what Menu.jsx expects
-    const getItemCount = useCallback((categoryId) => {
-        return getCategoryItemCount(categoryId);
-    }, [getCategoryItemCount]);
+    const getItemCount = useCallback(
+        categoryId => {
+            return getCategoryItemCount(categoryId);
+        },
+        [getCategoryItemCount]
+    );
 
     // Debug function to check cache status
     const getCacheStatus = useCallback(() => {
@@ -271,6 +327,6 @@ export const useMenu = () => {
 
         // Utility
         totalItems: menuItems.length,
-        filteredCount: filteredItems.length
+        filteredCount: filteredItems.length,
     };
 };

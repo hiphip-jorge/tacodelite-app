@@ -5,7 +5,7 @@ This directory contains data files and seeding scripts for the Taco Delite appli
 ## Files
 
 - `menu_categories_rows.csv` - Menu categories data for seeding
-- `menu_rows.csv` - Menu items data for seeding  
+- `menu_rows.csv` - Menu items data for seeding
 - `seed-dynamodb.js` - Main seeding script for DynamoDB
 - `seed-admin-users.cjs` - Admin user seeding script
 - `seed-admin-users-dev.cjs` - Development admin user seeding script

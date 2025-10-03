@@ -1,20 +1,27 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, UpdateCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
+const {
+    DynamoDBDocumentClient,
+    UpdateCommand,
+    GetCommand,
+} = require('@aws-sdk/lib-dynamodb');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const getCorsHeaders = (origin, additionalHeaders = {}) => {
     return {
         'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'PUT, OPTIONS',
-        ...additionalHeaders
+        ...additionalHeaders,
     };
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         console.log('Event received:', JSON.stringify(event, null, 2));
 
@@ -25,7 +32,7 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: getCorsHeaders(origin),
-                body: ''
+                body: '',
             };
         }
 
@@ -37,8 +44,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Announcement ID is required'
-                })
+                    error: 'Announcement ID is required',
+                }),
             };
         }
 
@@ -47,7 +54,12 @@ exports.handler = async (event) => {
         const { title, message, type, active, startsAt, expiresAt } = body;
 
         // Validate date range if both startsAt and expiresAt are provided
-        if (startsAt !== undefined && expiresAt !== undefined && startsAt && expiresAt) {
+        if (
+            startsAt !== undefined &&
+            expiresAt !== undefined &&
+            startsAt &&
+            expiresAt
+        ) {
             const startDate = new Date(startsAt);
             const endDate = new Date(expiresAt);
             if (startDate >= endDate) {
@@ -56,8 +68,8 @@ exports.handler = async (event) => {
                     headers: getCorsHeaders(origin),
                     body: JSON.stringify({
                         success: false,
-                        error: 'Start date must be before expiration date'
-                    })
+                        error: 'Start date must be before expiration date',
+                    }),
                 };
             }
         }
@@ -67,8 +79,8 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
                 pk: 'ANNOUNCEMENT',
-                sk: `ANNOUNCEMENT#${announcementId}`
-            }
+                sk: `ANNOUNCEMENT#${announcementId}`,
+            },
         };
 
         const getCommand = new GetCommand(getParams);
@@ -80,8 +92,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Announcement not found'
-                })
+                    error: 'Announcement not found',
+                }),
             };
         }
 
@@ -137,8 +149,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'No fields to update'
-                })
+                    error: 'No fields to update',
+                }),
             };
         }
 
@@ -147,12 +159,12 @@ exports.handler = async (event) => {
             TableName: process.env.DYNAMODB_TABLE,
             Key: {
                 pk: 'ANNOUNCEMENT',
-                sk: `ANNOUNCEMENT#${announcementId}`
+                sk: `ANNOUNCEMENT#${announcementId}`,
             },
             UpdateExpression: `SET ${updateExpressions.join(', ')}`,
             ExpressionAttributeNames: expressionAttributeNames,
             ExpressionAttributeValues: expressionAttributeValues,
-            ReturnValues: 'ALL_NEW'
+            ReturnValues: 'ALL_NEW',
         };
 
         const updateCommand = new UpdateCommand(updateParams);
@@ -174,7 +186,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: getCorsHeaders(origin, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }),
             body: JSON.stringify({
                 success: true,
@@ -187,11 +199,10 @@ exports.handler = async (event) => {
                     startsAt: result.Attributes.startsAt,
                     expiresAt: result.Attributes.expiresAt,
                     createdAt: result.Attributes.createdAt,
-                    updatedAt: result.Attributes.updatedAt
-                }
-            })
+                    updatedAt: result.Attributes.updatedAt,
+                },
+            }),
         };
-
     } catch (error) {
         console.error('Update announcement error:', error);
         const origin = event.headers?.origin || event.headers?.Origin || '*';
@@ -200,8 +211,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

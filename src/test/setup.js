@@ -1,23 +1,23 @@
-import '@testing-library/jest-dom'
+import '@testing-library/jest-dom';
 
 // Mock localStorage with actual storage
 const localStorageMock = {
     store: {},
-    getItem: vi.fn((key) => localStorageMock.store[key] || null),
+    getItem: vi.fn(key => localStorageMock.store[key] || null),
     setItem: vi.fn((key, value) => {
-        localStorageMock.store[key] = value
+        localStorageMock.store[key] = value;
     }),
-    removeItem: vi.fn((key) => {
-        delete localStorageMock.store[key]
+    removeItem: vi.fn(key => {
+        delete localStorageMock.store[key];
     }),
     clear: vi.fn(() => {
-        localStorageMock.store = {}
+        localStorageMock.store = {};
     }),
-}
-global.localStorage = localStorageMock
+};
+global.localStorage = localStorageMock;
 
 // Mock fetch
-global.fetch = vi.fn()
+global.fetch = vi.fn();
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -32,14 +32,14 @@ Object.defineProperty(window, 'matchMedia', {
         removeEventListener: vi.fn(),
         dispatchEvent: vi.fn(),
     })),
-})
+});
 
 // Mock IntersectionObserver
 global.IntersectionObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
     disconnect: vi.fn(),
-}))
+}));
 
 // Mock environment variables for testing
 Object.defineProperty(global, 'import', {
@@ -47,9 +47,9 @@ Object.defineProperty(global, 'import', {
         meta: {
             env: {
                 VITE_USE_MOCK: 'false',
-                VITE_API_URL: 'https://test-api.com'
-            }
-        }
+                VITE_API_URL: 'https://test-api.com',
+            },
+        },
     },
-    writable: true
-})
+    writable: true,
+});

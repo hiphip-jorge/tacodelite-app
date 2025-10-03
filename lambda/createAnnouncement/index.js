@@ -2,19 +2,22 @@ const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand } = require('@aws-sdk/lib-dynamodb');
 const { logActivity } = require('./shared/logActivity');
 
-const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const client = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 const docClient = DynamoDBDocumentClient.from(client);
 
 const getCorsHeaders = (origin, additionalHeaders = {}) => {
     return {
         'Access-Control-Allow-Origin': origin,
-        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Headers':
+            'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        ...additionalHeaders
+        ...additionalHeaders,
     };
 };
 
-exports.handler = async (event) => {
+exports.handler = async event => {
     try {
         console.log('Event received:', JSON.stringify(event, null, 2));
 
@@ -25,13 +28,20 @@ exports.handler = async (event) => {
             return {
                 statusCode: 200,
                 headers: getCorsHeaders(origin),
-                body: ''
+                body: '',
             };
         }
 
         // Parse request body
         const body = JSON.parse(event.body);
-        const { title, message, type = 'general', active = true, startsAt, expiresAt } = body;
+        const {
+            title,
+            message,
+            type = 'general',
+            active = true,
+            startsAt,
+            expiresAt,
+        } = body;
 
         // Validate required fields
         if (!title || !message) {
@@ -40,8 +50,8 @@ exports.handler = async (event) => {
                 headers: getCorsHeaders(origin),
                 body: JSON.stringify({
                     success: false,
-                    error: 'Title and message are required'
-                })
+                    error: 'Title and message are required',
+                }),
             };
         }
 
@@ -55,8 +65,8 @@ exports.handler = async (event) => {
                     headers: getCorsHeaders(origin),
                     body: JSON.stringify({
                         success: false,
-                        error: 'Start date must be before expiration date'
-                    })
+                        error: 'Start date must be before expiration date',
+                    }),
                 };
             }
         }
@@ -78,13 +88,13 @@ exports.handler = async (event) => {
             expiresAt: expiresAt || null,
             createdAt: timestamp,
             updatedAt: timestamp,
-            createdBy: 'admin' // TODO: Get from auth context
+            createdBy: 'admin', // TODO: Get from auth context
         };
 
         // Save to DynamoDB
         const params = {
             TableName: process.env.DYNAMODB_TABLE,
-            Item: announcement
+            Item: announcement,
         };
 
         const command = new PutCommand(params);
@@ -106,7 +116,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 201,
             headers: getCorsHeaders(origin, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             }),
             body: JSON.stringify({
                 success: true,
@@ -118,11 +128,10 @@ exports.handler = async (event) => {
                     active: announcement.active,
                     startsAt: announcement.startsAt,
                     expiresAt: announcement.expiresAt,
-                    createdAt: announcement.createdAt
-                }
-            })
+                    createdAt: announcement.createdAt,
+                },
+            }),
         };
-
     } catch (error) {
         console.error('Create announcement error:', error);
         const origin = event.headers?.origin || event.headers?.Origin || '*';
@@ -131,8 +140,8 @@ exports.handler = async (event) => {
             headers: getCorsHeaders(origin),
             body: JSON.stringify({
                 success: false,
-                error: 'Internal server error'
-            })
+                error: 'Internal server error',
+            }),
         };
     }
 };

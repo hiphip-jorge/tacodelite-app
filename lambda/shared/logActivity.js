@@ -1,7 +1,9 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { PutCommand } = require('@aws-sdk/lib-dynamodb');
 
-const docClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-east-1' });
+const docClient = new DynamoDBClient({
+    region: process.env.AWS_REGION || 'us-east-1',
+});
 
 /**
  * Log an activity to DynamoDB
@@ -13,7 +15,15 @@ const docClient = new DynamoDBClient({ region: process.env.AWS_REGION || 'us-eas
  * @param {string} userName - User name who performed the action (optional)
  * @param {object} event - Lambda event object to extract user info from headers
  */
-async function logActivity(type, action, itemName, itemId = null, userId = null, userName = null, event = null) {
+async function logActivity(
+    type,
+    action,
+    itemName,
+    itemId = null,
+    userId = null,
+    userName = null,
+    event = null
+) {
     try {
         const now = new Date().toISOString();
         const activityId = Date.now().toString();
@@ -44,17 +54,19 @@ async function logActivity(type, action, itemName, itemId = null, userId = null,
             userName: finalUserName,
             timestamp: now,
             createdAt: now,
-            updatedAt: now
+            updatedAt: now,
         };
 
         // Determine table name based on environment
-        const tableName = process.env.AWS_LAMBDA_FUNCTION_NAME?.includes('staging')
+        const tableName = process.env.AWS_LAMBDA_FUNCTION_NAME?.includes(
+            'staging'
+        )
             ? 'tacodelite-app-activities-staging'
             : 'tacodelite-app-activities-production';
 
         const putParams = {
             TableName: tableName,
-            Item: activity
+            Item: activity,
         };
 
         await docClient.send(new PutCommand(putParams));
