@@ -84,6 +84,38 @@ exports.handler = async event => {
             expressionAttributeValues[':active'] = body.active;
         }
 
+        if (body.required !== undefined) {
+            updateExpressions.push('#required = :required');
+            expressionAttributeNames['#required'] = 'required';
+            expressionAttributeValues[':required'] = body.required;
+        }
+
+        if (body.multiSelect !== undefined) {
+            updateExpressions.push('#multiSelect = :multiSelect');
+            expressionAttributeNames['#multiSelect'] = 'multiSelect';
+            expressionAttributeValues[':multiSelect'] = body.multiSelect;
+        }
+
+        if (body.min !== undefined) {
+            updateExpressions.push('#min = :min');
+            expressionAttributeNames['#min'] = 'min';
+            expressionAttributeValues[':min'] = body.min;
+        }
+
+        if (body.max !== undefined) {
+            updateExpressions.push('#max = :max');
+            expressionAttributeNames['#max'] = 'max';
+            expressionAttributeValues[':max'] = body.max;
+        }
+
+        if (body.defaultSelections !== undefined) {
+            updateExpressions.push('#defaultSelections = :defaultSelections');
+            expressionAttributeNames['#defaultSelections'] =
+                'defaultSelections';
+            expressionAttributeValues[':defaultSelections'] =
+                body.defaultSelections;
+        }
+
         // Always update updatedAt
         updateExpressions.push('#updatedAt = :updatedAt');
         expressionAttributeNames['#updatedAt'] = 'updatedAt';

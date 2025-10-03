@@ -65,6 +65,12 @@ exports.handler = async event => {
             name: body.name,
             description: body.description || '',
             sortOrder: body.sortOrder || 0,
+            required: body.required !== undefined ? body.required : false,
+            multiSelect:
+                body.multiSelect !== undefined ? body.multiSelect : true,
+            min: body.min !== undefined ? body.min : 0,
+            max: body.max !== undefined ? body.max : null,
+            defaultSelections: body.defaultSelections || [],
             active: body.active !== undefined ? body.active : true,
             createdAt: now,
             updatedAt: now,
