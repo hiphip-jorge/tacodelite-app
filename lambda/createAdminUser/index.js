@@ -115,7 +115,8 @@ exports.handler = async (event) => {
         );
 
         // Return success response (without password)
-        const { password: _, ...userResponse } = newUser;
+        const userResponse = { ...newUser };
+        delete userResponse.password;
 
         return {
             statusCode: 201,

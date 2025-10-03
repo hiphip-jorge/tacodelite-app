@@ -210,7 +210,7 @@ async function getMenuVersion() {
 }
 
 // Check if cached data is still valid based on version
-async function isCacheValid(cacheKey) {
+async function isCacheValid() {
     try {
         // Check if we have a cached version
         const cachedVersion = cacheUtils.get(CACHE_KEYS.MENU_VERSION);

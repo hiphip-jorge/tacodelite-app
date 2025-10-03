@@ -115,7 +115,7 @@ exports.handler = async (event) => {
                 }
             };
             const putCommand = new PutCommand(putParams);
-            const response = await docClient.send(putCommand);
+            await docClient.send(putCommand);
         } else {
             // Category didn't change, just update the existing item
             const updateParams = {
@@ -149,7 +149,7 @@ exports.handler = async (event) => {
             };
 
             const updateCommand = new UpdateCommand(updateParams);
-            const response = await docClient.send(updateCommand);
+            await docClient.send(updateCommand);
         }
 
         // Increment menu version after successful update

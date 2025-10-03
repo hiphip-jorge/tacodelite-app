@@ -20,7 +20,7 @@ export const useMenu = () => {
     currentCategoryRef.current = selectedCategory;
 
     // Add request ID to prevent race conditions
-    const requestIdRef = useRef(0);
+    // const requestIdRef = useRef(0);
 
     // Load initial data
     useEffect(() => {

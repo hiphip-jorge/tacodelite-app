@@ -32,7 +32,7 @@ module.exports = {
   ignorePatterns: ['dist/', '*.min.js'],
   overrides: [
     {
-      files: ['lambda/**/*.js', 'mocks/**/*.js'],
+      files: ['lambda/**/*.js'],
       env: {
         node: true,
         es2021: true,
@@ -53,12 +53,42 @@ module.exports = {
       },
     },
     {
+      files: ['mocks/**/*.js'],
+      env: {
+        node: true,
+        es2021: true,
+      },
+      parserOptions: {
+        sourceType: 'module',
+      },
+      rules: {
+        'no-unused-vars': 'warn',
+      },
+    },
+    {
       files: ['*.config.js', '*.config.cjs', 'vite.config.js', 'tailwind.config.js', 'postcss.config.js'],
       env: {
         node: true,
       },
       parserOptions: {
         sourceType: 'module',
+      },
+    },
+    {
+      files: ['**/*.test.js', '**/*.test.jsx', '**/test/**/*.js', '**/test/**/*.jsx', '**/__tests__/**/*.js', '**/__tests__/**/*.jsx', 'src/test/**/*.js'],
+      env: {
+        browser: true,
+        node: true,
+      },
+      globals: {
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
       },
     },
   ],

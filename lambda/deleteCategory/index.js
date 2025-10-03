@@ -55,12 +55,12 @@ exports.handler = async (event) => {
         }
 
         // Get category info before deletion for activity logging
-        const getCategoryParams = {
-            TableName: process.env.CATEGORIES_TABLE,
-            Key: {
-                pk: `CATEGORY#${categoryId}`
-            }
-        };
+        // const getCategoryParams = {
+        //     TableName: process.env.CATEGORIES_TABLE,
+        //     Key: {
+        //         pk: `CATEGORY#${categoryId}`
+        //     }
+        // };
 
         const categoryResult = await docClient.send(new QueryCommand({
             TableName: process.env.CATEGORIES_TABLE,

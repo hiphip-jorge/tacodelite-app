@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
     // Determine output directory based on environment
     const environment = process.env.VITE_ENVIRONMENT || 'development'
     const outDir = environment === 'production' ? 'dist/production' :
