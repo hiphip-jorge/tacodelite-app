@@ -135,18 +135,7 @@ resource "aws_api_gateway_integration" "post_categories" {
 }
 
 # API Gateway Resources
-resource "aws_api_gateway_resource" "menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
-  path_part   = "menu-items"
-}
-
-# Individual menu item resource for updates
-resource "aws_api_gateway_resource" "menu_item" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  parent_id   = aws_api_gateway_resource.menu_items.id
-  path_part   = "{id}"
-}
+# Note: menu_items and menu_item resources moved to menu-api-resources.tf for new structure
 
 # Admin Authentication API Resources
 resource "aws_api_gateway_resource" "admin" {
@@ -167,143 +156,9 @@ resource "aws_api_gateway_resource" "admin_verify" {
   path_part   = "verify"
 }
 
-# CORS Support - OPTIONS method for menu_items
-resource "aws_api_gateway_method" "options_menu_items" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_items.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
+# Note: CORS for menu_items moved to menu-api-resources.tf for new structure
 
-resource "aws_api_gateway_method_response" "options_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.options_menu_items.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
-  }
-}
-
-resource "aws_api_gateway_integration" "options_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.options_menu_items.http_method
-  type        = "MOCK"
-
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_integration_response" "options_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.options_menu_items.http_method
-  status_code = aws_api_gateway_method_response.options_menu_items.status_code
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
-  }
-}
-
-# POST method for creating menu items
-resource "aws_api_gateway_method" "post_menu_items" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_items.id
-  http_method   = "POST"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "post_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.post_menu_items.http_method
-  status_code = "201"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
-  }
-}
-
-resource "aws_api_gateway_integration" "post_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.post_menu_items.http_method
-
-  integration_http_method = "POST"
-  type                   = "AWS_PROXY"
-  uri                    = aws_lambda_function.create_menu_item.invoke_arn
-}
-
-# PUT method for updating menu items
-resource "aws_api_gateway_method" "put_menu_item" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_item.id
-  http_method   = "PUT"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "put_menu_item" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_item.id
-  http_method = aws_api_gateway_method.put_menu_item.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
-  }
-}
-
-resource "aws_api_gateway_integration" "put_menu_item" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_item.id
-  http_method = aws_api_gateway_method.put_menu_item.http_method
-
-  integration_http_method = "POST"
-  type                   = "AWS_PROXY"
-  uri                    = aws_lambda_function.update_menu_item.invoke_arn
-}
-
-# DELETE method for menu items
-resource "aws_api_gateway_method" "delete_menu_item" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_item.id
-  http_method   = "DELETE"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "delete_menu_item" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_item.id
-  http_method = aws_api_gateway_method.delete_menu_item.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
-  }
-}
-
-resource "aws_api_gateway_integration" "delete_menu_item" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_item.id
-  http_method = aws_api_gateway_method.delete_menu_item.http_method
-
-  integration_http_method = "POST"
-  type                   = "AWS_PROXY"
-  uri                    = aws_lambda_function.delete_menu_item.invoke_arn
-}
+# Note: POST, PUT, DELETE methods for menu items moved to menu-api-resources.tf for new structure
 
 resource "aws_api_gateway_resource" "categories" {
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -323,11 +178,7 @@ resource "aws_api_gateway_resource" "search" {
   path_part   = "search"
 }
 
-resource "aws_api_gateway_resource" "menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
-  path_part   = "menu-version"
-}
+# Note: menu_version resource moved to menu-api-resources.tf for new structure
 
 # CORS Support - OPTIONS method for search
 resource "aws_api_gateway_method" "options_search" {
@@ -374,218 +225,18 @@ resource "aws_api_gateway_integration_response" "options_search" {
   }
 }
 
-# CORS Support - OPTIONS method for menu-version
-resource "aws_api_gateway_method" "options_menu_version" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_version.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
+# Note: CORS for menu_version moved to menu-api-resources.tf for new structure
 
-resource "aws_api_gateway_method_response" "options_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.options_menu_version.http_method
-  status_code = "200"
+# Note: GET method for menu_version moved to menu-api-resources.tf for new structure
 
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
-  }
-}
+# Note: POST method for menu_version (increment) moved to menu-api-resources.tf for new structure
 
-resource "aws_api_gateway_integration" "options_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.options_menu_version.http_method
-  type        = "MOCK"
+# Legacy menu-items-by-category resource removed to avoid conflict with new structure
 
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_integration_response" "options_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.options_menu_version.http_method
-  status_code = aws_api_gateway_method_response.options_menu_version.status_code
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
-  }
-}
-
-# GET method for menu-version
-resource "aws_api_gateway_method" "get_menu_version" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_version.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "get_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.get_menu_version.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = false
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-  }
-}
-
-resource "aws_api_gateway_integration" "get_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.get_menu_version.http_method
-  type        = "AWS_PROXY"
-  integration_http_method = "POST"
-  uri         = aws_lambda_function.get_menu_version.invoke_arn
-}
-
-resource "aws_api_gateway_integration_response" "get_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.get_menu_version.http_method
-  status_code = aws_api_gateway_method_response.get_menu_version.status_code
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-  }
-
-  depends_on = [
-    aws_lambda_function.get_menu_version,
-    aws_api_gateway_integration.get_menu_version
-  ]
-}
-
-# POST method for menu-version (increment)
-resource "aws_api_gateway_method" "increment_menu_version" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_version.id
-  http_method   = "POST"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "increment_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.increment_menu_version.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = false
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-  }
-}
-
-resource "aws_api_gateway_integration" "increment_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.increment_menu_version.http_method
-  type        = "AWS_PROXY"
-  integration_http_method = "POST"
-  uri         = aws_lambda_function.increment_menu_version.invoke_arn
-}
-
-resource "aws_api_gateway_integration_response" "increment_menu_version" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_version.id
-  http_method = aws_api_gateway_method.increment_menu_version.http_method
-  status_code = aws_api_gateway_method_response.increment_menu_version.status_code
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-  }
-
-  depends_on = [
-    aws_lambda_function.increment_menu_version,
-    aws_api_gateway_integration.increment_menu_version
-  ]
-}
-
-resource "aws_api_gateway_resource" "menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  parent_id   = aws_api_gateway_rest_api.tacodelite_api.root_resource_id
-  path_part   = "menu-items-by-category"
-}
-
-# CORS Support - OPTIONS method for menu_items_by_category
-resource "aws_api_gateway_method" "options_menu_items_by_category" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_items_by_category.id
-  http_method   = "OPTIONS"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "options_menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items_by_category.id
-  http_method = aws_api_gateway_method.options_menu_items_by_category.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-    "method.response.header.Access-Control-Allow-Origin"  = false
-  }
-}
-
-resource "aws_api_gateway_integration" "options_menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items_by_category.id
-  http_method = aws_api_gateway_method.options_menu_items_by_category.http_method
-  type        = "MOCK"
-
-  request_templates = {
-    "application/json" = "{\"statusCode\": 200}"
-  }
-}
-
-resource "aws_api_gateway_integration_response" "options_menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items_by_category.id
-  http_method = aws_api_gateway_method.options_menu_items_by_category.http_method
-  status_code = aws_api_gateway_method_response.options_menu_items_by_category.status_code
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,OPTIONS'"
-    "method.response.header.Access-Control-Allow-Origin"  = "'${var.allowed_origins}'"
-  }
-}
+# Legacy menu-items-by-category CORS methods removed to avoid conflict with new structure
 
 # API Gateway Methods
-resource "aws_api_gateway_method" "get_menu_items" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_items.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "get_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.get_menu_items.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = false
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-  }
-}
+# Note: GET method for menu_items moved to menu-api-resources.tf for new structure
 
 resource "aws_api_gateway_method" "get_categories" {
   rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
@@ -627,36 +278,10 @@ resource "aws_api_gateway_method_response" "search_menu_items" {
   }
 }
 
-resource "aws_api_gateway_method" "get_menu_items_by_category" {
-  rest_api_id   = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id   = aws_api_gateway_resource.menu_items_by_category.id
-  http_method   = "GET"
-  authorization = "NONE"
-}
-
-resource "aws_api_gateway_method_response" "get_menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items_by_category.id
-  http_method = aws_api_gateway_method.get_menu_items_by_category.http_method
-  status_code = "200"
-
-  response_parameters = {
-    "method.response.header.Access-Control-Allow-Origin"  = false
-    "method.response.header.Access-Control-Allow-Headers" = false
-    "method.response.header.Access-Control-Allow-Methods" = false
-  }
-}
+# Legacy get_menu_items_by_category method removed to avoid conflict with new structure
 
 # Lambda Integrations
-resource "aws_api_gateway_integration" "get_menu_items" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items.id
-  http_method = aws_api_gateway_method.get_menu_items.http_method
-
-  integration_http_method = "POST"
-  type                   = "AWS_PROXY"
-  uri                    = aws_lambda_function.get_menu_items.invoke_arn
-}
+# Note: Integration for get_menu_items moved to menu-api-resources.tf for new structure
 
 
 
@@ -746,15 +371,7 @@ resource "aws_api_gateway_integration" "search_menu_items" {
 
 
 
-resource "aws_api_gateway_integration" "get_menu_items_by_category" {
-  rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
-  resource_id = aws_api_gateway_resource.menu_items_by_category.id
-  http_method = aws_api_gateway_method.get_menu_items_by_category.http_method
-
-  integration_http_method = "POST"
-  type                   = "AWS_PROXY"
-  uri                    = aws_lambda_function.get_menu_items_by_category.invoke_arn
-}
+# Legacy get_menu_items_by_category integration removed to avoid conflict with new structure
 
 
 
@@ -811,6 +428,15 @@ resource "aws_lambda_permission" "get_menu_items_by_category" {
   statement_id  = "AllowExecutionFromAPIGateway-get-menu-items-by-category"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.get_menu_items_by_category.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
+}
+
+# Lambda permission for unified menu resource function
+resource "aws_lambda_permission" "get_menu_resource" {
+  statement_id  = "AllowExecutionFromAPIGateway-get-menu-resource"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.getMenuResource.function_name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_api_gateway_rest_api.tacodelite_api.execution_arn}/*/*"
 }
@@ -908,17 +534,10 @@ resource "aws_api_gateway_usage_plan" "tacodelite_usage_plan" {
 # API Gateway Deployment
 resource "aws_api_gateway_deployment" "tacodelite_api" {
   depends_on = [
-    aws_api_gateway_integration.get_menu_items,
-    aws_api_gateway_integration.post_menu_items,
-    aws_api_gateway_integration.get_menu_version,
-    aws_api_gateway_integration.increment_menu_version,
-    aws_api_gateway_integration.options_menu_version,
+    # Menu API resources from menu-api-resources.tf
     aws_api_gateway_integration.get_categories,
     aws_api_gateway_integration.post_categories,
     aws_api_gateway_integration.search_menu_items,
-    aws_api_gateway_integration.get_menu_items_by_category,
-    aws_api_gateway_integration.put_menu_item,
-    aws_api_gateway_integration.delete_menu_item,
     aws_api_gateway_integration.put_category,
     aws_api_gateway_integration.delete_category,
     aws_api_gateway_integration.admin_login,
@@ -947,15 +566,10 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.options_activities,
 
     aws_api_gateway_method.options_categories,
-    aws_api_gateway_method.options_menu_items,
     aws_api_gateway_method.options_search,
-    aws_api_gateway_method.options_menu_version,
-    aws_api_gateway_method.options_menu_items_by_category,
     aws_api_gateway_method.options_admin_users,
     aws_api_gateway_method.options_users,
     aws_api_gateway_method.options_user,
-    aws_api_gateway_method.get_menu_version,
-    aws_api_gateway_method.increment_menu_version,
     aws_api_gateway_method.admin_login,
     aws_api_gateway_method.admin_verify,
     aws_api_gateway_method.get_admin_users,
@@ -988,14 +602,9 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_method.get_activities,
     aws_api_gateway_method.options_activities,
     aws_api_gateway_method_response.options_categories,
-    aws_api_gateway_method_response.options_menu_items,
     aws_api_gateway_method_response.options_search,
-    aws_api_gateway_method_response.options_menu_version,
-    aws_api_gateway_method_response.options_menu_items_by_category,
     aws_api_gateway_method_response.options_users,
     aws_api_gateway_method_response.options_user,
-    aws_api_gateway_method_response.get_menu_version,
-    aws_api_gateway_method_response.increment_menu_version,
     aws_api_gateway_method_response.admin_login,
     aws_api_gateway_method_response.admin_verify,
     aws_api_gateway_method_response.get_users,
@@ -1011,7 +620,6 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.options_categories,
     aws_api_gateway_integration.options_menu_items,
     aws_api_gateway_integration.options_search,
-    aws_api_gateway_integration.options_menu_items_by_category,
     aws_api_gateway_integration.options_users,
     aws_api_gateway_integration.options_user,
     aws_api_gateway_integration.options_announcements,
@@ -1026,35 +634,24 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_api_gateway_integration.options_admin_verify,
     aws_api_gateway_integration.options_admin_users,
     aws_api_gateway_integration_response.options_categories,
-    aws_api_gateway_integration_response.options_menu_items,
     aws_api_gateway_integration_response.options_search,
-    aws_api_gateway_integration_response.options_menu_version,
-    aws_api_gateway_integration_response.options_menu_items_by_category,
     aws_api_gateway_integration_response.options_users,
     aws_api_gateway_integration_response.options_user,
     aws_api_gateway_integration_response.options_announcements,
     aws_api_gateway_integration_response.options_activities,
     aws_api_gateway_integration_response.options_announcement,
     aws_api_gateway_integration_response.options_admin,
-    aws_api_gateway_integration_response.get_menu_version,
-    aws_api_gateway_integration_response.increment_menu_version,
     aws_api_gateway_integration_response.options_admin_login,
     aws_api_gateway_integration_response.options_admin_verify,
     aws_api_gateway_integration_response.options_admin_users,
     aws_api_gateway_integration_response.admin_login,
     aws_api_gateway_integration_response.admin_verify,
-    aws_lambda_permission.get_menu_items,
-    aws_lambda_permission.create_menu_item,
-    aws_lambda_permission.get_menu_version,
-    aws_lambda_permission.increment_menu_version,
     aws_lambda_permission.get_categories,
     aws_lambda_permission.create_category,
     aws_lambda_permission.update_category,
     aws_lambda_permission.delete_category,
     aws_lambda_permission.search_menu_items,
     aws_lambda_permission.get_menu_items_by_category,
-    aws_lambda_permission.update_menu_item,
-    aws_lambda_permission.delete_menu_item,
     aws_lambda_permission.admin_login,
     aws_lambda_permission.admin_verify,
     aws_lambda_permission.get_admin_users,
@@ -1077,7 +674,8 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
     aws_lambda_permission.create_modifier,
     aws_lambda_permission.update_modifier,
     aws_lambda_permission.delete_modifier,
-    aws_lambda_permission.get_activities
+    aws_lambda_permission.get_activities,
+    aws_lambda_permission.get_menu_resource
   ]
 
   rest_api_id = aws_api_gateway_rest_api.tacodelite_api.id
@@ -1085,18 +683,12 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
   # Force new deployment when Lambda functions change
   triggers = {
     redeployment = sha1(jsonencode([
-      aws_api_gateway_method.get_menu_items.id,
-      aws_api_gateway_method.post_menu_items.id,
-      aws_api_gateway_method.get_menu_version.id,
-      aws_api_gateway_method.increment_menu_version.id,
+      # Menu API methods from menu-api-resources.tf
       aws_api_gateway_method.get_categories.id,
       aws_api_gateway_method.post_categories.id,
       aws_api_gateway_method.put_category.id,
       aws_api_gateway_method.delete_category.id,
       aws_api_gateway_method.search_menu_items.id,
-      aws_api_gateway_method.get_menu_items_by_category.id,
-      aws_api_gateway_method.put_menu_item.id,
-      aws_api_gateway_method.delete_menu_item.id,
       aws_api_gateway_method.admin_login.id,
       aws_api_gateway_method.admin_verify.id,
       aws_api_gateway_method.get_admin_users.id,
@@ -1109,10 +701,7 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_method.delete_user.id,
       aws_api_gateway_method.options.id,
       aws_api_gateway_method.options_categories.id,
-      aws_api_gateway_method.options_menu_items.id,
       aws_api_gateway_method.options_search.id,
-      aws_api_gateway_method.options_menu_version.id,
-      aws_api_gateway_method.options_menu_items_by_category.id,
       aws_api_gateway_method.options_admin.id,
       aws_api_gateway_method.options_admin_login.id,
       aws_api_gateway_method.options_admin_verify.id,
@@ -1140,19 +729,11 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_method.delete_modifier.id,
       aws_api_gateway_method.options_modifiers.id,
       aws_api_gateway_method.options_modifier.id,
-      aws_api_gateway_integration.get_menu_items.id,
-      aws_api_gateway_integration.post_menu_items.id,
-      aws_api_gateway_integration.get_menu_version.id,
-      aws_api_gateway_integration.increment_menu_version.id,
-      aws_api_gateway_integration.options_menu_version.id,
       aws_api_gateway_integration.get_categories.id,
       aws_api_gateway_integration.post_categories.id,
       aws_api_gateway_integration.put_category.id,
       aws_api_gateway_integration.delete_category.id,
       aws_api_gateway_integration.search_menu_items.id,
-      aws_api_gateway_integration.get_menu_items_by_category.id,
-      aws_api_gateway_integration.put_menu_item.id,
-      aws_api_gateway_integration.delete_menu_item.id,
       aws_api_gateway_integration.admin_login.id,
       aws_api_gateway_integration.admin_verify.id,
       aws_api_gateway_integration.get_admin_users.id,
@@ -1165,10 +746,7 @@ resource "aws_api_gateway_deployment" "tacodelite_api" {
       aws_api_gateway_integration.delete_user.id,
       aws_api_gateway_integration.options.id,
       aws_api_gateway_integration.options_categories.id,
-      aws_api_gateway_integration.options_menu_items.id,
       aws_api_gateway_integration.options_search.id,
-      aws_api_gateway_integration.options_menu_version.id,
-      aws_api_gateway_integration.options_menu_items_by_category.id,
       aws_api_gateway_integration.options_admin.id,
       aws_api_gateway_integration.options_admin_login.id,
       aws_api_gateway_integration.options_admin_verify.id,

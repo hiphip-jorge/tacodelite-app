@@ -148,6 +148,7 @@ echo "🚀 Starting Lambda packaging process..."
 
 # Core functions with checksums (for caching support)
 package_lambda_with_checksum "getMenuItems" "getMenuItems"
+package_lambda_with_checksum "getMenuResource" "getMenuResource"
 package_lambda_with_checksum "getCategories" "getCategories"
 package_lambda_with_checksum "createCategory" "createCategory"
 package_lambda_with_checksum "updateCategory" "updateCategory"
@@ -251,6 +252,7 @@ missing_files=()
 # Check main Lambda functions (with checksums)
 required_files_with_checksums=(
     "getMenuItems.*.zip"
+    "getMenuResource.*.zip"
     "getCategories.*.zip"
     "createCategory.*.zip"
     "updateCategory.*.zip"

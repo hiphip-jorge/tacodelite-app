@@ -515,7 +515,7 @@ export async function getCategories() {
         const existingCache = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
 
         console.log('🌐 Fetching fresh categories data');
-        const response = await apiCall('/categories', {
+        const response = await apiCall('/menu/categories', {
             etag: existingCache.etag || undefined,
         });
 
@@ -529,7 +529,12 @@ export async function getCategories() {
         } else {
             // Server returned new data
             console.log('🔄 Server returned new categories data');
-            categories = response.data || [];
+            // Handle new API format: {data: {categories: [...], count: N}}
+            if (response.data?.categories) {
+                categories = response.data.categories;
+            } else {
+                categories = response.data || [];
+            }
 
             // Cache the new data with ETag
             cacheUtils.setWithETag(
@@ -602,7 +607,7 @@ export async function getMenuItems() {
         const existingCache = cacheUtils.getWithETag(CACHE_KEYS.MENU_ITEMS);
 
         console.log('🌐 Fetching fresh menu items data');
-        const response = await apiCall('/menu-items', {
+        const response = await apiCall('/menu/items/items', {
             etag: existingCache.etag || undefined,
         });
 
@@ -616,7 +621,12 @@ export async function getMenuItems() {
         } else {
             // Server returned new data
             console.log('🔄 Server returned new menu items data');
-            menuItems = response.data || [];
+            // Handle new API format: {data: {items: [...], count: N}}
+            if (response.data?.items) {
+                menuItems = response.data.items;
+            } else {
+                menuItems = response.data || [];
+            }
 
             // Cache the new data with ETag
             cacheUtils.setWithETag(
@@ -665,13 +675,13 @@ export async function getMenuItemsByCategory(categoryId) {
     }
 
     try {
-        if (categoryId === 'all') {
-            // Use the cached menu items for 'all' category
-            return await getMenuItems();
-        }
-
         // Get all menu items from cache and filter by category
         const allMenuItems = await getMenuItems();
+
+        if (categoryId === 'all') {
+            // Return all active items for 'all' category
+            return allMenuItems.filter(item => item.active);
+        }
         const categoryIdNumber = parseInt(categoryId);
         const filteredItems = allMenuItems.filter(
             item => item.categoryId === categoryIdNumber
@@ -687,17 +697,15 @@ export async function getMenuItemsByCategory(categoryId) {
         console.log('🔄 Falling back to API call for menu items by category');
         try {
             const response = await apiCall(
-                `/menu-items-by-category?categoryId=${categoryId}`
+                `/menu/items/by-category/${categoryId}`
             );
-            // Handle both response formats:
-            // 1. Old format: {success: true, data: [...], ...}
-            // 2. New format: [...] (direct array)
+            // Handle new API format: {items: [...], count: N, categoryId: N}
             let result;
-            if (response?.data) {
-                // Old format with nested data
-                result = response.data;
+            if (response?.items) {
+                // New unified API format with items array
+                result = response.items;
             } else if (Array.isArray(response)) {
-                // New format with direct array
+                // Fallback for direct array format
                 result = response;
             } else {
                 // Fallback: try to convert object with numeric keys to array

@@ -105,6 +105,8 @@ locals {
   # Auth functions are not using checksums, keeping static paths
   auth_login_zip         = "login.zip"
   auth_verify_zip        = "verify.zip"
+  # New unified menu resource function
+  get_menu_resource_zip = length(tolist(fileset("../lambda", "getMenuResource.*.zip"))) > 0 ? tolist(fileset("../lambda", "getMenuResource.*.zip"))[0] : "getMenuResource.zip"
 }
 
 # Lambda Functions
@@ -173,6 +175,29 @@ resource "aws_lambda_function" "get_menu_items_by_category" {
     Name        = "${var.app_name}-get-menu-items-by-category-${var.environment}"
     Environment = var.environment
     Purpose     = "Get menu items by category"
+  }
+}
+
+# New unified menu resource Lambda function
+resource "aws_lambda_function" "getMenuResource" {
+  filename         = "../lambda/${local.get_menu_resource_zip}"
+  function_name    = "${var.app_name}-get-menu-resource-${var.environment}"
+  role            = aws_iam_role.lambda_role.arn
+  handler         = "index.handler"
+  runtime         = "nodejs20.x"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
+      ALLOWED_ORIGINS = var.allowed_origins
+    }
+  }
+
+  tags = {
+    Name        = "${var.app_name}-get-menu-resource-${var.environment}"
+    Environment = var.environment
+    Purpose     = "Unified menu resource handler"
   }
 }
 

@@ -78,30 +78,35 @@ export const getActiveAnnouncements = async () => {
 
             // Check if announcement has started
             if (announcement.startsAt) {
-                const startDate = new Date(announcement.startsAt);
-                // Handle date-only format (YYYY-MM-DD)
+                // Handle date-only format (YYYY-MM-DD) by comparing date strings
                 if (announcement.startsAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    // Date-only format: set to start of day
-                    startDate.setHours(0, 0, 0, 0);
-                }
-
-                if (now < startDate) {
-                    return false; // Announcement hasn't started yet
+                    const nowDateString = now.toISOString().split('T')[0];
+                    if (nowDateString < announcement.startsAt) {
+                        return false; // Announcement hasn't started yet
+                    }
+                } else {
+                    // Handle full datetime format
+                    const startDate = new Date(announcement.startsAt);
+                    if (now < startDate) {
+                        return false; // Announcement hasn't started yet
+                    }
                 }
             }
 
             // Check if announcement has expired
             if (announcement.expiresAt) {
-                const expirationDate = new Date(announcement.expiresAt);
-                // Handle date-only expiration dates (YYYY-MM-DD format)
-                // Convert to end of day in local timezone to avoid timezone issues
+                // Handle date-only expiration dates (YYYY-MM-DD format) by comparing date strings
                 if (announcement.expiresAt.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    // Date-only format: set to end of day in local timezone
-                    expirationDate.setHours(23, 59, 59, 999);
-                }
-
-                if (expirationDate <= now) {
-                    return false; // Announcement has expired
+                    const nowDateString = now.toISOString().split('T')[0];
+                    if (nowDateString > announcement.expiresAt) {
+                        return false; // Announcement has expired
+                    }
+                } else {
+                    // Handle full datetime format
+                    const expirationDate = new Date(announcement.expiresAt);
+                    if (expirationDate <= now) {
+                        return false; // Announcement has expired
+                    }
                 }
             }
 

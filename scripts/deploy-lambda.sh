@@ -48,6 +48,7 @@ package_lambda() {
 
 # Package each Lambda function
 package_lambda "getMenuItems" "lambda/getMenuItems"
+package_lambda "getMenuResource" "lambda/getMenuResource"
 package_lambda "getCategories" "lambda/getCategories"
 package_lambda "createCategory" "lambda/createCategory"
 package_lambda "updateCategory" "lambda/updateCategory"
