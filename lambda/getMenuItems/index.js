@@ -59,17 +59,35 @@ exports.handler = async event => {
             event.headers?.['if-none-match'] ||
             event.headers?.['If-None-Match'];
 
-        // Get menu items
+        // Get menu items - optimized to only fetch core menu item data
         const command = new ScanCommand({
             TableName: process.env.DYNAMODB_TABLE,
-            FilterExpression: 'begins_with(pk, :itemPrefix)',
+            FilterExpression: 'begins_with(pk, :itemPrefix) AND pk = sk',
             ExpressionAttributeValues: {
                 ':itemPrefix': 'ITEM#',
             },
         });
 
         const result = await docClient.send(command);
-        const menuItems = result.Items || [];
+        let menuItems = result.Items || [];
+
+        // Clean up menu items to exclude modifier-related fields and ensure consistent structure
+        menuItems = menuItems.map(item => ({
+            pk: item.pk,
+            sk: item.sk,
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            categoryId: item.categoryId,
+            vegetarian: item.vegetarian,
+            active: item.active,
+            // Include any other core fields that exist
+            ...(item.img && { img: item.img }),
+            ...(item.alt && { alt: item.alt }),
+            ...(item.categoryName && { categoryName: item.categoryName }),
+            ...(item.createdAt && { createdAt: item.createdAt }),
+        }));
 
         // Get current menu version
         const menuVersion = await getMenuVersion();
