@@ -190,6 +190,12 @@ jobs:
                   # Select staging workspace
                   terraform -chdir=terraform workspace select staging || terraform -chdir=terraform workspace new staging
 
+                  # Import existing API Gateway resources (handles "already exists" conflicts)
+                  # Run before plan - imports are idempotent (skip if already in state)
+                  echo "📥 Importing existing API Gateway resources (if needed)..."
+                  chmod +x terraform/scripts/import-api-methods.sh
+                  terraform/scripts/import-api-methods.sh staging || true
+
                   # Plan the changes
                   echo "📋 Planning Terraform changes..."
                   terraform -chdir=terraform plan -var-file=../env_files/staging.tfvars -out=tfplan
