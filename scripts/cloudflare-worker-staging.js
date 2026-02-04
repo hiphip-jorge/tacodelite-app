@@ -114,15 +114,40 @@ async function handleRequest(request) {
             const baseUrl =
                 'https://i8vgeh8do9.execute-api.us-east-1.amazonaws.com';
 
-            // Map React app calls to correct API Gateway paths
+            // Map API calls to correct API Gateway paths
+            // API Gateway uses /menu/* structure; admin and legacy app use flat paths
             let apiPath = url.pathname.replace('/prod', '');
-            if (apiPath === '/getCategories') apiPath = '/categories';
-            if (apiPath === '/getMenuItems') apiPath = '/menu-items';
-            if (apiPath === '/searchMenuItems') apiPath = '/search';
-            if (apiPath === '/getMenuItemsByCategory')
-                apiPath = '/menu-items-by-category';
+            const searchParams = new URLSearchParams(url.search);
 
-            const apiUrl = new URL('/prod' + apiPath + url.search, baseUrl);
+            if (apiPath === '/getCategories') apiPath = '/categories';
+            if (apiPath === '/getMenuItems' || apiPath === '/menu-items')
+                apiPath = '/menu/menu-items';
+            // Map /menu-items/{id} for PUT, DELETE, GET (edit page)
+            if (apiPath.match(/^\/menu-items\/([^/]+)$/)) {
+                const match = apiPath.match(/^\/menu-items\/([^/]+)$/);
+                apiPath = `/menu/menu-items/${match[1]}`;
+            }
+            if (apiPath === '/searchMenuItems') apiPath = '/search';
+            if (
+                apiPath === '/getMenuItemsByCategory' ||
+                apiPath === '/menu-items-by-category'
+            ) {
+                const categoryId = searchParams.get('categoryId');
+                apiPath = categoryId
+                    ? `/menu/menu-items/items/by-category/${categoryId}`
+                    : '/menu/menu-items';
+                searchParams.delete('categoryId');
+            }
+            if (apiPath === '/search-menu-items') {
+                apiPath = '/menu/menu-items/items/search';
+                // query param stays in searchParams
+            }
+
+            const queryString = searchParams.toString();
+            const apiUrl = new URL(
+                '/prod' + apiPath + (queryString ? '?' + queryString : ''),
+                baseUrl
+            );
 
             console.log(
                 `Proxying API call: ${url.pathname} -> ${apiUrl.toString()}`
