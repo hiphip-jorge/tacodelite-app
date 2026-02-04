@@ -54,22 +54,27 @@ const getCorsHeaders = (origin, additionalHeaders = {}) => {
 
 // Clean menu items to exclude modifier-related fields and ensure consistent structure
 function cleanMenuItems(items) {
-    return items.map(item => ({
-        pk: item.pk,
-        sk: item.sk,
-        id: item.id,
-        name: item.name,
-        description: item.description,
-        price: item.price,
-        categoryId: item.categoryId,
-        vegetarian: item.vegetarian,
-        active: item.active,
-        // Include any other core fields that exist
-        ...(item.img && { img: item.img }),
-        ...(item.alt && { alt: item.alt }),
-        ...(item.categoryName && { categoryName: item.categoryName }),
-        ...(item.createdAt && { createdAt: item.createdAt }),
-    }));
+    return items.map(item => {
+        // Support categoryId from various field names (categoryId, category_id)
+        const categoryId = item.categoryId ?? item.category_id ?? undefined;
+
+        return {
+            pk: item.pk,
+            sk: item.sk,
+            id: item.id,
+            name: item.name,
+            description: item.description,
+            price: item.price,
+            categoryId,
+            vegetarian: item.vegetarian,
+            active: item.active,
+            // Include any other core fields that exist
+            ...(item.img && { img: item.img }),
+            ...(item.alt && { alt: item.alt }),
+            ...(item.categoryName && { categoryName: item.categoryName }),
+            ...(item.createdAt && { createdAt: item.createdAt }),
+        };
+    });
 }
 
 // Get menu items (core items only, no modifiers)
@@ -140,31 +145,50 @@ exports.handler = async event => {
         const pathSegments = path.split('/').filter(Boolean);
 
         // Expected path structure: /prod/menu/{resource}/{subresource}
-        // pathSegments: ['prod', 'menu', 'items', 'items'] or ['prod', 'menu', 'categories']
+        // pathSegments: ['prod', 'menu', 'items', 'items'] or ['prod', 'menu', 'menu-items', 'items', 'by-category', '123']
 
-        const resource = pathSegments[2]; // 'items', 'categories', etc.
+        const resource = pathSegments[2]; // 'items', 'categories', 'menu-items', etc.
         const subResource = pathSegments[3]; // 'items', 'modifiers', 'by-category', etc.
+        const pathSegment4 = pathSegments[4]; // 'by-category', 'search', or category id
+        const pathSegment5 = pathSegments[5]; // category id when pathSegment4 is 'by-category'
         const queryParams = event.queryStringParameters || {};
 
         let responseData = {};
         let resourceType = 'items'; // default
 
+        // Normalize: menu-items/items/* uses same logic as items/*
+        const effectiveResource =
+            resource === 'menu-items' && subResource === 'items'
+                ? 'items'
+                : resource;
+        const effectiveSubResource =
+            resource === 'menu-items' && subResource === 'items'
+                ? pathSegment4
+                : subResource;
+        const effectiveCategoryId =
+            resource === 'menu-items' && pathSegment4 === 'by-category'
+                ? pathSegment5
+                : pathSegment4;
+
         // Determine what data to fetch based on path
-        if (resource === 'items') {
-            if (subResource === 'items') {
-                // /menu/items/items - just menu items
+        if (effectiveResource === 'items') {
+            if (effectiveSubResource === 'items') {
+                // /menu/items/items or /menu/menu-items - just menu items
                 responseData.items = await getMenuItems();
                 responseData.count = responseData.items.length;
                 resourceType = 'items-only';
-            } else if (subResource === 'modifiers') {
+            } else if (effectiveSubResource === 'modifiers') {
                 // /menu/items/modifiers - just modifiers
                 responseData.modifierGroups = await getModifierGroups();
                 responseData.modifiers = await getModifiers();
                 responseData.count = responseData.modifiers.length;
                 resourceType = 'modifiers-only';
-            } else if (subResource === 'by-category') {
-                // /menu/items/by-category/{id} - items by category
-                const categoryId = pathSegments[4];
+            } else if (
+                effectiveSubResource === 'by-category' &&
+                effectiveCategoryId
+            ) {
+                // /menu/items/by-category/{id} or /menu/menu-items/items/by-category/{id}
+                const categoryId = effectiveCategoryId;
                 const allItems = await getMenuItems();
                 responseData.items = allItems.filter(
                     item =>
@@ -173,7 +197,7 @@ exports.handler = async event => {
                 responseData.categoryId = parseInt(categoryId);
                 responseData.count = responseData.items.length;
                 resourceType = 'items-by-category';
-            } else if (subResource === 'search') {
+            } else if (effectiveSubResource === 'search') {
                 // /menu/items/search?query=...
                 const searchTerm = queryParams.query?.toLowerCase() || '';
                 const allItems = await getMenuItems();

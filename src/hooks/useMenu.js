@@ -40,10 +40,14 @@ export const useMenu = () => {
                 setCategories(categoriesData);
 
                 const menuData = await getMenuItems();
-                setMenuItems(menuData);
+                // Filter out items without valid categoryId (data integrity - prevents undefined in UI)
+                const validMenuData = (menuData || []).filter(
+                    item => item != null && item.categoryId != null
+                );
+                setMenuItems(validMenuData);
 
                 // Sort and set initial filtered items to show all items
-                const sortedInitialItems = menuData.sort((a, b) => {
+                const sortedInitialItems = [...validMenuData].sort((a, b) => {
                     const idA = parseInt(a.pk?.replace('ITEM#', '') || '0');
                     const idB = parseInt(b.pk?.replace('ITEM#', '') || '0');
                     return idA - idB;
@@ -221,15 +225,6 @@ export const useMenu = () => {
             const categoryNumber = parseInt(
                 categoryId.replace('CATEGORY#', '')
             );
-
-            // Debug: Log the first few menu items to see their structure
-            if (menuItems.length > 0) {
-                console.log('First menu item structure:', menuItems[0]);
-                console.log('Looking for categoryId:', categoryNumber);
-                console.log('Available categoryIds:', [
-                    ...new Set(menuItems.map(item => item.categoryId)),
-                ]);
-            }
 
             return menuItems.filter(item => item.categoryId === categoryNumber)
                 .length;
