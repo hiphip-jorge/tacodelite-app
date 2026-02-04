@@ -142,9 +142,12 @@ const Menu = () => {
                 )}
 
                 {/* Menu Items Grid */}
-                {!isLoading && !menuItemsLoading && filteredItems.length > 0 ? (
+                {!isLoading &&
+                !menuItemsLoading &&
+                Array.isArray(filteredItems) &&
+                filteredItems.length > 0 ? (
                     <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12'>
-                        {filteredItems.map(item => (
+                        {(filteredItems || []).map(item => (
                             <MenuItem key={item.pk} item={item} />
                         ))}
                     </div>

@@ -529,12 +529,13 @@ export async function getCategories() {
         } else {
             // Server returned new data
             console.log('🔄 Server returned new categories data');
-            // Handle new API format: {data: {categories: [...], count: N}}
-            if (response.data?.categories) {
-                categories = response.data.categories;
-            } else {
-                categories = response.data || [];
-            }
+            // Handle API formats: {categories: [...], count: N} or array or {data: {categories: [...]}}
+            const raw = response.data;
+            categories = Array.isArray(raw)
+                ? raw
+                : (raw?.categories ??
+                  raw?.data?.categories ??
+                  (Array.isArray(raw?.data) ? raw.data : []));
 
             // Cache the new data with ETag
             cacheUtils.setWithETag(
@@ -621,12 +622,13 @@ export async function getMenuItems() {
         } else {
             // Server returned new data
             console.log('🔄 Server returned new menu items data');
-            // Handle new API format: {data: {items: [...], count: N}}
-            if (response.data?.items) {
-                menuItems = response.data.items;
-            } else {
-                menuItems = response.data || [];
-            }
+            // Handle API formats: {items: [...], count: N} or array or {data: {items: [...]}}
+            const raw = response.data;
+            menuItems = Array.isArray(raw)
+                ? raw
+                : (raw?.items ??
+                  raw?.data?.items ??
+                  (Array.isArray(raw?.data) ? raw.data : []));
 
             // Cache the new data with ETag
             cacheUtils.setWithETag(
@@ -677,13 +679,14 @@ export async function getMenuItemsByCategory(categoryId) {
     try {
         // Get all menu items from cache and filter by category
         const allMenuItems = await getMenuItems();
+        const safeMenuItems = Array.isArray(allMenuItems) ? allMenuItems : [];
 
         if (categoryId === 'all') {
             // Return all active items for 'all' category
-            return allMenuItems.filter(item => item.active);
+            return safeMenuItems.filter(item => item?.active);
         }
         const categoryIdNumber = parseInt(categoryId);
-        const filteredItems = allMenuItems.filter(
+        const filteredItems = safeMenuItems.filter(
             item => item.categoryId === categoryIdNumber
         );
 
@@ -699,17 +702,17 @@ export async function getMenuItemsByCategory(categoryId) {
             const response = await apiCall(
                 `/menu/items/by-category/${categoryId}`
             );
-            // Handle new API format: {items: [...], count: N, categoryId: N}
+            // Handle API format: apiCall returns {data: {items: [...], count, categoryId}}
+            const raw = response?.data;
             let result;
-            if (response?.items) {
-                // New unified API format with items array
-                result = response.items;
-            } else if (Array.isArray(response)) {
-                // Fallback for direct array format
-                result = response;
+            if (Array.isArray(raw?.items)) {
+                result = raw.items;
+            } else if (Array.isArray(raw)) {
+                result = raw;
+            } else if (Array.isArray(raw?.data)) {
+                result = raw.data;
             } else {
-                // Fallback: try to convert object with numeric keys to array
-                result = Object.values(response || {});
+                result = [];
             }
             return result;
         } catch (apiError) {
@@ -742,8 +745,9 @@ export async function searchMenuItems(query) {
         // For search, we can use cached menu items and filter locally
         // This is more efficient than making a separate API call
         const allMenuItems = await getMenuItems();
+        const safeMenuItems = Array.isArray(allMenuItems) ? allMenuItems : [];
 
-        const searchResults = allMenuItems.filter(
+        const searchResults = safeMenuItems.filter(
             item =>
                 item.name.toLowerCase().includes(query.toLowerCase()) ||
                 item.description.toLowerCase().includes(query.toLowerCase())

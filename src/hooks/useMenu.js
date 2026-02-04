@@ -37,13 +37,15 @@ export const useMenu = () => {
                 // cacheManager.clearAllOnStartup(); // Removed to enable caching
 
                 const categoriesData = await getCategories();
-                setCategories(categoriesData);
+                setCategories(
+                    Array.isArray(categoriesData) ? categoriesData : []
+                );
 
                 const menuData = await getMenuItems();
                 // Filter out items without valid categoryId (data integrity - prevents undefined in UI)
-                const validMenuData = (menuData || []).filter(
-                    item => item != null && item.categoryId != null
-                );
+                const validMenuData = (
+                    Array.isArray(menuData) ? menuData : []
+                ).filter(item => item != null && item.categoryId != null);
                 setMenuItems(validMenuData);
 
                 // Sort and set initial filtered items to show all items
@@ -239,9 +241,13 @@ export const useMenu = () => {
 
     // Get price range
     const getPriceRange = useCallback(() => {
-        if (filteredItems.length === 0) return { min: 0, max: 0 };
+        const items = Array.isArray(filteredItems) ? filteredItems : [];
+        if (items.length === 0) return { min: 0, max: 0 };
 
-        const prices = filteredItems.map(item => item.price);
+        const prices = items
+            .map(item => item?.price)
+            .filter(p => typeof p === 'number');
+        if (prices.length === 0) return { min: 0, max: 0 };
         return {
             min: Math.min(...prices),
             max: Math.max(...prices),

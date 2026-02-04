@@ -12,9 +12,10 @@ const CategoryFilter = ({
 
     // Add "All Items" option and map categories to expected format
     // Categories are already sorted by ID from the useMenu hook
+    const safeCategories = Array.isArray(categories) ? categories : [];
     const allCategories = [
         { id: 'all', name: 'All Items', description: 'View our complete menu' },
-        ...categories.map(cat => ({
+        ...safeCategories.map(cat => ({
             id: cat.pk, // Use pk as id (e.g., "CATEGORY#4")
             name: cat.name,
             description: cat.description,
@@ -156,8 +157,9 @@ const CategoryFilter = ({
                     <div className='inline-flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-full px-3 py-1'>
                         <span className='text-gray-400 text-sm'>Showing:</span>
                         <span className='text-taco-yellow-400 font-medium text-sm'>
-                            {categories.find(cat => cat.pk === selectedCategory)
-                                ?.name || 'Unknown Category'}
+                            {safeCategories.find(
+                                cat => cat.pk === selectedCategory
+                            )?.name || 'Unknown Category'}
                         </span>
                         <span className='text-gray-400 text-sm'>
                             ({getCategoryItemCount(selectedCategory)} items)

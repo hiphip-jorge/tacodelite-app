@@ -142,6 +142,16 @@ async function handleRequest(request) {
                 apiPath = '/menu/menu-items/items/search';
                 // query param stays in searchParams
             }
+            if (apiPath === '/menu-version') apiPath = '/menu/version';
+            // Menu app uses /menu/items/* but API Gateway has /menu/menu-items/*
+            if (apiPath === '/menu/items/items')
+                apiPath = '/menu/menu-items/items';
+            if (apiPath.match(/^\/menu\/items\/by-category\/([^/]+)$/)) {
+                const match = apiPath.match(
+                    /^\/menu\/items\/by-category\/([^/]+)$/
+                );
+                apiPath = `/menu/menu-items/items/by-category/${match[1]}`;
+            }
 
             const queryString = searchParams.toString();
             const apiUrl = new URL(
