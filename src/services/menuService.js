@@ -740,16 +740,24 @@ export async function getMenuItemsByCategory(categoryId) {
 
 // Search menu items
 export async function searchMenuItems(query) {
+    const searchTerm = (query ?? '').toLowerCase();
+    if (!searchTerm) return [];
+
+    const matchesSearch = (item, term) => {
+        const name = (item?.name ?? '').toLowerCase();
+        const description = (item?.description ?? '').toLowerCase();
+        return (
+            name.includes(term) ||
+            description.includes(term) ||
+            (term.includes('vegetarian') && item?.vegetarian === true) ||
+            (term.includes('vegan') && item?.vegetarian === true)
+        );
+    };
+
     if (USE_MOCK_DATA) {
         console.log('🔶 Using mock search data');
         await simulateDelay(400); // Simulate network delay
-
-        const searchResults = mockMenuItems.filter(
-            item =>
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.description.toLowerCase().includes(query.toLowerCase())
-        );
-        return searchResults;
+        return mockMenuItems.filter(item => matchesSearch(item, searchTerm));
     }
 
     try {
@@ -758,10 +766,8 @@ export async function searchMenuItems(query) {
         const allMenuItems = await getMenuItems();
         const safeMenuItems = Array.isArray(allMenuItems) ? allMenuItems : [];
 
-        const searchResults = safeMenuItems.filter(
-            item =>
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.description.toLowerCase().includes(query.toLowerCase())
+        const searchResults = safeMenuItems.filter(item =>
+            matchesSearch(item, searchTerm)
         );
 
         console.log(
@@ -772,12 +778,7 @@ export async function searchMenuItems(query) {
         console.error('Failed to search menu items:', error);
         // Fallback to mock data if API fails
         console.log('🔶 Falling back to mock search data');
-        const searchResults = mockMenuItems.filter(
-            item =>
-                item.name.toLowerCase().includes(query.toLowerCase()) ||
-                item.description.toLowerCase().includes(query.toLowerCase())
-        );
-        return searchResults;
+        return mockMenuItems.filter(item => matchesSearch(item, searchTerm));
     }
 }
 
