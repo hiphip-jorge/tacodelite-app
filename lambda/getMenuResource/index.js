@@ -146,10 +146,9 @@ exports.handler = async event => {
         const path = event.path || event.requestContext?.path || '';
         const pathSegments = path.split('/').filter(Boolean);
 
-        // Expected path structure: /prod/menu/{resource}/{subresource}
-        // pathSegments: ['prod', 'menu', 'items', 'items'] or ['prod', 'menu', 'menu-items', 'items', 'by-category', '123']
-
-        const resource = pathSegments[2]; // 'items', 'categories', 'menu-items', etc.
+        // Expected path structure: /prod/menu/{resource}/{subresource} OR /menu/{resource}
+        // pathSegments: ['prod', 'menu', 'items', 'items'] or ['menu', 'categories'] (API Gateway may omit stage)
+        const resource = pathSegments[2] ?? pathSegments[1]; // 'items', 'categories', 'menu-items', etc.
         const subResource = pathSegments[3]; // 'items', 'modifiers', 'by-category', etc.
         const pathSegment4 = pathSegments[4]; // 'by-category', 'search', or category id
         const pathSegment5 = pathSegments[5]; // category id when pathSegment4 is 'by-category'
