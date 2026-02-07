@@ -189,8 +189,9 @@ resource "aws_lambda_function" "getMenuResource" {
 
   environment {
     variables = {
-      DYNAMODB_TABLE = aws_dynamodb_table.menu_items.name
-      ALLOWED_ORIGINS = var.allowed_origins
+      DYNAMODB_TABLE     = aws_dynamodb_table.menu_items.name
+      CATEGORIES_TABLE   = aws_dynamodb_table.menu_categories.name
+      ALLOWED_ORIGINS    = var.allowed_origins
     }
   }
 

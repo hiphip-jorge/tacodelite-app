@@ -119,10 +119,12 @@ async function getModifiers() {
     return result.Items || [];
 }
 
-// Get categories
+// Get categories (from menu_categories table - categories are stored separately from menu items)
 async function getCategories() {
+    const categoriesTable =
+        process.env.CATEGORIES_TABLE || process.env.DYNAMODB_TABLE;
     const command = new ScanCommand({
-        TableName: process.env.DYNAMODB_TABLE,
+        TableName: categoriesTable,
         FilterExpression: 'begins_with(pk, :categoryPrefix)',
         ExpressionAttributeValues: {
             ':categoryPrefix': 'CATEGORY#',
