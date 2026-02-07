@@ -94,9 +94,10 @@ export const useMenu = () => {
                     // Show all active items - no API call needed, instant response
                     items = [...menuItems]; // Create a copy to avoid reference issues
                 } else {
-                    // Filter by category - extract numeric part from PK (e.g., "CATEGORY#4" -> 4)
+                    // Filter by category - extract numeric part from PK (handles CATEGORY#1, CATEGORY#001)
                     const categoryNumber = parseInt(
-                        selectedCategory.replace('CATEGORY#', '')
+                        selectedCategory.replace(/CATEGORY#/, ''),
+                        10
                     );
                     console.log(
                         'Filtering by category:',
@@ -180,21 +181,24 @@ export const useMenu = () => {
         setSelectedCategory('all');
     }, []);
 
+    // Helper: extract numeric ID from category pk (handles CATEGORY#1, CATEGORY#001, etc.)
+    const getCategoryNumericId = useCallback(pk => {
+        if (!pk || typeof pk !== 'string') return null;
+        return parseInt(pk.replace(/CATEGORY#/, ''), 10) || null;
+    }, []);
+
     // Get category name by ID
     const getCategoryName = useCallback(
         categoryId => {
             if (categoryId === 'all') return 'All Items';
             if (!categoryId || typeof categoryId !== 'string') return 'Unknown';
-            // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
-            const categoryNumber = parseInt(
-                categoryId.replace('CATEGORY#', '')
-            );
+            const targetId = getCategoryNumericId(categoryId);
             const category = categories.find(
-                cat => cat.pk === `CATEGORY#${categoryNumber}`
+                cat => getCategoryNumericId(cat.pk) === targetId
             );
-            return category ? category.name : 'Unknown';
+            return category ? (category.name ?? 'Unknown') : 'Unknown';
         },
-        [categories]
+        [categories, getCategoryNumericId]
     );
 
     // Get category description by ID
@@ -202,16 +206,13 @@ export const useMenu = () => {
         categoryId => {
             if (categoryId === 'all') return '';
             if (!categoryId || typeof categoryId !== 'string') return '';
-            // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
-            const categoryNumber = parseInt(
-                categoryId.replace('CATEGORY#', '')
-            );
+            const targetId = getCategoryNumericId(categoryId);
             const category = categories.find(
-                cat => cat.pk === `CATEGORY#${categoryNumber}`
+                cat => getCategoryNumericId(cat.pk) === targetId
             );
-            return category ? category.description : '';
+            return category ? (category.description ?? '') : '';
         },
-        [categories]
+        [categories, getCategoryNumericId]
     );
 
     // Get items count for a category
@@ -223,15 +224,13 @@ export const useMenu = () => {
             if (!categoryId || typeof categoryId !== 'string') {
                 return 0;
             }
-            // Extract numeric part from category PK (e.g., "CATEGORY#4" -> 4)
-            const categoryNumber = parseInt(
-                categoryId.replace('CATEGORY#', '')
-            );
+            const categoryNumber = getCategoryNumericId(categoryId);
+            if (categoryNumber == null) return 0;
 
             return menuItems.filter(item => item.categoryId === categoryNumber)
                 .length;
         },
-        [menuItems]
+        [menuItems, getCategoryNumericId]
     );
 
     // Get vegetarian items count

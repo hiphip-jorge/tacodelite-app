@@ -242,7 +242,21 @@ describe('MenuService Caching', () => {
             const result = await getCategories();
 
             expect(fetch).toHaveBeenCalledTimes(2); // categories + version
-            expect(result).toEqual(mockCategories);
+            // Categories are normalized: pk, name, description, sortOrder
+            expect(result).toEqual([
+                {
+                    pk: 'CATEGORY#001',
+                    name: 'Breakfast',
+                    description: '',
+                    sortOrder: 1,
+                },
+                {
+                    pk: 'CATEGORY#002',
+                    name: 'Tacos',
+                    description: '',
+                    sortOrder: 2,
+                },
+            ]);
             expect(localStorage.getItem('menu_categories')).toBeTruthy();
         });
     });

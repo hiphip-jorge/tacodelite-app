@@ -11,14 +11,14 @@ const CategoryFilter = ({
     const [showAllCategories, setShowAllCategories] = useState(false);
 
     // Add "All Items" option and map categories to expected format
-    // Categories are already sorted by ID from the useMenu hook
+    // Categories are already sorted from menuService (sortOrder or pk)
     const safeCategories = Array.isArray(categories) ? categories : [];
     const allCategories = [
         { id: 'all', name: 'All Items', description: 'View our complete menu' },
         ...safeCategories.map(cat => ({
-            id: cat.pk, // Use pk as id (e.g., "CATEGORY#4")
-            name: cat.name,
-            description: cat.description,
+            id: cat.pk,
+            name: cat.name ?? cat.categoryName ?? 'Unnamed',
+            description: cat.description ?? '',
         })),
     ];
 
@@ -159,7 +159,7 @@ const CategoryFilter = ({
                         <span className='text-taco-yellow-400 font-medium text-sm'>
                             {safeCategories.find(
                                 cat => cat.pk === selectedCategory
-                            )?.name || 'Unknown Category'}
+                            )?.name ?? 'Unknown Category'}
                         </span>
                         <span className='text-gray-400 text-sm'>
                             ({getCategoryItemCount(selectedCategory)} items)

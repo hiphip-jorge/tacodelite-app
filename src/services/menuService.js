@@ -484,6 +484,27 @@ async function isCacheValid() {
     }
 }
 
+// Normalize categories for consistent display (handles various API/DB formats)
+function normalizeCategories(categories) {
+    if (!categories || !Array.isArray(categories)) return [];
+    return categories
+        .filter(cat => cat && cat.pk)
+        .map(cat => ({
+            pk: cat.pk,
+            name: cat.name ?? cat.categoryName ?? 'Unnamed Category',
+            description: cat.description ?? '',
+            sortOrder:
+                cat.sortOrder ??
+                parseInt(cat.pk?.replace(/CATEGORY#/, '') || '0', 10),
+        }))
+        .sort((a, b) => {
+            if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+            const idA = parseInt(a.pk?.replace(/CATEGORY#/, '') || '0', 10);
+            const idB = parseInt(b.pk?.replace(/CATEGORY#/, '') || '0', 10);
+            return idA - idB;
+        });
+}
+
 // Get all categories
 export async function getCategories() {
     if (USE_MOCK_DATA) {
@@ -499,7 +520,7 @@ export async function getCategories() {
             const cacheValid = await isCacheValid(CACHE_KEYS.CATEGORIES);
             if (cacheValid) {
                 console.log('📦 Using cached categories data');
-                return cachedData.data;
+                return normalizeCategories(cachedData.data);
             } else {
                 console.log('🔄 Cache invalidated, clearing cached data');
                 // Clear the invalid cache
@@ -525,7 +546,7 @@ export async function getCategories() {
             console.log(
                 '📦 Server confirmed cache is valid - using cached categories'
             );
-            categories = existingCache.data;
+            categories = normalizeCategories(existingCache.data);
         } else {
             // Server returned new data
             console.log('🔄 Server returned new categories data');
@@ -550,17 +571,7 @@ export async function getCategories() {
             cacheUtils.set(`${CACHE_KEYS.MENU_VERSION}_timestamp`, Date.now());
         }
 
-        // Sort categories by their numeric ID (e.g., "CATEGORY#1" -> 1)
-        if (categories && Array.isArray(categories)) {
-            const sortedCategories = categories.sort((a, b) => {
-                const idA = parseInt(a.pk?.replace('CATEGORY#', '') || '0');
-                const idB = parseInt(b.pk?.replace('CATEGORY#', '') || '0');
-                return idA - idB;
-            });
-            return sortedCategories;
-        }
-
-        return categories || [];
+        return normalizeCategories(categories);
     } catch (error) {
         console.error('Failed to fetch categories:', error);
 
@@ -568,7 +579,7 @@ export async function getCategories() {
         const cachedData = cacheUtils.getWithETag(CACHE_KEYS.CATEGORIES);
         if (cachedData.data) {
             console.log('🔄 Using expired cached categories data as fallback');
-            return cachedData.data;
+            return normalizeCategories(cachedData.data);
         }
 
         // Fallback to mock data if API fails and no cache
