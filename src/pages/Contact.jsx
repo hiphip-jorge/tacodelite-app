@@ -77,6 +77,57 @@ function Contact() {
                     </p>
                 </motion.div>
 
+                {/* Delivery Options */}
+                <div className='mb-16'>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className='text-3xl font-secular text-white text-center mb-12'
+                    >
+                        Order Online
+                    </motion.h2>
+
+                    <div className='grid md:grid-cols-2 gap-8'>
+                        {deliveryOptions.map((option, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{
+                                    duration: 0.8,
+                                    delay: index * 0.2,
+                                }}
+                                className='bg-gray-800 rounded-lg shadow-md p-8 text-center border border-gray-700'
+                            >
+                                <div className='mb-4'>
+                                    <div className='bg-gray-100 rounded-lg p-4 inline-block'>
+                                        <img
+                                            src={option.logo}
+                                            alt={`${option.name} logo`}
+                                            className='h-16 mx-auto object-contain'
+                                        />
+                                    </div>
+                                </div>
+                                <h3 className='text-2xl font-secular text-white mb-3'>
+                                    {option.name}
+                                </h3>
+                                <p className='text-gray-300 mb-6'>
+                                    {option.description}
+                                </p>
+                                <a
+                                    href={option.link}
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='btn-primary text-lg px-6 py-3 inline-block'
+                                >
+                                    Order on {option.name}
+                                </a>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+
                 {/* Contact Information Grid */}
                 <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16'>
                     {contactInfo.map((info, index) => (
@@ -211,57 +262,6 @@ function Contact() {
                             </a>
                         </div>
                     </motion.div>
-                </div>
-
-                {/* Delivery Options */}
-                <div className='mb-16'>
-                    <motion.h2
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8 }}
-                        className='text-3xl font-secular text-white text-center mb-12'
-                    >
-                        Order Online
-                    </motion.h2>
-
-                    <div className='grid md:grid-cols-2 gap-8'>
-                        {deliveryOptions.map((option, index) => (
-                            <motion.div
-                                key={index}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                transition={{
-                                    duration: 0.8,
-                                    delay: index * 0.2,
-                                }}
-                                className='bg-gray-800 rounded-lg shadow-md p-8 text-center border border-gray-700'
-                            >
-                                <div className='mb-4'>
-                                    <div className='bg-gray-100 rounded-lg p-4 inline-block'>
-                                        <img
-                                            src={option.logo}
-                                            alt={`${option.name} logo`}
-                                            className='h-16 mx-auto object-contain'
-                                        />
-                                    </div>
-                                </div>
-                                <h3 className='text-2xl font-secular text-white mb-3'>
-                                    {option.name}
-                                </h3>
-                                <p className='text-gray-300 mb-6'>
-                                    {option.description}
-                                </p>
-                                <a
-                                    href={option.link}
-                                    target='_blank'
-                                    rel='noopener noreferrer'
-                                    className='btn-primary text-lg px-6 py-3 inline-block'
-                                >
-                                    Order on {option.name}
-                                </a>
-                            </motion.div>
-                        ))}
-                    </div>
                 </div>
 
                 {/* Catering Section */}
