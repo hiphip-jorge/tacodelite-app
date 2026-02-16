@@ -11,6 +11,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TERRAFORM_DIR="$(dirname "$SCRIPT_DIR")"
 cd "$TERRAFORM_DIR"
 
+# Import only if resource is not already in state (avoids "Resource already managed" error)
+import_if_missing() {
+  local addr="$1"
+  local id="$2"
+  if terraform state show "$addr" &>/dev/null; then
+    echo "  $addr: already in state"
+  else
+    terraform import "$addr" "$id" && echo "  $addr: imported"
+  fi
+}
+
 # Select workspace if using staging/production
 ENV="${1:-staging}"
 terraform workspace select "$ENV" 2>/dev/null || true
@@ -53,23 +64,31 @@ fi
 
 echo ""
 echo "Importing methods..."
-terraform import aws_api_gateway_method.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET" || echo "  get_menu_items_unified (method): already in state"
-terraform import aws_api_gateway_method.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS" || echo "  options_menu_items (method): already in state"
+import_if_missing aws_api_gateway_method.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET"
+import_if_missing aws_api_gateway_method.get_menu_items_base "${REST_API_ID}/${MENU_ITEMS_ID}/GET"
+import_if_missing aws_api_gateway_method.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS"
 
 echo ""
 echo "Importing method responses..."
-terraform import aws_api_gateway_method_response.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET/200" || echo "  get_menu_items_unified (response): already in state"
-terraform import aws_api_gateway_method_response.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS/200" || echo "  options_menu_items (response): already in state"
+import_if_missing aws_api_gateway_method_response.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET/200"
+# get_menu_items_base method_response - may not exist in AWS (AWS_PROXY); Terraform will create if needed
+import_if_missing aws_api_gateway_method_response.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS/200"
 
 echo ""
 echo "Importing integrations..."
-terraform import aws_api_gateway_integration.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET" || echo "  get_menu_items_unified (integration): already in state"
-terraform import aws_api_gateway_integration.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS" || echo "  options_menu_items (integration): already in state"
+import_if_missing aws_api_gateway_integration.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET"
+# get_menu_items_base integration - may not exist in AWS; skip import if already in state
+if terraform state show aws_api_gateway_integration.get_menu_items_base &>/dev/null; then
+  echo "  aws_api_gateway_integration.get_menu_items_base: already in state"
+else
+  terraform import aws_api_gateway_integration.get_menu_items_base "${REST_API_ID}/${MENU_ITEMS_ID}/GET" 2>/dev/null && echo "  get_menu_items_base (integration): imported" || echo "  get_menu_items_base (integration): not in AWS, Terraform will create"
+fi
+import_if_missing aws_api_gateway_integration.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS"
 
 echo ""
 echo "Importing integration responses..."
-terraform import aws_api_gateway_integration_response.get_menu_items_unified "${REST_API_ID}/${MENU_ITEMS_SUB_ID}/GET/200" || echo "  get_menu_items_unified (integration_response): already in state"
-terraform import aws_api_gateway_integration_response.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS/200" || echo "  options_menu_items (integration_response): already in state"
+# get_menu_items_unified uses AWS_PROXY - no integration_response in Terraform
+import_if_missing aws_api_gateway_integration_response.options_menu_items "${REST_API_ID}/${MENU_ITEMS_ID}/OPTIONS/200"
 
 echo ""
 echo "Done! Run: terraform plan"

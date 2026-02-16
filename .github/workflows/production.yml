@@ -190,6 +190,11 @@ jobs:
                   # Select production workspace
                   terraform -chdir=terraform workspace select production || terraform -chdir=terraform workspace new production
 
+                  # Import existing API Gateway methods (handles "Method already exists" errors)
+                  echo "📥 Importing existing API Gateway resources if needed..."
+                  chmod +x terraform/scripts/import-api-methods.sh
+                  ./terraform/scripts/import-api-methods.sh production || true
+
                   # Plan the changes
                   echo "📋 Planning Terraform changes..."
                   terraform -chdir=terraform plan -var-file=../env_files/production.tfvars -out=tfplan
