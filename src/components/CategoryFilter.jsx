@@ -31,9 +31,9 @@ const CategoryFilter = ({
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
             className='mb-8'
         >
             {/* Header */}
@@ -57,9 +57,9 @@ const CategoryFilter = ({
                     return (
                         <motion.button
                             key={category.id}
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.4, delay: index * 0.05 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.3, delay: index * 0.03 }}
                             onClick={() => onCategoryChange(category.id)}
                             className={`relative group p-3 rounded-bubbly border-2 transition-all duration-300 ${
                                 isSelected

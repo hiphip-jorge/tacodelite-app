@@ -52,25 +52,26 @@ const Menu = () => {
                     <div className='mt-6'>
                         {isLoading ? (
                             <div className='mb-8'>
-                                {/* Category Skeleton Header */}
-                                <div className='text-center mb-6'>
-                                    <div className='animate-pulse'>
-                                        <div className='bg-gray-300 dark:bg-gray-700 h-6 rounded w-48 mx-auto mb-2'></div>
-                                        <div className='bg-gray-300 dark:bg-gray-700 h-4 rounded w-64 mx-auto'></div>
-                                    </div>
+                                {/* Category Skeleton Header - lightweight */}
+                                <div className='text-center mb-6 animate-pulse'>
+                                    <div
+                                        className='bg-gray-200 dark:bg-gray-700 h-6 rounded w-48 mx-auto mb-2'
+                                        aria-hidden='true'
+                                    />
+                                    <div
+                                        className='bg-gray-200 dark:bg-gray-700 h-4 rounded w-64 mx-auto'
+                                        aria-hidden='true'
+                                    />
                                 </div>
 
-                                {/* Category Grid Skeleton */}
+                                {/* Category Grid Skeleton - lightweight */}
                                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4'>
-                                    {[...Array(8)].map((_, i) => (
-                                        <div key={i} className='animate-pulse'>
-                                            <div className='relative p-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'>
-                                                <div className='text-center'>
-                                                    <div className='bg-gray-300 dark:bg-gray-700 h-4 rounded w-20 mx-auto mb-1'></div>
-                                                    <div className='bg-gray-300 dark:bg-gray-700 h-3 rounded w-16 mx-auto'></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    {[...Array(6)].map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className='animate-pulse bg-gray-200 dark:bg-gray-700 rounded-bubbly h-16'
+                                            aria-hidden='true'
+                                        />
                                     ))}
                                 </div>
                             </div>
@@ -113,29 +114,16 @@ const Menu = () => {
                     </div>
                 )}
 
-                {/* Loading indicator for category filtering */}
-                {menuItemsLoading && (
+                {/* Menu Items Grid - lightweight skeleton to prevent CLS without hurting FCP/LCP */}
+                {(isLoading || menuItemsLoading) && (
                     <div className='mb-12'>
-                        {/* Menu Items Grid Skeleton */}
                         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
-                            {[...Array(12)].map((_, i) => (
-                                <div key={i} className='animate-pulse'>
-                                    <div className='bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
-                                        {/* Image skeleton */}
-                                        <div className='bg-gray-200 dark:bg-gray-700 h-48 w-full'></div>
-
-                                        {/* Content skeleton */}
-                                        <div className='p-4'>
-                                            <div className='bg-gray-200 dark:bg-gray-700 h-5 rounded w-3/4 mb-2'></div>
-                                            <div className='bg-gray-200 dark:bg-gray-700 h-4 rounded w-full mb-2'></div>
-                                            <div className='bg-gray-200 dark:bg-gray-700 h-4 rounded w-2/3 mb-3'></div>
-                                            <div className='flex justify-between items-center'>
-                                                <div className='bg-gray-200 dark:bg-gray-700 h-6 rounded w-16'></div>
-                                                <div className='bg-gray-200 dark:bg-gray-700 h-6 rounded w-20'></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            {[...Array(8)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className='animate-pulse bg-gray-200 dark:bg-gray-700 rounded-bubbly-lg h-[13rem]'
+                                    aria-hidden='true'
+                                />
                             ))}
                         </div>
                     </div>

@@ -18,9 +18,9 @@ const MenuItem = ({ item = {}, index }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: index * 0.05 }}
             className='bg-white dark:bg-gray-700 rounded-bubbly-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-600/50 hover:border-taco-yellow-500/40 group p-1 flex flex-col h-full'
         >
             {/* Encapsulated title + description - accent color, rounded top and bottom */}
