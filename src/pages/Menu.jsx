@@ -127,7 +127,7 @@ const Menu = () => {
                             {[...Array(8)].map((_, i) => (
                                 <div
                                     key={i}
-                                    className='animate-pulse bg-gray-200 dark:bg-gray-700 rounded-bubbly-lg h-[13rem]'
+                                    className='animate-pulse bg-gray-200 dark:bg-gray-700 rounded-bubbly-lg h-[18rem]'
                                     aria-hidden='true'
                                 />
                             ))}

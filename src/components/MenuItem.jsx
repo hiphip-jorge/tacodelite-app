@@ -16,6 +16,13 @@ const MenuItem = ({ item = {}, index }) => {
             .join(' ');
     };
 
+    const formatDescription = desc => {
+        if (!desc || typeof desc !== 'string') return '';
+        const trimmed = desc.trim();
+        if (!trimmed) return '';
+        return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -24,12 +31,12 @@ const MenuItem = ({ item = {}, index }) => {
             className='bg-white dark:bg-gray-700 rounded-bubbly-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-600/50 hover:border-taco-yellow-500/40 group p-1 flex flex-col h-full'
         >
             {/* Encapsulated title + description - accent color, rounded top and bottom */}
-            <div className='bg-taco-yellow-500/20 dark:bg-taco-yellow-500/15 border border-taco-yellow-500/40 rounded-t-bubbly-md rounded-b-md px-5 pt-5 pb-4 min-h-[8.5rem] flex-1 flex flex-col'>
+            <div className='bg-taco-yellow-500/20 dark:bg-taco-yellow-500/15 border border-taco-yellow-500/40 rounded-t-bubbly-md rounded-b-md px-5 pt-5 pb-4 min-h-[14.5rem] flex-1 flex flex-col'>
                 <h3 className='text-xl font-bold font-secular text-gray-900 dark:text-white mb-2 group-hover:text-taco-yellow-600 dark:group-hover:text-taco-yellow-400 transition-colors'>
                     {formatName(item.name)}
                 </h3>
-                <p className='text-sm text-gray-600 dark:text-gray-300 line-clamp-3'>
-                    {item.description}
+                <p className='text-sm text-gray-600 dark:text-gray-300 line-clamp-6'>
+                    {formatDescription(item.description)}
                 </p>
             </div>
 
