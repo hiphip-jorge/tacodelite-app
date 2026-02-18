@@ -25,18 +25,22 @@
         <!-- Twitter Card -->
         <meta name="twitter:card" content="summary_large_image" />
 
-        <!-- Fonts - preconnect for faster loading -->
+        <!-- Fonts - preconnect + async load to avoid render blocking -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="stylesheet" href="https://use.typekit.net/kui8jtg.css" />
+        <!-- Load both fonts in one request, async to prevent render blocking -->
         <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Secular+One&display=swap"
+            rel="preload"
+            href="https://fonts.googleapis.com/css2?family=Chewy&family=Secular+One&display=swap"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
         />
-        <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Chewy&display=swap"
-        />
+        <noscript>
+            <link
+                rel="stylesheet"
+                href="https://fonts.googleapis.com/css2?family=Chewy&family=Secular+One&display=swap"
+            />
+        </noscript>
     </head>
     <body>
         <div id="root"></div>

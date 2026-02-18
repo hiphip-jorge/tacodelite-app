@@ -24,7 +24,10 @@ function Navbar() {
                         <img
                             src='/assets/td-logo_2021.webp'
                             alt='Taco Delite'
+                            width={96}
+                            height={48}
                             className='h-12 w-auto'
+                            fetchPriority='high'
                         />
                         <span className='ml-3 text-xl font-hobo text-gray-900 dark:text-white'>
                             Taco Delite

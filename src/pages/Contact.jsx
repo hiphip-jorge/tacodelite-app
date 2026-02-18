@@ -111,7 +111,10 @@ function Contact() {
                                         <img
                                             src={option.logo}
                                             alt={`${option.name} logo`}
+                                            width={128}
+                                            height={64}
                                             className='h-16 mx-auto object-contain'
+                                            loading='lazy'
                                         />
                                     </div>
                                 </div>

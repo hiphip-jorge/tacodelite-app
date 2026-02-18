@@ -90,7 +90,10 @@ function About() {
                         <img
                             src='/assets/taco_delite.webp'
                             alt='Taco Delite Restaurant'
+                            width={600}
+                            height={400}
                             className='rounded-lg shadow-lg w-full'
+                            loading='lazy'
                         />
                     </motion.div>
                 </div>

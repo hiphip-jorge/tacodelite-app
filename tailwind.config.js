@@ -11,7 +11,6 @@ export default {
                 'bubbly-xl': '2.5rem',
             },
             fontFamily: {
-                acier: ['acier-bat-grotesque', 'sans-serif'],
                 secular: ['Secular One', 'sans-serif'],
             },
             colors: {

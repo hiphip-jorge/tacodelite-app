@@ -14,7 +14,10 @@ function Footer() {
                             <img
                                 src='/assets/td-logo_2021.webp'
                                 alt='Taco Delite'
+                                width={80}
+                                height={40}
                                 className='h-10 w-auto mr-3'
+                                loading='lazy'
                             />
                             <span className='text-xl font-hobo'>
                                 Taco Delite
