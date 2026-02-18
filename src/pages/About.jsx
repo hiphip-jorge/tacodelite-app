@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import Seo from '../components/Seo';
 
 function About() {
     const highlights = [
@@ -24,6 +25,11 @@ function About() {
 
     return (
         <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
+            <Seo
+                title='About'
+                description='Taco Delite has been serving authentic Tex-Mex flavors in Plano since 1989. Learn our story, values, and commitment to quality.'
+                keywords='About Taco Delite, Plano restaurant, Tex-Mex history, family restaurant'
+            />
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 {/* Header */}
                 <motion.div

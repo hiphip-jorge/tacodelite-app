@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import MenuItem from '../components/MenuItem';
 import SearchBar from '../components/SearchBar';
 import CategoryFilter from '../components/CategoryFilter';
+import Seo from '../components/Seo';
 import { useMenu } from '../hooks/useMenu';
 
 const Menu = () => {
@@ -29,6 +30,11 @@ const Menu = () => {
 
     return (
         <div className='min-h-screen bg-gray-100 dark:bg-gray-800 py-8 overflow-hidden'>
+            <Seo
+                title='Menu'
+                description='Discover our delicious selection of authentic Mexican cuisine. From traditional tacos to modern fusion dishes. View our full menu online.'
+                keywords='Menu, Tacos, Burritos, Tex-Mex, Plano, Mexican food, restaurant menu'
+            />
             <div className='container mx-auto px-16 sm:px-20 md:px-24 lg:px-28'>
                 {/* Header */}
                 <div className='text-center mb-12'>

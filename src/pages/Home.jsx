@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 
 function Home() {
     const features = [
@@ -23,6 +24,11 @@ function Home() {
 
     return (
         <div className='min-h-screen'>
+            <Seo
+                title='Home'
+                description='The best Tex-Mex food in Plano. Fresh ingredients, bold flavors, and friendly service since 1989. Order online for pickup or delivery.'
+                keywords='Tacos, Plano, Tex-Mex, Mexican food, restaurant, delivery, pickup, catering'
+            />
             {/* Hero Section */}
             <section className='relative bg-gray-900 text-white overflow-hidden'>
                 {/* Background Accent Elements */}

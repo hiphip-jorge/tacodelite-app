@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import doorDashLogo from '../assets/logos/door-dash.png';
 import uberEatsLogo from '../assets/logos/uber-eats.png';
+import Seo from '../components/Seo';
 
 function Contact() {
     useEffect(() => {
@@ -60,6 +61,11 @@ function Contact() {
 
     return (
         <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
+            <Seo
+                title='Contact'
+                description='Visit Taco Delite at 2957 W 15th St, Plano TX. Order online via DoorDash or Uber Eats. Call (972) 964-5419. Mon-Sat 7AM-9PM.'
+                keywords='Contact Taco Delite, Plano address, phone, hours, DoorDash, Uber Eats, order online'
+            />
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 {/* Header */}
                 <motion.div
