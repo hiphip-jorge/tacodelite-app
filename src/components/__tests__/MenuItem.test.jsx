@@ -32,7 +32,7 @@ describe('MenuItem Component', () => {
 
         expect(screen.getByText('Test Taco')).toBeInTheDocument();
         expect(screen.getByText('$4.99')).toBeInTheDocument();
-        expect(screen.getByText('A delicious test taco')).toBeInTheDocument();
+        expect(screen.getByText('A delicious test taco.')).toBeInTheDocument();
     });
 
     it('should handle undefined name gracefully', () => {

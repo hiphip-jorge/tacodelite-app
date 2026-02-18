@@ -127,9 +127,9 @@ describe('Menu Component', () => {
         renderWithRouter(<Menu />);
 
         expect(
-            screen.getByText('A delicious breakfast taco')
+            screen.getByText('A delicious breakfast taco.')
         ).toBeInTheDocument();
-        expect(screen.getByText('A hearty bean burrito')).toBeInTheDocument();
+        expect(screen.getByText('A hearty bean burrito.')).toBeInTheDocument();
     });
 
     it('should not show loading state when not loading', () => {
