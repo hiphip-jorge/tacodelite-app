@@ -5,7 +5,7 @@ function Footer() {
     const currentYear = new Date().getFullYear();
 
     return (
-        <footer className='bg-gray-800 text-white'>
+        <footer className='bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
                 <div className='grid md:grid-cols-4 gap-8'>
                     {/* Company Info */}
@@ -20,7 +20,7 @@ function Footer() {
                                 Taco Delite
                             </span>
                         </div>
-                        <p className='text-gray-300 mb-4 max-w-md'>
+                        <p className='text-gray-600 dark:text-gray-300 mb-4 max-w-md'>
                             Serving flavorful Tex-Mex cuisine in Plano since
                             1989. Fresh ingredients, bold flavors, and friendly
                             service.
@@ -41,7 +41,7 @@ function Footer() {
                             <li>
                                 <Link
                                     to='/'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     Home
                                 </Link>
@@ -49,7 +49,7 @@ function Footer() {
                             <li>
                                 <Link
                                     to='/menu'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     Menu
                                 </Link>
@@ -57,7 +57,7 @@ function Footer() {
                             <li>
                                 <Link
                                     to='/about'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     About
                                 </Link>
@@ -65,7 +65,7 @@ function Footer() {
                             <li>
                                 <Link
                                     to='/contact'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     Contact
                                 </Link>
@@ -76,13 +76,13 @@ function Footer() {
                     {/* Contact Info */}
                     <div>
                         <h3 className='text-lg font-secular mb-4'>Contact</h3>
-                        <ul className='space-y-2 text-gray-300'>
+                        <ul className='space-y-2 text-gray-600 dark:text-gray-300'>
                             <li>
                                 <a
                                     href='https://maps.app.goo.gl/XhxheTxBpTHwJZ9ZA'
                                     target='_blank'
                                     rel='noopener noreferrer'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     📍 2957 W 15th St, Plano, TX 75075
                                 </a>
@@ -90,7 +90,7 @@ function Footer() {
                             <li>
                                 <a
                                     href='tel:+19729645419'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     📞 (972) 964-5419
                                 </a>
@@ -98,7 +98,7 @@ function Footer() {
                             <li>
                                 <a
                                     href='mailto:tacodelitewestplano@gmail.com'
-                                    className='text-gray-300 hover:text-white transition-colors'
+                                    className='text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors'
                                 >
                                     📧 tacodelitewestplano@gmail.com
                                 </a>
@@ -108,8 +108,8 @@ function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className='border-t border-gray-700 mt-8 pt-8 text-center'>
-                    <p className='text-gray-400'>
+                <div className='border-t border-gray-300 dark:border-gray-700 mt-8 pt-8 text-center'>
+                    <p className='text-gray-500 dark:text-gray-400'>
                         © {currentYear} Taco Delite. All rights reserved.
                     </p>
                 </div>

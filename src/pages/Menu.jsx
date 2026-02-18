@@ -28,14 +28,14 @@ const Menu = () => {
     }, []);
 
     return (
-        <div className='min-h-screen bg-gray-800 py-8 overflow-hidden'>
+        <div className='min-h-screen bg-gray-100 dark:bg-gray-800 py-8 overflow-hidden'>
             <div className='container mx-auto px-16 sm:px-20 md:px-24 lg:px-28'>
                 {/* Header */}
                 <div className='text-center mb-12'>
-                    <h1 className='text-5xl font-bold font-secular text-white mb-4'>
+                    <h1 className='text-5xl font-bold font-secular text-gray-900 dark:text-white mb-4'>
                         Our Menu
                     </h1>
-                    <p className='text-xl text-gray-300 max-w-2xl mx-auto'>
+                    <p className='text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
                         Discover our delicious selection of authentic Mexican
                         cuisine, from traditional tacos to modern fusion dishes.
                     </p>
@@ -55,8 +55,8 @@ const Menu = () => {
                                 {/* Category Skeleton Header */}
                                 <div className='text-center mb-6'>
                                     <div className='animate-pulse'>
-                                        <div className='bg-gray-700 h-6 rounded w-48 mx-auto mb-2'></div>
-                                        <div className='bg-gray-700 h-4 rounded w-64 mx-auto'></div>
+                                        <div className='bg-gray-300 dark:bg-gray-700 h-6 rounded w-48 mx-auto mb-2'></div>
+                                        <div className='bg-gray-300 dark:bg-gray-700 h-4 rounded w-64 mx-auto'></div>
                                     </div>
                                 </div>
 
@@ -64,10 +64,10 @@ const Menu = () => {
                                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4'>
                                     {[...Array(8)].map((_, i) => (
                                         <div key={i} className='animate-pulse'>
-                                            <div className='relative p-3 rounded-lg border-2 border-gray-700 bg-gray-800'>
+                                            <div className='relative p-3 rounded-lg border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'>
                                                 <div className='text-center'>
-                                                    <div className='bg-gray-700 h-4 rounded w-20 mx-auto mb-1'></div>
-                                                    <div className='bg-gray-700 h-3 rounded w-16 mx-auto'></div>
+                                                    <div className='bg-gray-300 dark:bg-gray-700 h-4 rounded w-20 mx-auto mb-1'></div>
+                                                    <div className='bg-gray-300 dark:bg-gray-700 h-3 rounded w-16 mx-auto'></div>
                                                 </div>
                                             </div>
                                         </div>
@@ -98,12 +98,12 @@ const Menu = () => {
                 {isLoading ? (
                     <div className='mb-8 text-center'>
                         <div className='animate-pulse'>
-                            <div className='bg-gray-700 h-5 rounded w-64 mx-auto'></div>
+                            <div className='bg-gray-300 dark:bg-gray-700 h-5 rounded w-64 mx-auto'></div>
                         </div>
                     </div>
                 ) : (
                     <div className='mb-8 text-center'>
-                        <p className='text-gray-300'>
+                        <p className='text-gray-600 dark:text-gray-300'>
                             Showing {filteredItems.length} of {menuItems.length}{' '}
                             items
                             {selectedCategory !== 'all' &&
@@ -120,18 +120,18 @@ const Menu = () => {
                         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
                             {[...Array(12)].map((_, i) => (
                                 <div key={i} className='animate-pulse'>
-                                    <div className='bg-gray-800 rounded-lg overflow-hidden border border-gray-700'>
+                                    <div className='bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700'>
                                         {/* Image skeleton */}
-                                        <div className='bg-gray-700 h-48 w-full'></div>
+                                        <div className='bg-gray-200 dark:bg-gray-700 h-48 w-full'></div>
 
                                         {/* Content skeleton */}
                                         <div className='p-4'>
-                                            <div className='bg-gray-700 h-5 rounded w-3/4 mb-2'></div>
-                                            <div className='bg-gray-700 h-4 rounded w-full mb-2'></div>
-                                            <div className='bg-gray-700 h-4 rounded w-2/3 mb-3'></div>
+                                            <div className='bg-gray-200 dark:bg-gray-700 h-5 rounded w-3/4 mb-2'></div>
+                                            <div className='bg-gray-200 dark:bg-gray-700 h-4 rounded w-full mb-2'></div>
+                                            <div className='bg-gray-200 dark:bg-gray-700 h-4 rounded w-2/3 mb-3'></div>
                                             <div className='flex justify-between items-center'>
-                                                <div className='bg-gray-700 h-6 rounded w-16'></div>
-                                                <div className='bg-gray-700 h-6 rounded w-20'></div>
+                                                <div className='bg-gray-200 dark:bg-gray-700 h-6 rounded w-16'></div>
+                                                <div className='bg-gray-200 dark:bg-gray-700 h-6 rounded w-20'></div>
                                             </div>
                                         </div>
                                     </div>
@@ -155,7 +155,7 @@ const Menu = () => {
                   !menuItemsLoading &&
                   filteredItems.length === 0 ? (
                     <div className='text-center py-12'>
-                        <div className='text-gray-400 mb-4'>
+                        <div className='text-gray-500 dark:text-gray-400 mb-4'>
                             <svg
                                 className='mx-auto h-16 w-16'
                                 fill='none'
@@ -170,21 +170,21 @@ const Menu = () => {
                                 />
                             </svg>
                         </div>
-                        <h3 className='text-lg font-medium text-white mb-2'>
+                        <h3 className='text-lg font-medium text-gray-900 dark:text-white mb-2'>
                             No items found
                         </h3>
-                        <p className='text-gray-400'>
+                        <p className='text-gray-500 dark:text-gray-400'>
                             Try adjusting your search or filter criteria.
                         </p>
                     </div>
                 ) : null}
 
                 {/* CTA Section */}
-                <div className='text-center py-12 bg-gray-800 rounded-lg shadow-sm border border-gray-700'>
-                    <h3 className='text-2xl font-bold text-white mb-4'>
+                <div className='text-center py-12 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700'>
+                    <h3 className='text-2xl font-bold text-gray-900 dark:text-white mb-4'>
                         Questions About Our Menu?
                     </h3>
-                    <p className='text-gray-300 mb-6 max-w-2xl mx-auto'>
+                    <p className='text-gray-600 dark:text-gray-300 mb-6 max-w-2xl mx-auto'>
                         Our team is here to help you find the perfect dish.
                         Contact us for recommendations, dietary restrictions, or
                         any other questions.

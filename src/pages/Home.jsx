@@ -65,7 +65,7 @@ function Home() {
             </section>
 
             {/* Features Section */}
-            <section className='py-20 bg-gray-800'>
+            <section className='py-20 bg-gray-100 dark:bg-gray-800'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -73,10 +73,10 @@ function Home() {
                         transition={{ duration: 0.8 }}
                         className='text-center mb-16'
                     >
-                        <h2 className='text-3xl md:text-4xl font-secular text-white mb-4'>
+                        <h2 className='text-3xl md:text-4xl font-secular text-gray-900 dark:text-white mb-4'>
                             Why Choose Taco Delite?
                         </h2>
-                        <p className='text-xl text-gray-300 max-w-2xl mx-auto'>
+                        <p className='text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
                             We're committed to serving the most delicious and
                             freshest Tex-Mex food
                         </p>
@@ -97,10 +97,10 @@ function Home() {
                                 <div className='text-6xl mb-4'>
                                     {feature.icon}
                                 </div>
-                                <h3 className='text-xl font-secular text-white mb-2'>
+                                <h3 className='text-xl font-secular text-gray-900 dark:text-white mb-2'>
                                     {feature.title}
                                 </h3>
-                                <p className='text-gray-300'>
+                                <p className='text-gray-600 dark:text-gray-300'>
                                     {feature.description}
                                 </p>
                             </motion.div>
@@ -110,17 +110,17 @@ function Home() {
             </section>
 
             {/* CTA Section */}
-            <section className='py-20 bg-gray-900'>
+            <section className='py-20 bg-gray-200 dark:bg-gray-900'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center'>
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className='text-3xl md:text-4xl font-secular text-white mb-6'>
+                        <h2 className='text-3xl md:text-4xl font-secular text-gray-900 dark:text-white mb-6'>
                             Ready for Amazing Tex-Mex?
                         </h2>
-                        <p className='text-xl text-gray-300 mb-8 max-w-2xl mx-auto'>
+                        <p className='text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto'>
                             Order online for pickup or delivery, or visit us in
                             person for the full experience
                         </p>

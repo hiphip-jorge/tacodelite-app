@@ -38,10 +38,10 @@ const CategoryFilter = ({
         >
             {/* Header */}
             <div className='text-center mb-6'>
-                <h2 className='text-xl font-bold font-secular text-white mb-2'>
+                <h2 className='text-xl font-bold font-secular text-gray-900 dark:text-white mb-2'>
                     Browse by Category
                 </h2>
-                <p className='text-gray-400 text-sm'>
+                <p className='text-gray-500 dark:text-gray-400 text-sm'>
                     {searchQuery
                         ? 'Search results'
                         : 'Click a category to filter our menu'}
@@ -64,7 +64,7 @@ const CategoryFilter = ({
                             className={`relative group p-3 rounded-bubbly border-2 transition-all duration-300 ${
                                 isSelected
                                     ? 'border-taco-yellow-500 bg-taco-yellow-500/10 shadow-lg shadow-taco-yellow-500/20'
-                                    : 'border-gray-700 bg-gray-800 hover:border-taco-yellow-500/50 hover:bg-gray-700/50'
+                                    : 'border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-taco-yellow-500/50 hover:bg-gray-100 dark:hover:bg-gray-700/50'
                             }`}
                         >
                             {/* Category Content */}
@@ -73,8 +73,8 @@ const CategoryFilter = ({
                                 <h3
                                     className={`font-bold font-secular text-base mb-1 transition-colors ${
                                         isSelected
-                                            ? 'text-taco-yellow-400'
-                                            : 'text-white group-hover:text-taco-yellow-400'
+                                            ? 'text-taco-yellow-600 dark:text-taco-yellow-400'
+                                            : 'text-gray-900 dark:text-white group-hover:text-taco-yellow-500 dark:group-hover:text-taco-yellow-400'
                                     }`}
                                 >
                                     {category.name}
@@ -84,8 +84,8 @@ const CategoryFilter = ({
                                 <div
                                     className={`text-xs transition-colors ${
                                         isSelected
-                                            ? 'text-taco-yellow-300'
-                                            : 'text-gray-400 group-hover:text-gray-300'
+                                            ? 'text-taco-yellow-600 dark:text-taco-yellow-300'
+                                            : 'text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300'
                                     }`}
                                 >
                                     {itemCount}{' '}
@@ -123,7 +123,7 @@ const CategoryFilter = ({
                 <div className='text-center'>
                     <button
                         onClick={() => setShowAllCategories(!showAllCategories)}
-                        className='inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-bubbly hover:bg-gray-600 transition-colors text-sm'
+                        className='inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-bubbly hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm'
                     >
                         <span>
                             {showAllCategories
@@ -154,14 +154,16 @@ const CategoryFilter = ({
                     animate={{ opacity: 1, y: 0 }}
                     className='mt-4 text-center'
                 >
-                    <div className='inline-flex items-center gap-2 bg-gray-800 border border-gray-700 rounded-full px-3 py-1'>
-                        <span className='text-gray-400 text-sm'>Showing:</span>
-                        <span className='text-taco-yellow-400 font-medium text-sm'>
+                    <div className='inline-flex items-center gap-2 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full px-3 py-1'>
+                        <span className='text-gray-500 dark:text-gray-400 text-sm'>
+                            Showing:
+                        </span>
+                        <span className='text-taco-yellow-600 dark:text-taco-yellow-400 font-medium text-sm'>
                             {safeCategories.find(
                                 cat => cat.pk === selectedCategory
                             )?.name ?? 'Unknown Category'}
                         </span>
-                        <span className='text-gray-400 text-sm'>
+                        <span className='text-gray-500 dark:text-gray-400 text-sm'>
                             ({getCategoryItemCount(selectedCategory)} items)
                         </span>
                     </div>

@@ -10,7 +10,7 @@ import Footer from './components/Footer.jsx';
 
 function App() {
     return (
-        <div className='min-h-screen bg-gray-800'>
+        <div className='min-h-screen bg-gray-100 dark:bg-gray-800'>
             <AnnouncementBanner />
             <Navbar />
             <main>

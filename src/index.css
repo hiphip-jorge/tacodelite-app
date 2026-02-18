@@ -2,11 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Prevent white flash during scrolling on dark backgrounds */
+/* Theme-aware background - light mode default, dark when .dark class on html */
 html,
 body {
-    background-color: #1f2937; /* bg-gray-800 - matches navbar and footer */
+    background-color: #f3f4f6; /* bg-gray-100 - light mode */
     overflow-x: hidden;
+    transition: background-color 0.2s ease;
+}
+
+html.dark body {
+    background-color: #1f2937; /* bg-gray-800 - dark mode */
 }
 
 @layer components {
@@ -15,11 +20,11 @@ body {
     }
 
     .btn-secondary {
-        @apply bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white font-bold py-2 px-5 rounded-bubbly transition-colors border border-gray-700 hover:border-taco-green-800/50;
+        @apply bg-gray-200 hover:bg-gray-300 text-gray-800 hover:text-gray-900 font-bold py-2 px-5 rounded-bubbly transition-colors border border-gray-300 hover:border-taco-yellow-500/50 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 dark:hover:text-white dark:border-gray-700 dark:hover:border-taco-green-800/50;
     }
 
     .card {
-        @apply bg-gray-800 rounded-bubbly shadow-md p-6 border border-taco-green-800/30;
+        @apply bg-white rounded-bubbly shadow-md p-6 border border-gray-200 dark:bg-gray-800 dark:border-taco-green-800/30;
     }
 }
 

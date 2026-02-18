@@ -59,7 +59,7 @@ function Contact() {
     ];
 
     return (
-        <div className='min-h-screen bg-gray-900 py-8'>
+        <div className='min-h-screen bg-gray-100 dark:bg-gray-900 py-8'>
             <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
                 {/* Header */}
                 <motion.div
@@ -68,10 +68,10 @@ function Contact() {
                     transition={{ duration: 0.8 }}
                     className='text-center mb-16'
                 >
-                    <h1 className='text-4xl md:text-5xl font-secular text-white mb-6'>
+                    <h1 className='text-4xl md:text-5xl font-secular text-gray-900 dark:text-white mb-6'>
                         Contact Us
                     </h1>
-                    <p className='text-xl text-gray-300 max-w-2xl mx-auto'>
+                    <p className='text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto'>
                         We'd love to hear from you! Visit us, call us, or order
                         online.
                     </p>
@@ -83,7 +83,7 @@ function Contact() {
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8 }}
-                        className='text-3xl font-secular text-white text-center mb-12'
+                        className='text-3xl font-secular text-gray-900 dark:text-white text-center mb-12'
                     >
                         Order Online
                     </motion.h2>
@@ -98,10 +98,10 @@ function Contact() {
                                     duration: 0.8,
                                     delay: index * 0.2,
                                 }}
-                                className='bg-gray-800 rounded-lg shadow-md p-8 text-center border border-gray-700'
+                                className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center border border-gray-200 dark:border-gray-700'
                             >
                                 <div className='mb-4'>
-                                    <div className='bg-gray-100 rounded-lg p-4 inline-block'>
+                                    <div className='bg-gray-100 dark:bg-gray-700 rounded-lg p-4 inline-block'>
                                         <img
                                             src={option.logo}
                                             alt={`${option.name} logo`}
@@ -109,10 +109,10 @@ function Contact() {
                                         />
                                     </div>
                                 </div>
-                                <h3 className='text-2xl font-secular text-white mb-3'>
+                                <h3 className='text-2xl font-secular text-gray-900 dark:text-white mb-3'>
                                     {option.name}
                                 </h3>
-                                <p className='text-gray-300 mb-6'>
+                                <p className='text-gray-600 dark:text-gray-300 mb-6'>
                                     {option.description}
                                 </p>
                                 <a
@@ -136,13 +136,15 @@ function Contact() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: index * 0.1 }}
-                            className='bg-gray-800 rounded-lg shadow-md p-6 text-center border border-gray-700'
+                            className='bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 text-center border border-gray-200 dark:border-gray-700'
                         >
                             <div className='text-4xl mb-4'>{info.icon}</div>
-                            <h3 className='text-lg font-secular text-white mb-2'>
+                            <h3 className='text-lg font-secular text-gray-900 dark:text-white mb-2'>
                                 {info.title}
                             </h3>
-                            <p className='text-gray-300 mb-4'>{info.content}</p>
+                            <p className='text-gray-600 dark:text-gray-300 mb-4'>
+                                {info.content}
+                            </p>
                             {info.action && (
                                 <a
                                     href={info.href}
@@ -168,10 +170,10 @@ function Contact() {
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
                     >
-                        <h2 className='text-3xl font-secular text-white mb-6'>
+                        <h2 className='text-3xl font-secular text-gray-900 dark:text-white mb-6'>
                             Visit Our Restaurant
                         </h2>
-                        <p className='text-lg text-gray-300 mb-6'>
+                        <p className='text-lg text-gray-600 dark:text-gray-300 mb-6'>
                             Located at the Prairie Creek Village Shopping Center
                             in Plano, our restaurant is easily accessible with
                             plenty of parking and a welcoming atmosphere for
@@ -183,10 +185,10 @@ function Contact() {
                                     📍
                                 </span>
                                 <div>
-                                    <h3 className='font-semibold text-white'>
+                                    <h3 className='font-semibold text-gray-900 dark:text-white'>
                                         Address
                                     </h3>
-                                    <p className='text-gray-300'>
+                                    <p className='text-gray-600 dark:text-gray-300'>
                                         2957 W 15th St
                                         <br />
                                         Plano, TX 75075
@@ -198,10 +200,10 @@ function Contact() {
                                     🚗
                                 </span>
                                 <div>
-                                    <h3 className='font-semibold text-white'>
+                                    <h3 className='font-semibold text-gray-900 dark:text-white'>
                                         Parking
                                     </h3>
-                                    <p className='text-gray-300'>
+                                    <p className='text-gray-600 dark:text-gray-300'>
                                         Free parking available in our lot
                                     </p>
                                 </div>
@@ -211,10 +213,10 @@ function Contact() {
                                     ♿
                                 </span>
                                 <div>
-                                    <h3 className='font-semibold text-white'>
+                                    <h3 className='font-semibold text-gray-900 dark:text-white'>
                                         Accessibility
                                     </h3>
-                                    <p className='text-gray-300'>
+                                    <p className='text-gray-600 dark:text-gray-300'>
                                         Wheelchair accessible entrance and
                                         seating
                                     </p>
@@ -227,11 +229,11 @@ function Contact() {
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.8 }}
-                        className='bg-gray-800 rounded-lg p-8 border border-gray-700'
+                        className='bg-white dark:bg-gray-800 rounded-lg p-8 border border-gray-200 dark:border-gray-700'
                     >
                         <div className='text-center mb-6'>
                             <div className='text-6xl mb-4'>🗺️</div>
-                            <p className='text-gray-300 mb-4'>
+                            <p className='text-gray-600 dark:text-gray-300 mb-4'>
                                 Interactive Map
                             </p>
                         </div>
@@ -269,12 +271,12 @@ function Contact() {
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    className='bg-gray-800 rounded-lg shadow-lg p-8 md:p-12 text-center border border-gray-700'
+                    className='bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 md:p-12 text-center border border-gray-200 dark:border-gray-700'
                 >
                     <h2 className='text-3xl font-secular text-white mb-6'>
                         Catering Services
                     </h2>
-                    <p className='text-lg text-gray-300 mb-8 max-w-2xl mx-auto'>
+                    <p className='text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto'>
                         Planning an event? Let us cater it! We offer delicious
                         Tex-Mex food for parties, corporate events, and special
                         occasions.

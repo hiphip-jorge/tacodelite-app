@@ -21,14 +21,14 @@ const MenuItem = ({ item = {}, index }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
-            className='bg-gray-700 rounded-bubbly-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-600/50 hover:border-taco-yellow-500/40 group p-1 flex flex-col h-full'
+            className='bg-white dark:bg-gray-700 rounded-bubbly-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-600/50 hover:border-taco-yellow-500/40 group p-1 flex flex-col h-full'
         >
             {/* Encapsulated title + description - accent color, rounded top and bottom */}
-            <div className='bg-taco-yellow-500/15 border border-taco-yellow-500/40 rounded-t-bubbly-md rounded-b-md px-5 pt-5 pb-4 min-h-[8.5rem] flex-1 flex flex-col'>
-                <h3 className='text-xl font-bold font-secular text-white mb-2 group-hover:text-taco-yellow-400 transition-colors'>
+            <div className='bg-taco-yellow-500/20 dark:bg-taco-yellow-500/15 border border-taco-yellow-500/40 rounded-t-bubbly-md rounded-b-md px-5 pt-5 pb-4 min-h-[8.5rem] flex-1 flex flex-col'>
+                <h3 className='text-xl font-bold font-secular text-gray-900 dark:text-white mb-2 group-hover:text-taco-yellow-600 dark:group-hover:text-taco-yellow-400 transition-colors'>
                     {formatName(item.name)}
                 </h3>
-                <p className='text-sm text-gray-300 line-clamp-3'>
+                <p className='text-sm text-gray-600 dark:text-gray-300 line-clamp-3'>
                     {item.description}
                 </p>
             </div>
@@ -38,20 +38,20 @@ const MenuItem = ({ item = {}, index }) => {
                 <div className='flex items-center gap-2 flex-wrap'>
                     {/* Vegetarian Badge */}
                     {item.vegetarian && (
-                        <span className='bg-taco-green-600/20 text-taco-green-400 px-3 py-1.5 rounded-full font-medium text-xs border border-taco-green-600/30'>
+                        <span className='bg-taco-green-500/20 dark:bg-taco-green-600/20 text-taco-green-700 dark:text-taco-green-400 px-3 py-1.5 rounded-full font-medium text-xs border border-taco-green-500/40 dark:border-taco-green-600/30'>
                             🌱 Vegetarian
                         </span>
                     )}
                     {/* Unavailable Badge - only show when item is not active */}
                     {!item.active && (
-                        <span className='bg-gray-600/50 text-gray-400 px-3 py-1.5 rounded-full font-medium text-xs border border-gray-500/30'>
+                        <span className='bg-gray-300 dark:bg-gray-600/50 text-gray-600 dark:text-gray-400 px-3 py-1.5 rounded-full font-medium text-xs border border-gray-400 dark:border-gray-500/30'>
                             Unavailable
                         </span>
                     )}
                 </div>
 
                 {/* Price - pill-shaped, prominent */}
-                <span className='bg-taco-yellow-500/20 text-taco-yellow-400 px-3 py-1.5 rounded-full font-bold text-base border border-taco-yellow-500/40 shrink-0'>
+                <span className='bg-taco-yellow-500/30 dark:bg-taco-yellow-500/20 text-taco-yellow-700 dark:text-taco-yellow-400 px-3 py-1.5 rounded-full font-bold text-base border border-taco-yellow-500/40 shrink-0'>
                     {formatPrice(item.price)}
                 </span>
             </div>
