@@ -138,7 +138,7 @@ function Navbar() {
                                         location.pathname === item.path
                                             ? 'bg-taco-yellow-100 dark:bg-taco-yellow-900 text-taco-yellow-600 dark:text-taco-yellow-400 border border-taco-yellow-50 dark:border-taco-yellow-500/40'
                                             : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-taco-yellow-500 border border-transparent hover:border-gray-300 dark:hover:border-gray-600'
-                                    } block px-3 py-2 rounded-md text-base font-medium transition-colors`}
+                                    } block px-3 py-2 rounded-bubbly text-base font-medium transition-colors`}
                                     onClick={() => setIsOpen(false)}
                                 >
                                     {item.label}
