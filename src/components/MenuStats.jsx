@@ -108,7 +108,7 @@ const MenuStats = ({
                         {searchQuery && (
                             <button
                                 onClick={() => window.location.reload()}
-                                className='px-4 py-2 bg-taco-yellow-500 text-gray-900 rounded-bubbly hover:bg-taco-yellow-400 transition-colors text-sm'
+                                className='px-4 py-2 bg-taco-yellow-500 text-gray-900 rounded-bubbly hover:bg-taco-yellow-400 transition-colors text-sm border border-taco-yellow-50'
                             >
                                 Clear Search
                             </button>

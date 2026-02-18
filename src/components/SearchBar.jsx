@@ -94,7 +94,7 @@ const SearchBar = ({
                     {/* Search Button */}
                     <button
                         type='submit'
-                        className='absolute inset-y-0 right-0 px-4 py-2 bg-taco-yellow-500 text-gray-900 font-medium rounded-r-bubbly hover:bg-taco-yellow-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800'
+                        className='absolute inset-y-0 right-0 px-4 py-2 bg-taco-yellow-500 text-gray-900 font-medium rounded-r-bubbly hover:bg-taco-yellow-400 transition-colors duration-200 border border-taco-yellow-50 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-gray-800'
                     >
                         Search
                     </button>

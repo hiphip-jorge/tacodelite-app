@@ -123,7 +123,7 @@ const CategoryFilter = ({
                 <div className='text-center'>
                     <button
                         onClick={() => setShowAllCategories(!showAllCategories)}
-                        className='inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-bubbly hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm'
+                        className='inline-flex items-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-bubbly hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors text-sm border border-gray-100 dark:border-gray-600'
                     >
                         <span>
                             {showAllCategories
