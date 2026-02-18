@@ -7,11 +7,21 @@ const SearchBar = ({
     placeholder = 'Search our menu...',
 }) => {
     const [inputValue, setInputValue] = useState(searchTerm || '');
+    const [isMobile, setIsMobile] = useState(false);
 
     // Sync input value with searchTerm prop
     useEffect(() => {
         setInputValue(searchTerm || '');
     }, [searchTerm]);
+
+    // Hide placeholder on mobile (max-width: 640px = Tailwind sm breakpoint)
+    useEffect(() => {
+        const mq = window.matchMedia('(max-width: 640px)');
+        const handler = () => setIsMobile(mq.matches);
+        handler();
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
+    }, []);
 
     const handleSubmit = e => {
         e.preventDefault();
@@ -61,7 +71,7 @@ const SearchBar = ({
                         type='text'
                         value={inputValue}
                         onChange={handleInputChange}
-                        placeholder={placeholder}
+                        placeholder={isMobile ? '' : placeholder}
                         className='block w-full pl-10 pr-12 py-3 border border-gray-300 dark:border-gray-600 rounded-bubbly bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:border-transparent transition-all duration-200'
                     />
 
@@ -106,7 +116,7 @@ const SearchBar = ({
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
-                        className='mt-2 text-center text-sm text-gray-500'
+                        className='mt-2 text-center text-sm text-gray-500 max-sm:hidden'
                     >
                         Try searching for "taco", "vegetarian", "breakfast", or
                         any ingredient
