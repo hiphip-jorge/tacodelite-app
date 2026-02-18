@@ -62,7 +62,7 @@ const SearchBar = ({
                         value={inputValue}
                         onChange={handleInputChange}
                         placeholder={placeholder}
-                        className='block w-full pl-10 pr-12 py-3 border border-gray-600 rounded-lg bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:border-transparent transition-all duration-200'
+                        className='block w-full pl-10 pr-12 py-3 border border-gray-600 rounded-bubbly bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:border-transparent transition-all duration-200'
                     />
 
                     {/* Clear Button */}
@@ -94,7 +94,7 @@ const SearchBar = ({
                     {/* Search Button */}
                     <button
                         type='submit'
-                        className='absolute inset-y-0 right-0 px-4 py-2 bg-taco-yellow-500 text-gray-900 font-medium rounded-r-lg hover:bg-taco-yellow-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-800'
+                        className='absolute inset-y-0 right-0 px-4 py-2 bg-taco-yellow-500 text-gray-900 font-medium rounded-r-bubbly hover:bg-taco-yellow-400 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-taco-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-800'
                     >
                         Search
                     </button>

@@ -19,7 +19,7 @@ const MenuStats = ({
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className='bg-gray-800 border border-gray-700 rounded-lg p-6 mb-8'
+            className='bg-gray-800 border border-gray-700 rounded-bubbly p-6 mb-8'
         >
             <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
                 {/* Total Items */}
@@ -99,14 +99,14 @@ const MenuStats = ({
                     <div className='flex flex-wrap justify-center gap-3'>
                         <button
                             onClick={() => window.location.reload()}
-                            className='px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors text-sm'
+                            className='px-4 py-2 bg-gray-700 text-gray-300 rounded-bubbly hover:bg-gray-600 transition-colors text-sm'
                         >
                             View All Items
                         </button>
                         {searchQuery && (
                             <button
                                 onClick={() => window.location.reload()}
-                                className='px-4 py-2 bg-taco-yellow-500 text-gray-900 rounded-lg hover:bg-taco-yellow-400 transition-colors text-sm'
+                                className='px-4 py-2 bg-taco-yellow-500 text-gray-900 rounded-bubbly hover:bg-taco-yellow-400 transition-colors text-sm'
                             >
                                 Clear Search
                             </button>

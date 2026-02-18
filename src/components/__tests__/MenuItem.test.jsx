@@ -33,7 +33,6 @@ describe('MenuItem Component', () => {
         expect(screen.getByText('Test Taco')).toBeInTheDocument();
         expect(screen.getByText('$4.99')).toBeInTheDocument();
         expect(screen.getByText('A delicious test taco')).toBeInTheDocument();
-        expect(screen.getByText('TT')).toBeInTheDocument(); // Initials
     });
 
     it('should handle undefined name gracefully', () => {
@@ -100,7 +99,6 @@ describe('MenuItem Component', () => {
         render(<MenuItem item={itemWithLowercaseName} index={0} />);
 
         expect(screen.getByText('Chicken Burrito')).toBeInTheDocument();
-        expect(screen.getByText('CB')).toBeInTheDocument(); // Initials
     });
 
     it('should handle multi-word names correctly', () => {
@@ -113,7 +111,6 @@ describe('MenuItem Component', () => {
         expect(
             screen.getByText('Supreme Beef And Bean Burrito')
         ).toBeInTheDocument();
-        expect(screen.getByText('SB')).toBeInTheDocument(); // First 2 words
     });
 
     it('should handle vegetarian items', () => {

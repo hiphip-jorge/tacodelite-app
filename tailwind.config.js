@@ -3,6 +3,12 @@ export default {
     content: ['./index.html', './src/**/*.{js,jsx}'],
     theme: {
         extend: {
+            borderRadius: {
+                bubbly: '1.5rem',
+                'bubbly-md': '1.75rem',
+                'bubbly-lg': '2rem',
+                'bubbly-xl': '2.5rem',
+            },
             fontFamily: {
                 acier: ['acier-bat-grotesque', 'sans-serif'],
                 secular: ['Secular One', 'sans-serif'],

@@ -29,10 +29,10 @@ const Menu = () => {
 
     return (
         <div className='min-h-screen bg-gray-800 py-8 overflow-hidden'>
-            <div className='container mx-auto px-4'>
+            <div className='container mx-auto px-16 sm:px-20 md:px-24 lg:px-28'>
                 {/* Header */}
                 <div className='text-center mb-12'>
-                    <h1 className='text-5xl font-bold text-white mb-4 font-hobo'>
+                    <h1 className='text-5xl font-bold font-secular text-white mb-4'>
                         Our Menu
                     </h1>
                     <p className='text-xl text-gray-300 max-w-2xl mx-auto'>
@@ -146,7 +146,7 @@ const Menu = () => {
                 !menuItemsLoading &&
                 Array.isArray(filteredItems) &&
                 filteredItems.length > 0 ? (
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12'>
+                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12 items-stretch'>
                         {(filteredItems || []).map(item => (
                             <MenuItem key={item.pk} item={item} />
                         ))}

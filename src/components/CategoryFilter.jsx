@@ -38,7 +38,7 @@ const CategoryFilter = ({
         >
             {/* Header */}
             <div className='text-center mb-6'>
-                <h2 className='text-xl font-bold text-white mb-2'>
+                <h2 className='text-xl font-bold font-secular text-white mb-2'>
                     Browse by Category
                 </h2>
                 <p className='text-gray-400 text-sm'>
@@ -61,7 +61,7 @@ const CategoryFilter = ({
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.4, delay: index * 0.05 }}
                             onClick={() => onCategoryChange(category.id)}
-                            className={`relative group p-3 rounded-lg border-2 transition-all duration-300 ${
+                            className={`relative group p-3 rounded-bubbly border-2 transition-all duration-300 ${
                                 isSelected
                                     ? 'border-taco-yellow-500 bg-taco-yellow-500/10 shadow-lg shadow-taco-yellow-500/20'
                                     : 'border-gray-700 bg-gray-800 hover:border-taco-yellow-500/50 hover:bg-gray-700/50'
@@ -71,7 +71,7 @@ const CategoryFilter = ({
                             <div className='text-center'>
                                 {/* Category Name */}
                                 <h3
-                                    className={`font-bold text-base mb-1 transition-colors ${
+                                    className={`font-bold font-secular text-base mb-1 transition-colors ${
                                         isSelected
                                             ? 'text-taco-yellow-400'
                                             : 'text-white group-hover:text-taco-yellow-400'
@@ -123,7 +123,7 @@ const CategoryFilter = ({
                 <div className='text-center'>
                     <button
                         onClick={() => setShowAllCategories(!showAllCategories)}
-                        className='inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition-colors text-sm'
+                        className='inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-gray-300 rounded-bubbly hover:bg-gray-600 transition-colors text-sm'
                     >
                         <span>
                             {showAllCategories
