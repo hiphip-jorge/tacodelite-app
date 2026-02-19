@@ -136,6 +136,12 @@ exports.handler = async event => {
             if (body.portionSize) newItem.portionSize = body.portionSize;
             if (body.unitCount != null)
                 newItem.unitCount = parseInt(body.unitCount);
+            if (body.modifierGroupId)
+                newItem.modifierGroupId = body.modifierGroupId;
+            if (body.defaultSelections && Array.isArray(body.defaultSelections))
+                newItem.defaultSelections = body.defaultSelections;
+            if (body.availableAddons && Array.isArray(body.availableAddons))
+                newItem.availableAddons = body.availableAddons;
             const putParams = {
                 TableName: process.env.DYNAMODB_TABLE,
                 Item: newItem,
@@ -180,6 +186,29 @@ exports.handler = async event => {
                 updateParts.push('#unitCount = :unitCount');
                 exprNames['#unitCount'] = 'unitCount';
                 exprValues[':unitCount'] = parseInt(body.unitCount);
+            }
+            if (body.modifierGroupId !== undefined) {
+                updateParts.push('#modifierGroupId = :modifierGroupId');
+                exprNames['#modifierGroupId'] = 'modifierGroupId';
+                exprValues[':modifierGroupId'] = body.modifierGroupId;
+            }
+            if (body.defaultSelections !== undefined) {
+                updateParts.push('#defaultSelections = :defaultSelections');
+                exprNames['#defaultSelections'] = 'defaultSelections';
+                exprValues[':defaultSelections'] = Array.isArray(
+                    body.defaultSelections
+                )
+                    ? body.defaultSelections
+                    : [];
+            }
+            if (body.availableAddons !== undefined) {
+                updateParts.push('#availableAddons = :availableAddons');
+                exprNames['#availableAddons'] = 'availableAddons';
+                exprValues[':availableAddons'] = Array.isArray(
+                    body.availableAddons
+                )
+                    ? body.availableAddons
+                    : [];
             }
             const updateParams = {
                 TableName: process.env.DYNAMODB_TABLE,

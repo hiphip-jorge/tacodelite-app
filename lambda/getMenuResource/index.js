@@ -70,6 +70,17 @@ function cleanMenuItems(items) {
             active: item.active,
             ...(item.portionSize && { portionSize: item.portionSize }),
             ...(item.unitCount != null && { unitCount: item.unitCount }),
+            ...(item.modifierGroupId && {
+                modifierGroupId: item.modifierGroupId,
+            }),
+            ...(item.defaultSelections &&
+                item.defaultSelections.length > 0 && {
+                    defaultSelections: item.defaultSelections,
+                }),
+            ...(item.availableAddons &&
+                item.availableAddons.length > 0 && {
+                    availableAddons: item.availableAddons,
+                }),
             ...(item.img && { img: item.img }),
             ...(item.alt && { alt: item.alt }),
             ...(item.categoryName && { categoryName: item.categoryName }),

@@ -111,6 +111,17 @@ exports.handler = async event => {
             ...(body.unitCount != null && {
                 unitCount: parseInt(body.unitCount),
             }),
+            ...(body.modifierGroupId && {
+                modifierGroupId: body.modifierGroupId,
+            }),
+            ...(body.defaultSelections &&
+                Array.isArray(body.defaultSelections) && {
+                    defaultSelections: body.defaultSelections,
+                }),
+            ...(body.availableAddons &&
+                Array.isArray(body.availableAddons) && {
+                    availableAddons: body.availableAddons,
+                }),
             createdAt: new Date().toISOString(),
         };
 

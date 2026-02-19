@@ -172,7 +172,6 @@ This document describes the DynamoDB table structure and data models for the Tac
     "groupName": "Lunch",
     "priceSm": 0.5,
     "priceLg": 0.75,
-    "priceType": "addon",
     "defaultSelected": false,
     "sortOrder": 1,
     "active": true,
@@ -181,11 +180,7 @@ This document describes the DynamoDB table structure and data models for the Tac
 }
 ```
 
-**Price Types:**
-
-- `addon` - Extra charge; uses priceSm or priceLg based on menu item portionSize (or unitCount × priceSm for Family)
-- `included` - No charge; priceSm and priceLg are 0
-- `removal` - Removal option; priceSm and priceLg are 0
+**Behavior:** Determined by menu item association (defaultSelections = included, availableAddons = add-on). Every modifier can be removed; "No X" options are derived in the UI when the modifier is included.
 
 **Menu Item with portionSize/unitCount:**
 

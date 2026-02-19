@@ -58,13 +58,12 @@ const MODIFIER_GROUPS = [
  * Each has priceSm and priceLg
  */
 const LUNCH_MODIFIERS = [
-    // Protein choices (included)
+    // Protein choices (included - price 0, menu item decides via defaultSelections)
     {
         id: 'GROUND_BEEF',
         name: 'Ground Beef',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 1,
     },
     {
@@ -72,7 +71,6 @@ const LUNCH_MODIFIERS = [
         name: 'Chicken Fajita',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 2,
     },
     {
@@ -80,7 +78,6 @@ const LUNCH_MODIFIERS = [
         name: 'Steak Fajita',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 3,
     },
     {
@@ -88,7 +85,6 @@ const LUNCH_MODIFIERS = [
         name: 'Shredded Chicken',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 4,
     },
     // Base toppings (included)
@@ -97,7 +93,6 @@ const LUNCH_MODIFIERS = [
         name: 'Lettuce',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 5,
     },
     {
@@ -105,7 +100,6 @@ const LUNCH_MODIFIERS = [
         name: 'Shredded Cheese',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 6,
     },
     {
@@ -113,16 +107,14 @@ const LUNCH_MODIFIERS = [
         name: 'Homemade Beans',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 7,
     },
-    // Add-ons (sm/lg pricing)
+    // Add-ons (sm/lg pricing - charged when in availableAddons)
     {
         id: 'TOMATOES',
         name: 'Tomatoes',
         priceSm: 0.5,
         priceLg: 0.75,
-        priceType: 'addon',
         sortOrder: 8,
     },
     {
@@ -130,7 +122,6 @@ const LUNCH_MODIFIERS = [
         name: 'Sour Cream',
         priceSm: 0.5,
         priceLg: 0.75,
-        priceType: 'addon',
         sortOrder: 9,
     },
     {
@@ -138,7 +129,6 @@ const LUNCH_MODIFIERS = [
         name: 'Guacamole',
         priceSm: 1.5,
         priceLg: 2.0,
-        priceType: 'addon',
         sortOrder: 10,
     },
     {
@@ -146,7 +136,6 @@ const LUNCH_MODIFIERS = [
         name: 'Queso',
         priceSm: 1.0,
         priceLg: 1.5,
-        priceType: 'addon',
         sortOrder: 11,
     },
     {
@@ -154,7 +143,6 @@ const LUNCH_MODIFIERS = [
         name: 'Jalapeños',
         priceSm: 0.25,
         priceLg: 0.25,
-        priceType: 'addon',
         sortOrder: 12,
     },
     {
@@ -162,7 +150,6 @@ const LUNCH_MODIFIERS = [
         name: 'Bell Peppers & Onions',
         priceSm: 1.0,
         priceLg: 1.0,
-        priceType: 'addon',
         sortOrder: 13,
     },
     {
@@ -170,7 +157,6 @@ const LUNCH_MODIFIERS = [
         name: 'Pico de Gallo',
         priceSm: 0.5,
         priceLg: 0.5,
-        priceType: 'addon',
         sortOrder: 14,
     },
     // Sauce options (included)
@@ -179,7 +165,6 @@ const LUNCH_MODIFIERS = [
         name: 'Chili con Carne',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 15,
     },
     {
@@ -187,7 +172,6 @@ const LUNCH_MODIFIERS = [
         name: 'Sour Cream Sauce',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 16,
     },
     {
@@ -195,57 +179,7 @@ const LUNCH_MODIFIERS = [
         name: 'Special Burrito Sauce',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 17,
-    },
-    // Removal options
-    {
-        id: 'NO_LETTUCE',
-        name: 'No Lettuce',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 18,
-    },
-    {
-        id: 'NO_CHEESE',
-        name: 'No Cheese',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 19,
-    },
-    {
-        id: 'NO_TOMATOES',
-        name: 'No Tomatoes',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 20,
-    },
-    {
-        id: 'NO_SOUR_CREAM',
-        name: 'No Sour Cream',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 21,
-    },
-    {
-        id: 'NO_BEANS',
-        name: 'No Beans',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 22,
-    },
-    {
-        id: 'NO_JALAPENOS',
-        name: 'No Jalapeños',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 23,
     },
 ];
 
@@ -259,7 +193,6 @@ const BREAKFAST_MODIFIERS = [
         name: 'Egg & Sausage',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 1,
     },
     {
@@ -267,7 +200,6 @@ const BREAKFAST_MODIFIERS = [
         name: 'Egg & Chorizo',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 2,
     },
     // Base toppings
@@ -276,16 +208,14 @@ const BREAKFAST_MODIFIERS = [
         name: 'Shredded Cheese',
         priceSm: 0,
         priceLg: 0,
-        priceType: 'included',
         sortOrder: 3,
     },
-    // Breakfast add-ons (sm=0.50, lg=0.75 for single; both=0.99/1.49)
+    // Breakfast add-ons
     {
         id: 'FRESH_POTATOES',
         name: 'Fresh Cut Potatoes',
         priceSm: 0.5,
         priceLg: 0.75,
-        priceType: 'addon',
         sortOrder: 4,
     },
     {
@@ -293,7 +223,6 @@ const BREAKFAST_MODIFIERS = [
         name: 'Bacon',
         priceSm: 0.5,
         priceLg: 0.75,
-        priceType: 'addon',
         sortOrder: 5,
     },
     {
@@ -301,25 +230,7 @@ const BREAKFAST_MODIFIERS = [
         name: 'Both Potatoes & Bacon',
         priceSm: 0.99,
         priceLg: 1.49,
-        priceType: 'addon',
         sortOrder: 6,
-    },
-    // Removal options
-    {
-        id: 'NO_LETTUCE',
-        name: 'No Lettuce',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 7,
-    },
-    {
-        id: 'NO_CHEESE',
-        name: 'No Cheese',
-        priceSm: 0,
-        priceLg: 0,
-        priceType: 'removal',
-        sortOrder: 8,
     },
 ];
 
@@ -414,7 +325,6 @@ function createModifiersForGroup(groupId, modifiers, groupName) {
         groupName,
         priceSm: mod.priceSm ?? 0,
         priceLg: mod.priceLg ?? 0,
-        priceType: mod.priceType || 'addon',
         defaultSelected: false,
         sortOrder: mod.sortOrder || 0,
         active: true,
@@ -451,8 +361,24 @@ async function createModifiers() {
     console.log(`Created ${allModifiers.length} modifiers`);
 }
 
+/** Default included modifiers for LUNCH items (base toppings) */
+const LUNCH_DEFAULT_SELECTIONS = [
+    'LETTUCE',
+    'SHREDDED_CHEESE',
+    'HOMEMADE_BEANS',
+    'TOMATOES',
+    'SOUR_CREAM',
+    'JALAPENOS',
+];
+
+/** Default included modifiers for BREAKFAST items */
+const BREAKFAST_DEFAULT_SELECTIONS = ['EGG_SAUSAGE', 'SHREDDED_CHEESE'];
+
+/** Default included modifiers for FAMILY (same as LUNCH) */
+const FAMILY_DEFAULT_SELECTIONS = LUNCH_DEFAULT_SELECTIONS;
+
 /**
- * Determine portionSize or unitCount for a menu item
+ * Determine portionSize, unitCount, modifierGroupId, and defaultSelections for a menu item
  */
 function getItemModifierAttrs(item) {
     const categoryId = item.categoryId;
@@ -460,33 +386,47 @@ function getItemModifierAttrs(item) {
 
     // Desserts (13) and Drinks (14) - no modifiers
     if (categoryId === 13 || categoryId === 14) {
-        return { portionSize: null, unitCount: null };
+        return {
+            portionSize: null,
+            unitCount: null,
+            modifierGroupId: null,
+            defaultSelections: [],
+        };
     }
 
-    // Family (12) - unitCount
+    // Family (12) - unitCount, FAMILY group
     if (categoryId === 12) {
+        let unitCount = 1;
         if (name.includes('10 pack') || name.includes('10 tacos'))
-            return { portionSize: null, unitCount: 10 };
-        if (name.includes('dozen') || name.includes('12 '))
-            return { portionSize: null, unitCount: 12 };
-        if (name.includes('gallon') || name.includes('bag of'))
-            return { portionSize: null, unitCount: 1 };
-        return { portionSize: null, unitCount: 1 };
+            unitCount = 10;
+        else if (name.includes('dozen') || name.includes('12 ')) unitCount = 12;
+        else if (name.includes('gallon') || name.includes('bag of'))
+            unitCount = 1;
+        return {
+            portionSize: null,
+            unitCount,
+            modifierGroupId: 'FAMILY',
+            defaultSelections: FAMILY_DEFAULT_SELECTIONS,
+        };
     }
 
     // Breakfast (1) - portionSize: taco=sm, burrito/bowl/quesadilla=lg
     if (categoryId === 1) {
-        if (
+        const portionSize =
             name.includes('taco') &&
             !name.includes('burrito') &&
             !name.includes('quesadilla')
-        ) {
-            return { portionSize: 'sm', unitCount: null };
-        }
-        return { portionSize: 'lg', unitCount: null };
+                ? 'sm'
+                : 'lg';
+        return {
+            portionSize,
+            unitCount: null,
+            modifierGroupId: 'BREAKFAST',
+            defaultSelections: BREAKFAST_DEFAULT_SELECTIONS,
+        };
     }
 
-    // Lunch categories (2-11) - portionSize
+    // Lunch categories (2-11) - portionSize, LUNCH group
     const smPatterns = [
         'taco',
         'tostada',
@@ -510,20 +450,25 @@ function getItemModifierAttrs(item) {
         'burger',
     ];
 
-    if (smPatterns.some(p => name.includes(p)))
-        return { portionSize: 'sm', unitCount: null };
-    if (lgPatterns.some(p => name.includes(p)))
-        return { portionSize: 'lg', unitCount: null };
+    let portionSize = 'lg';
+    if (smPatterns.some(p => name.includes(p))) portionSize = 'sm';
+    else if (lgPatterns.some(p => name.includes(p))) portionSize = 'lg';
 
-    // Chips-n-Stuff, Dinners - default to lg
-    return { portionSize: 'lg', unitCount: null };
+    return {
+        portionSize,
+        unitCount: null,
+        modifierGroupId: 'LUNCH',
+        defaultSelections: LUNCH_DEFAULT_SELECTIONS,
+    };
 }
 
 /**
- * Update menu items with portionSize/unitCount, remove modifierGroups
+ * Update menu items with portionSize, unitCount, modifierGroupId, defaultSelections
  */
 async function updateMenuItems() {
-    console.log('Updating menu items with portionSize/unitCount...');
+    console.log(
+        'Updating menu items with portionSize, unitCount, modifierGroupId, defaultSelections...'
+    );
 
     const scanResult = await docClient.send(
         new ScanCommand({
@@ -538,7 +483,8 @@ async function updateMenuItems() {
     const now = new Date().toISOString();
 
     for (const item of items) {
-        const { portionSize, unitCount } = getItemModifierAttrs(item);
+        const { portionSize, unitCount, modifierGroupId, defaultSelections } =
+            getItemModifierAttrs(item);
 
         const setParts = ['#updatedAt = :updatedAt'];
         const exprNames = { '#updatedAt': 'updatedAt' };
@@ -554,8 +500,35 @@ async function updateMenuItems() {
             exprNames['#unitCount'] = 'unitCount';
             exprValues[':unitCount'] = unitCount;
         }
+        if (modifierGroupId !== undefined && modifierGroupId !== null) {
+            setParts.push('#modifierGroupId = :modifierGroupId');
+            exprNames['#modifierGroupId'] = 'modifierGroupId';
+            exprValues[':modifierGroupId'] = modifierGroupId;
+        }
+        if (
+            defaultSelections !== undefined &&
+            Array.isArray(defaultSelections) &&
+            defaultSelections.length > 0
+        ) {
+            setParts.push('#defaultSelections = :defaultSelections');
+            exprNames['#defaultSelections'] = 'defaultSelections';
+            exprValues[':defaultSelections'] = defaultSelections;
+        }
 
-        const updateExpression = `SET ${setParts.join(', ')} REMOVE modifierGroups`;
+        // For items with no modifiers (Desserts, Drinks), remove modifier attrs if present
+        const removeParts = [];
+        if (!modifierGroupId) {
+            removeParts.push('modifierGroupId');
+        }
+        if (!defaultSelections || defaultSelections.length === 0) {
+            removeParts.push('defaultSelections');
+        }
+        removeParts.push('modifierGroups'); // legacy
+
+        const updateExpression =
+            removeParts.length > 0
+                ? `SET ${setParts.join(', ')} REMOVE ${removeParts.join(', ')}`
+                : `SET ${setParts.join(', ')}`;
 
         await docClient.send(
             new UpdateCommand({

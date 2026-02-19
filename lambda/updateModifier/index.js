@@ -69,35 +69,25 @@ exports.handler = async event => {
             expressionAttributeValues[':name'] = body.name;
         }
 
-        const priceType = body.priceType;
-        const shouldUpdatePrices =
-            body.priceSm !== undefined ||
-            body.priceLg !== undefined ||
-            priceType === 'included' ||
-            priceType === 'removal';
-        if (shouldUpdatePrices) {
+        if (body.priceSm !== undefined || body.priceLg !== undefined) {
             const effectivePriceSm =
-                priceType === 'included' || priceType === 'removal'
-                    ? 0
-                    : parseFloat(body.priceSm) || 0;
+                body.priceSm !== undefined
+                    ? parseFloat(body.priceSm) || 0
+                    : undefined;
             const effectivePriceLg =
-                priceType === 'included' || priceType === 'removal'
-                    ? 0
-                    : parseFloat(body.priceLg) || 0;
-            updateExpressions.push(
-                '#priceSm = :priceSm',
-                '#priceLg = :priceLg'
-            );
-            expressionAttributeNames['#priceSm'] = 'priceSm';
-            expressionAttributeNames['#priceLg'] = 'priceLg';
-            expressionAttributeValues[':priceSm'] = effectivePriceSm;
-            expressionAttributeValues[':priceLg'] = effectivePriceLg;
-        }
-
-        if (body.priceType !== undefined) {
-            updateExpressions.push('#priceType = :priceType');
-            expressionAttributeNames['#priceType'] = 'priceType';
-            expressionAttributeValues[':priceType'] = body.priceType;
+                body.priceLg !== undefined
+                    ? parseFloat(body.priceLg) || 0
+                    : undefined;
+            if (effectivePriceSm !== undefined) {
+                updateExpressions.push('#priceSm = :priceSm');
+                expressionAttributeNames['#priceSm'] = 'priceSm';
+                expressionAttributeValues[':priceSm'] = effectivePriceSm;
+            }
+            if (effectivePriceLg !== undefined) {
+                updateExpressions.push('#priceLg = :priceLg');
+                expressionAttributeNames['#priceLg'] = 'priceLg';
+                expressionAttributeValues[':priceLg'] = effectivePriceLg;
+            }
         }
 
         if (body.defaultSelected !== undefined) {

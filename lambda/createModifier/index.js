@@ -81,11 +81,8 @@ exports.handler = async event => {
         const modifierId = body.id.toUpperCase().replace(/[^A-Z0-9_]/g, '_');
 
         const now = new Date().toISOString();
-        const priceType = body.priceType || 'addon';
-        const priceSm =
-            priceType === 'addon' ? parseFloat(body.priceSm) || 0 : 0;
-        const priceLg =
-            priceType === 'addon' ? parseFloat(body.priceLg) || 0 : 0;
+        const priceSm = parseFloat(body.priceSm) || 0;
+        const priceLg = parseFloat(body.priceLg) || 0;
         const modifier = {
             pk: `MODIFIER#${body.groupId}`,
             sk: `MODIFIER#${modifierId}`,
@@ -95,7 +92,6 @@ exports.handler = async event => {
             groupName: groupResult.Item.name,
             priceSm,
             priceLg,
-            priceType, // 'addon' | 'included' | 'removal'
             defaultSelected: body.defaultSelected || false,
             sortOrder: body.sortOrder || 0,
             active: body.active !== undefined ? body.active : true,
