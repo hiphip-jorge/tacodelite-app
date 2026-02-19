@@ -92,7 +92,6 @@ exports.handler = async event => {
             groupName: groupResult.Item.name,
             priceSm,
             priceLg,
-            defaultSelected: body.defaultSelected || false,
             sortOrder: body.sortOrder || 0,
             active: body.active !== undefined ? body.active : true,
             createdAt: now,

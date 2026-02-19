@@ -325,7 +325,6 @@ function createModifiersForGroup(groupId, modifiers, groupName) {
         groupName,
         priceSm: mod.priceSm ?? 0,
         priceLg: mod.priceLg ?? 0,
-        defaultSelected: false,
         sortOrder: mod.sortOrder || 0,
         active: true,
         createdAt: new Date().toISOString(),

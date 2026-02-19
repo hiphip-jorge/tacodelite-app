@@ -90,13 +90,6 @@ exports.handler = async event => {
             }
         }
 
-        if (body.defaultSelected !== undefined) {
-            updateExpressions.push('#defaultSelected = :defaultSelected');
-            expressionAttributeNames['#defaultSelected'] = 'defaultSelected';
-            expressionAttributeValues[':defaultSelected'] =
-                body.defaultSelected;
-        }
-
         if (body.sortOrder !== undefined) {
             updateExpressions.push('#sortOrder = :sortOrder');
             expressionAttributeNames['#sortOrder'] = 'sortOrder';

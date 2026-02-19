@@ -172,7 +172,6 @@ This document describes the DynamoDB table structure and data models for the Tac
     "groupName": "Lunch",
     "priceSm": 0.5,
     "priceLg": 0.75,
-    "defaultSelected": false,
     "sortOrder": 1,
     "active": true,
     "createdAt": "2025-01-15T12:00:00Z",
