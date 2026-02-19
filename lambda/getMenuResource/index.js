@@ -68,7 +68,8 @@ function cleanMenuItems(items) {
             categoryId,
             vegetarian: item.vegetarian,
             active: item.active,
-            // Include any other core fields that exist
+            ...(item.portionSize && { portionSize: item.portionSize }),
+            ...(item.unitCount != null && { unitCount: item.unitCount }),
             ...(item.img && { img: item.img }),
             ...(item.alt && { alt: item.alt }),
             ...(item.categoryName && { categoryName: item.categoryName }),

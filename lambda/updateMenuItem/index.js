@@ -122,53 +122,74 @@ exports.handler = async event => {
             await docClient.send(new DeleteCommand(deleteParams));
 
             // Create new item in the new category
+            const newItem = {
+                pk: `ITEM#${newCategoryId}`,
+                sk: `ITEM#${itemIdNumber}`,
+                id: parseInt(itemIdNumber),
+                name: body.name,
+                price: body.price,
+                active: body.active,
+                vegetarian: body.vegetarian,
+                description: body.description,
+                categoryId: newCategoryId,
+            };
+            if (body.portionSize) newItem.portionSize = body.portionSize;
+            if (body.unitCount != null)
+                newItem.unitCount = parseInt(body.unitCount);
             const putParams = {
                 TableName: process.env.DYNAMODB_TABLE,
-                Item: {
-                    pk: `ITEM#${newCategoryId}`,
-                    sk: `ITEM#${itemIdNumber}`,
-                    id: parseInt(itemIdNumber),
-                    name: body.name,
-                    price: body.price,
-                    active: body.active,
-                    vegetarian: body.vegetarian,
-                    description: body.description,
-                    categoryId: newCategoryId,
-                    modifierGroups: body.modifierGroups || [],
-                },
+                Item: newItem,
             };
             const putCommand = new PutCommand(putParams);
             await docClient.send(putCommand);
         } else {
             // Category didn't change, just update the existing item
+            const updateParts = [
+                '#name = :name',
+                '#price = :price',
+                '#active = :active',
+                '#vegetarian = :vegetarian',
+                '#description = :description',
+                '#categoryId = :categoryId',
+                '#id = :id',
+            ];
+            const exprNames = {
+                '#name': 'name',
+                '#price': 'price',
+                '#active': 'active',
+                '#vegetarian': 'vegetarian',
+                '#description': 'description',
+                '#categoryId': 'categoryId',
+                '#id': 'id',
+            };
+            const exprValues = {
+                ':name': body.name,
+                ':price': body.price,
+                ':active': body.active,
+                ':vegetarian': body.vegetarian,
+                ':description': body.description,
+                ':categoryId': body.categoryId,
+                ':id': parseInt(itemIdNumber),
+            };
+            if (body.portionSize !== undefined) {
+                updateParts.push('#portionSize = :portionSize');
+                exprNames['#portionSize'] = 'portionSize';
+                exprValues[':portionSize'] = body.portionSize;
+            }
+            if (body.unitCount !== undefined) {
+                updateParts.push('#unitCount = :unitCount');
+                exprNames['#unitCount'] = 'unitCount';
+                exprValues[':unitCount'] = parseInt(body.unitCount);
+            }
             const updateParams = {
                 TableName: process.env.DYNAMODB_TABLE,
                 Key: {
                     pk: existingItem.pk,
                     sk: existingItem.sk,
                 },
-                UpdateExpression:
-                    'SET #name = :name, #price = :price, #active = :active, #vegetarian = :vegetarian, #description = :description, #categoryId = :categoryId, #id = :id, #modifierGroups = :modifierGroups',
-                ExpressionAttributeNames: {
-                    '#name': 'name',
-                    '#price': 'price',
-                    '#active': 'active',
-                    '#vegetarian': 'vegetarian',
-                    '#description': 'description',
-                    '#categoryId': 'categoryId',
-                    '#id': 'id',
-                    '#modifierGroups': 'modifierGroups',
-                },
-                ExpressionAttributeValues: {
-                    ':name': body.name,
-                    ':price': body.price,
-                    ':active': body.active,
-                    ':vegetarian': body.vegetarian,
-                    ':description': body.description,
-                    ':categoryId': body.categoryId,
-                    ':id': parseInt(itemIdNumber),
-                    ':modifierGroups': body.modifierGroups || [],
-                },
+                UpdateExpression: `SET ${updateParts.join(', ')}`,
+                ExpressionAttributeNames: exprNames,
+                ExpressionAttributeValues: exprValues,
                 ReturnValues: 'ALL_NEW',
             };
 

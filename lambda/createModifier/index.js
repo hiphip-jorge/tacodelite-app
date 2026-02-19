@@ -88,7 +88,8 @@ exports.handler = async event => {
             name: body.name,
             groupId: body.groupId,
             groupName: groupResult.Item.name,
-            price: parseFloat(body.price) || 0,
+            priceSm: parseFloat(body.priceSm) || 0,
+            priceLg: parseFloat(body.priceLg) || 0,
             priceType: body.priceType || 'addon', // 'addon' | 'included' | 'removal'
             defaultSelected: body.defaultSelected || false,
             sortOrder: body.sortOrder || 0,

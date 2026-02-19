@@ -1,20 +1,23 @@
 #!/usr/bin/env node
 
 /**
- * Modifier Groups and Modifiers Seeding Script
+ * Modifier Groups and Modifiers Seeding Script (Redesigned)
  *
- * This script creates a comprehensive modifier system based on the menu analysis.
- * It handles the hierarchical nature of items (base → supreme) and provides
- * efficient ingredient reuse across different menu categories.
+ * Clean migration: Replaces old modifier system with simplified structure:
+ * - 3 groups: LUNCH, BREAKFAST, FAMILY
+ * - Modifiers have priceSm and priceLg (no duplicate sm/lg modifiers)
+ * - Menu items get portionSize (sm/lg) or unitCount (Family)
+ * - Modifier group derived from categoryId
  */
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
     DynamoDBDocumentClient,
     BatchWriteCommand,
+    ScanCommand,
+    UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
 
-// Initialize DynamoDB client
 const client = new DynamoDBClient({
     region: process.env.AWS_REGION || 'us-east-1',
 });
@@ -24,593 +27,352 @@ const TABLE_NAME =
     process.env.DYNAMODB_TABLE || 'tacodelite-app-menu-items-staging';
 
 /**
- * Modifier Groups Configuration
- * Organized by ingredient type and usage context
+ * New Modifier Groups: LUNCH, BREAKFAST, FAMILY
  */
 const MODIFIER_GROUPS = [
-    // Base protein choices - required for most items
     {
-        id: 'PROTEIN_CHOICES',
-        name: 'Protein Choice',
-        description: 'Select your protein option',
+        id: 'LUNCH',
+        name: 'Lunch',
+        description: 'Add-ons for lunch items (tacos, burritos, salads, etc.)',
         sortOrder: 1,
-        required: true,
-        multiSelect: false,
-        min: 1,
-        max: 1,
+        active: true,
     },
-
-    // Standard toppings that come with most items
     {
-        id: 'BASE_TOPPINGS',
-        name: 'Standard Toppings',
-        description: 'Standard toppings included with your item',
+        id: 'BREAKFAST',
+        name: 'Breakfast',
+        description: 'Add-ons for breakfast items',
         sortOrder: 2,
-        required: false,
-        multiSelect: true,
-        min: 0,
-        max: null,
+        active: true,
     },
-
-    // Small add-ons for tacos and smaller items
     {
-        id: 'SMALL_ADDONS',
-        name: 'Small Add-ons',
-        description: 'Small add-ons for tacos and smaller items',
+        id: 'FAMILY',
+        name: 'Family',
+        description: 'Add-ons for family packs (quantity × small price)',
         sortOrder: 3,
-        required: false,
-        multiSelect: true,
-        min: 0,
-        max: null,
-    },
-
-    // Large portion add-ons for burritos, salads, plates
-    {
-        id: 'LARGE_ADDONS',
-        name: 'Large Add-ons',
-        description: 'Premium ingredients for burritos, salads, and plates',
-        sortOrder: 4,
-        required: false,
-        multiSelect: true,
-        min: 0,
-        max: null,
-    },
-
-    // Breakfast-specific add-ons
-    {
-        id: 'BREAKFAST_ADDONS',
-        name: 'Breakfast Add-ons',
-        description: 'Breakfast-specific add-ons',
-        sortOrder: 5,
-        required: false,
-        multiSelect: true,
-        min: 0,
-        max: null,
-    },
-
-    // Sauce and topping options
-    {
-        id: 'SAUCE_OPTIONS',
-        name: 'Sauce & Topping Options',
-        description: 'Choose your sauce and premium toppings',
-        sortOrder: 6,
-        required: false,
-        multiSelect: true,
-        min: 0,
-        max: null,
-    },
-
-    // Removal options for dietary restrictions
-    {
-        id: 'REMOVAL_OPTIONS',
-        name: 'Remove Items',
-        description: 'Remove ingredients for dietary preferences',
-        sortOrder: 7,
-        required: false,
-        multiSelect: true,
-        min: 0,
-        max: null,
+        active: true,
     },
 ];
 
 /**
- * Modifiers Configuration
- * Organized by group with pricing and default selection logic
+ * LUNCH modifiers - merged from old SMALL_ADDONS and LARGE_ADDONS
+ * Each has priceSm and priceLg
  */
-const MODIFIERS = {
-    // Protein choices - these are the base proteins
-    PROTEIN_CHOICES: [
-        {
-            id: 'GROUND_BEEF',
-            name: 'Ground Beef',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: true,
-            sortOrder: 1,
-        },
-        {
-            id: 'CHICKEN_FAJITA',
-            name: 'Chicken Fajita',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 2,
-        },
-        {
-            id: 'STEAK_FAJITA',
-            name: 'Steak Fajita',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 3,
-        },
-        {
-            id: 'SHREDDED_CHICKEN',
-            name: 'Shredded Chicken',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 4,
-        },
-        {
-            id: 'EGG_SAUSAGE',
-            name: 'Egg & Sausage',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: true,
-            sortOrder: 5,
-        },
-        {
-            id: 'EGG_CHORIZO',
-            name: 'Egg & Chorizo',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 6,
-        },
-    ],
-
-    // Base toppings that come standard
-    BASE_TOPPINGS: [
-        {
-            id: 'LETTUCE',
-            name: 'Lettuce',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: true,
-            sortOrder: 1,
-        },
-        {
-            id: 'SHREDDED_CHEESE',
-            name: 'Shredded Cheese',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: true,
-            sortOrder: 2,
-        },
-        {
-            id: 'HOMEMADE_BEANS',
-            name: 'Homemade Beans',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 3,
-        },
-    ],
-
-    // Small add-ons for tacos and smaller items
-    SMALL_ADDONS: [
-        {
-            id: 'TOMATOES',
-            name: 'Tomatoes',
-            price: 0.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 1,
-        },
-        {
-            id: 'SOUR_CREAM',
-            name: 'Sour Cream',
-            price: 0.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 2,
-        },
-        {
-            id: 'GUACAMOLE',
-            name: 'Guacamole',
-            price: 1.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 3,
-        },
-        {
-            id: 'QUESO',
-            name: 'Queso',
-            price: 1.0,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 4,
-        },
-        {
-            id: 'JALAPENOS',
-            name: 'Jalapeños',
-            price: 0.25,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 5,
-        },
-    ],
-
-    // Large add-ons for burritos, salads, plates
-    LARGE_ADDONS: [
-        {
-            id: 'TOMATOES_LG',
-            name: 'Tomatoes',
-            price: 0.75,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 1,
-        },
-        {
-            id: 'SOUR_CREAM_LG',
-            name: 'Sour Cream',
-            price: 0.75,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 2,
-        },
-        {
-            id: 'GUACAMOLE_LG',
-            name: 'Guacamole',
-            price: 2.0,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 3,
-        },
-        {
-            id: 'QUESO_LG',
-            name: 'Queso',
-            price: 1.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 4,
-        },
-        {
-            id: 'BELL_PEPPERS_ONIONS',
-            name: 'Bell Peppers & Onions',
-            price: 1.0,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 5,
-        },
-        {
-            id: 'PICO_DE_GALLO',
-            name: 'Pico de Gallo',
-            price: 0.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 6,
-        },
-    ],
-
-    // Breakfast-specific add-ons
-    BREAKFAST_ADDONS: [
-        {
-            id: 'FRESH_POTATOES',
-            name: 'Fresh Cut Potatoes',
-            price: 0.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 1,
-        },
-        {
-            id: 'BACON',
-            name: 'Bacon',
-            price: 0.5,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 2,
-        },
-        {
-            id: 'POTATOES_BACON',
-            name: 'Both Potatoes & Bacon',
-            price: 0.99,
-            priceType: 'addon',
-            defaultSelected: false,
-            sortOrder: 3,
-        },
-    ],
-
-    // Sauce and topping options
-    SAUCE_OPTIONS: [
-        {
-            id: 'CHILI_CON_CARNE',
-            name: 'Chili con Carne',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 1,
-        },
-        {
-            id: 'SOUR_CREAM_SAUCE',
-            name: 'Sour Cream Sauce',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: false,
-            sortOrder: 2,
-        },
-        {
-            id: 'BURRITO_SAUCE',
-            name: 'Special Burrito Sauce',
-            price: 0,
-            priceType: 'included',
-            defaultSelected: true,
-            sortOrder: 3,
-        },
-    ],
-
+const LUNCH_MODIFIERS = [
+    // Protein choices (included)
+    {
+        id: 'GROUND_BEEF',
+        name: 'Ground Beef',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 1,
+    },
+    {
+        id: 'CHICKEN_FAJITA',
+        name: 'Chicken Fajita',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 2,
+    },
+    {
+        id: 'STEAK_FAJITA',
+        name: 'Steak Fajita',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 3,
+    },
+    {
+        id: 'SHREDDED_CHICKEN',
+        name: 'Shredded Chicken',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 4,
+    },
+    // Base toppings (included)
+    {
+        id: 'LETTUCE',
+        name: 'Lettuce',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 5,
+    },
+    {
+        id: 'SHREDDED_CHEESE',
+        name: 'Shredded Cheese',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 6,
+    },
+    {
+        id: 'HOMEMADE_BEANS',
+        name: 'Homemade Beans',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 7,
+    },
+    // Add-ons (sm/lg pricing)
+    {
+        id: 'TOMATOES',
+        name: 'Tomatoes',
+        priceSm: 0.5,
+        priceLg: 0.75,
+        priceType: 'addon',
+        sortOrder: 8,
+    },
+    {
+        id: 'SOUR_CREAM',
+        name: 'Sour Cream',
+        priceSm: 0.5,
+        priceLg: 0.75,
+        priceType: 'addon',
+        sortOrder: 9,
+    },
+    {
+        id: 'GUACAMOLE',
+        name: 'Guacamole',
+        priceSm: 1.5,
+        priceLg: 2.0,
+        priceType: 'addon',
+        sortOrder: 10,
+    },
+    {
+        id: 'QUESO',
+        name: 'Queso',
+        priceSm: 1.0,
+        priceLg: 1.5,
+        priceType: 'addon',
+        sortOrder: 11,
+    },
+    {
+        id: 'JALAPENOS',
+        name: 'Jalapeños',
+        priceSm: 0.25,
+        priceLg: 0.25,
+        priceType: 'addon',
+        sortOrder: 12,
+    },
+    {
+        id: 'BELL_PEPPERS_ONIONS',
+        name: 'Bell Peppers & Onions',
+        priceSm: 1.0,
+        priceLg: 1.0,
+        priceType: 'addon',
+        sortOrder: 13,
+    },
+    {
+        id: 'PICO_DE_GALLO',
+        name: 'Pico de Gallo',
+        priceSm: 0.5,
+        priceLg: 0.5,
+        priceType: 'addon',
+        sortOrder: 14,
+    },
+    // Sauce options (included)
+    {
+        id: 'CHILI_CON_CARNE',
+        name: 'Chili con Carne',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 15,
+    },
+    {
+        id: 'SOUR_CREAM_SAUCE',
+        name: 'Sour Cream Sauce',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 16,
+    },
+    {
+        id: 'BURRITO_SAUCE',
+        name: 'Special Burrito Sauce',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 17,
+    },
     // Removal options
-    REMOVAL_OPTIONS: [
-        {
-            id: 'NO_LETTUCE',
-            name: 'No Lettuce',
-            price: 0,
-            priceType: 'removal',
-            defaultSelected: false,
-            sortOrder: 1,
-        },
-        {
-            id: 'NO_CHEESE',
-            name: 'No Cheese',
-            price: 0,
-            priceType: 'removal',
-            defaultSelected: false,
-            sortOrder: 2,
-        },
-        {
-            id: 'NO_TOMATOES',
-            name: 'No Tomatoes',
-            price: 0,
-            priceType: 'removal',
-            defaultSelected: false,
-            sortOrder: 3,
-        },
-        {
-            id: 'NO_SOUR_CREAM',
-            name: 'No Sour Cream',
-            price: 0,
-            priceType: 'removal',
-            defaultSelected: false,
-            sortOrder: 4,
-        },
-        {
-            id: 'NO_BEANS',
-            name: 'No Beans',
-            price: 0,
-            priceType: 'removal',
-            defaultSelected: false,
-            sortOrder: 5,
-        },
-        {
-            id: 'NO_JALAPENOS',
-            name: 'No Jalapeños',
-            price: 0,
-            priceType: 'removal',
-            defaultSelected: false,
-            sortOrder: 6,
-        },
-    ],
-};
+    {
+        id: 'NO_LETTUCE',
+        name: 'No Lettuce',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 18,
+    },
+    {
+        id: 'NO_CHEESE',
+        name: 'No Cheese',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 19,
+    },
+    {
+        id: 'NO_TOMATOES',
+        name: 'No Tomatoes',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 20,
+    },
+    {
+        id: 'NO_SOUR_CREAM',
+        name: 'No Sour Cream',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 21,
+    },
+    {
+        id: 'NO_BEANS',
+        name: 'No Beans',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 22,
+    },
+    {
+        id: 'NO_JALAPENOS',
+        name: 'No Jalapeños',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 23,
+    },
+];
 
 /**
- * Menu Item Modifier Group Assignments
- * Maps menu items to their applicable modifier groups with default selections
+ * BREAKFAST modifiers - taco=sm, burrito/bowl/quesadilla=lg
  */
-const MENU_ITEM_MODIFIERS = {
-    // Breakfast items
-    1: {
-        // breakfast taco
-        modifierGroups: [
-            'PROTEIN_CHOICES',
-            'BASE_TOPPINGS',
-            'BREAKFAST_ADDONS',
-        ],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['EGG_SAUSAGE'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-        },
+const BREAKFAST_MODIFIERS = [
+    // Protein choices
+    {
+        id: 'EGG_SAUSAGE',
+        name: 'Egg & Sausage',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 1,
     },
-    2: {
-        // breakfast burrito
-        modifierGroups: [
-            'PROTEIN_CHOICES',
-            'BASE_TOPPINGS',
-            'BREAKFAST_ADDONS',
-        ],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['EGG_SAUSAGE'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-        },
+    {
+        id: 'EGG_CHORIZO',
+        name: 'Egg & Chorizo',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 2,
     },
-    3: {
-        // breakfast bowl
-        modifierGroups: [
-            'PROTEIN_CHOICES',
-            'BASE_TOPPINGS',
-            'BREAKFAST_ADDONS',
-        ],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['EGG_SAUSAGE'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-        },
+    // Base toppings
+    {
+        id: 'SHREDDED_CHEESE',
+        name: 'Shredded Cheese',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'included',
+        sortOrder: 3,
     },
-    82: {
-        // breakfast quesadilla
-        modifierGroups: [
-            'PROTEIN_CHOICES',
-            'BASE_TOPPINGS',
-            'BREAKFAST_ADDONS',
-        ],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['EGG_SAUSAGE'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-        },
+    // Breakfast add-ons (sm=0.50, lg=0.75 for single; both=0.99/1.49)
+    {
+        id: 'FRESH_POTATOES',
+        name: 'Fresh Cut Potatoes',
+        priceSm: 0.5,
+        priceLg: 0.75,
+        priceType: 'addon',
+        sortOrder: 4,
     },
-
-    // Taco items - base tacos get basic modifiers, supreme gets premium
-    6: {
-        // taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE'],
-        },
+    {
+        id: 'BACON',
+        name: 'Bacon',
+        priceSm: 0.5,
+        priceLg: 0.75,
+        priceType: 'addon',
+        sortOrder: 5,
     },
-    7: {
-        // supreme taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE'],
-            SMALL_ADDONS: ['TOMATOES', 'SOUR_CREAM'],
-        },
+    {
+        id: 'POTATOES_BACON',
+        name: 'Both Potatoes & Bacon',
+        priceSm: 0.99,
+        priceLg: 1.49,
+        priceType: 'addon',
+        sortOrder: 6,
     },
-    8: {
-        // soft taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE'],
-        },
+    // Removal options
+    {
+        id: 'NO_LETTUCE',
+        name: 'No Lettuce',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 7,
     },
-    9: {
-        // soft taco supreme
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE'],
-            SMALL_ADDONS: ['TOMATOES', 'SOUR_CREAM'],
-        },
+    {
+        id: 'NO_CHEESE',
+        name: 'No Cheese',
+        priceSm: 0,
+        priceLg: 0,
+        priceType: 'removal',
+        sortOrder: 8,
     },
-    10: {
-        // fajita soft taco
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'LARGE_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['CHICKEN_FAJITA'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-            LARGE_ADDONS: ['BELL_PEPPERS_ONIONS'],
-        },
-    },
-    11: {
-        // taco delite
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-        },
-    },
-    12: {
-        // taco delite supreme
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-            SMALL_ADDONS: ['TOMATOES', 'SOUR_CREAM'],
-        },
-    },
-    13: {
-        // taco delite w/ queso
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-            SMALL_ADDONS: ['QUESO'],
-        },
-    },
-    14: {
-        // taco delite w/ guac
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SMALL_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['LETTUCE', 'SHREDDED_CHEESE', 'HOMEMADE_BEANS'],
-            SMALL_ADDONS: ['GUACAMOLE'],
-        },
-    },
-
-    // Burrito items
-    15: {
-        // bean burrito
-        modifierGroups: ['BASE_TOPPINGS', 'SAUCE_OPTIONS'],
-        defaultSelections: {
-            BASE_TOPPINGS: ['HOMEMADE_BEANS', 'SHREDDED_CHEESE'],
-            SAUCE_OPTIONS: ['BURRITO_SAUCE'],
-        },
-    },
-    16: {
-        // meat burrito
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SAUCE_OPTIONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-            SAUCE_OPTIONS: ['BURRITO_SAUCE'],
-        },
-    },
-    17: {
-        // combo burrito
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'SAUCE_OPTIONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['HOMEMADE_BEANS', 'SHREDDED_CHEESE'],
-            SAUCE_OPTIONS: ['BURRITO_SAUCE'],
-        },
-    },
-    18: {
-        // super burrito
-        modifierGroups: [
-            'PROTEIN_CHOICES',
-            'BASE_TOPPINGS',
-            'LARGE_ADDONS',
-            'SAUCE_OPTIONS',
-        ],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['HOMEMADE_BEANS', 'SHREDDED_CHEESE'],
-            LARGE_ADDONS: ['TOMATOES_LG', 'SOUR_CREAM_LG'],
-            SAUCE_OPTIONS: ['BURRITO_SAUCE'],
-        },
-    },
-    19: {
-        // fajita burrito
-        modifierGroups: ['PROTEIN_CHOICES', 'BASE_TOPPINGS', 'LARGE_ADDONS'],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['CHICKEN_FAJITA'],
-            BASE_TOPPINGS: ['SHREDDED_CHEESE'],
-            LARGE_ADDONS: ['BELL_PEPPERS_ONIONS'],
-        },
-    },
-    20: {
-        // melt burrito
-        modifierGroups: [
-            'PROTEIN_CHOICES',
-            'BASE_TOPPINGS',
-            'LARGE_ADDONS',
-            'SAUCE_OPTIONS',
-        ],
-        defaultSelections: {
-            PROTEIN_CHOICES: ['GROUND_BEEF'],
-            BASE_TOPPINGS: ['HOMEMADE_BEANS', 'SHREDDED_CHEESE'],
-            LARGE_ADDONS: ['TOMATOES_LG', 'SOUR_CREAM_LG', 'QUESO_LG'],
-            SAUCE_OPTIONS: ['BURRITO_SAUCE'],
-        },
-    },
-
-    // Continue with other categories...
-    // Note: This is a comprehensive example. In practice, you'd continue mapping all menu items.
-};
+];
 
 /**
- * Create modifier groups in DynamoDB
+ * FAMILY modifiers - same as LUNCH, uses unitCount × priceSm
+ */
+const FAMILY_MODIFIERS = LUNCH_MODIFIERS;
+
+/**
+ * Delete old modifier groups and modifiers (clean migration)
+ */
+async function deleteOldModifiers() {
+    console.log('Deleting old modifier groups and modifiers...');
+
+    const scanResult = await docClient.send(
+        new ScanCommand({
+            TableName: TABLE_NAME,
+            FilterExpression:
+                'begins_with(pk, :groupPrefix) OR begins_with(pk, :modPrefix)',
+            ExpressionAttributeValues: {
+                ':groupPrefix': 'MODIFIER_GROUP#',
+                ':modPrefix': 'MODIFIER#',
+            },
+        })
+    );
+
+    const items = scanResult.Items || [];
+    if (items.length === 0) {
+        console.log('No existing modifiers to delete');
+        return;
+    }
+
+    for (let i = 0; i < items.length; i += 25) {
+        const batch = items.slice(i, i + 25);
+        const deleteRequests = batch.map(item => ({
+            DeleteRequest: {
+                Key: { pk: item.pk, sk: item.sk },
+            },
+        }));
+
+        await docClient.send(
+            new BatchWriteCommand({
+                RequestItems: {
+                    [TABLE_NAME]: deleteRequests,
+                },
+            })
+        );
+    }
+    console.log(`Deleted ${items.length} old modifier/modifier group items`);
+}
+
+/**
+ * Create modifier groups
  */
 async function createModifierGroups() {
     console.log('Creating modifier groups...');
@@ -620,183 +382,236 @@ async function createModifierGroups() {
         sk: `MODIFIER_GROUP#${group.id}`,
         id: group.id,
         name: group.name,
-        description: group.description,
+        description: group.description || '',
         sortOrder: group.sortOrder,
-        required: group.required,
-        multiSelect: group.multiSelect,
-        min: group.min,
-        max: group.max,
-        active: true,
+        active: group.active,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
     }));
 
-    // Batch write modifier groups
-    const batches = [];
     for (let i = 0; i < groups.length; i += 25) {
-        batches.push(groups.slice(i, i + 25));
-    }
-
-    for (const batch of batches) {
+        const batch = groups.slice(i, i + 25);
         const putRequests = batch.map(item => ({ PutRequest: { Item: item } }));
         await docClient.send(
             new BatchWriteCommand({
-                RequestItems: {
-                    [TABLE_NAME]: putRequests,
-                },
+                RequestItems: { [TABLE_NAME]: putRequests },
             })
         );
     }
-
     console.log(`Created ${groups.length} modifier groups`);
 }
 
 /**
- * Create modifiers in DynamoDB
+ * Create modifiers for a group
+ */
+function createModifiersForGroup(groupId, modifiers, groupName) {
+    return modifiers.map(mod => ({
+        pk: `MODIFIER#${groupId}`,
+        sk: `MODIFIER#${mod.id}`,
+        id: mod.id,
+        name: mod.name,
+        groupId,
+        groupName,
+        priceSm: mod.priceSm ?? 0,
+        priceLg: mod.priceLg ?? 0,
+        priceType: mod.priceType || 'addon',
+        defaultSelected: false,
+        sortOrder: mod.sortOrder || 0,
+        active: true,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+    }));
+}
+
+/**
+ * Create all modifiers
  */
 async function createModifiers() {
     console.log('Creating modifiers...');
 
-    const modifiers = [];
-    for (const [groupId, groupModifiers] of Object.entries(MODIFIERS)) {
-        for (const modifier of groupModifiers) {
-            modifiers.push({
-                pk: `MODIFIER#${groupId}`,
-                sk: `MODIFIER#${modifier.id}`,
-                id: modifier.id,
-                name: modifier.name,
-                groupId: groupId,
-                groupName:
-                    MODIFIER_GROUPS.find(g => g.id === groupId)?.name ||
-                    groupId,
-                price: modifier.price,
-                priceType: modifier.priceType,
-                defaultSelected: modifier.defaultSelected,
-                sortOrder: modifier.sortOrder,
-                active: true,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-            });
-        }
-    }
+    const allModifiers = [
+        ...createModifiersForGroup('LUNCH', LUNCH_MODIFIERS, 'Lunch'),
+        ...createModifiersForGroup(
+            'BREAKFAST',
+            BREAKFAST_MODIFIERS,
+            'Breakfast'
+        ),
+        ...createModifiersForGroup('FAMILY', FAMILY_MODIFIERS, 'Family'),
+    ];
 
-    // Batch write modifiers
-    const batches = [];
-    for (let i = 0; i < modifiers.length; i += 25) {
-        batches.push(modifiers.slice(i, i + 25));
-    }
-
-    for (const batch of batches) {
+    for (let i = 0; i < allModifiers.length; i += 25) {
+        const batch = allModifiers.slice(i, i + 25);
         const putRequests = batch.map(item => ({ PutRequest: { Item: item } }));
         await docClient.send(
             new BatchWriteCommand({
-                RequestItems: {
-                    [TABLE_NAME]: putRequests,
-                },
+                RequestItems: { [TABLE_NAME]: putRequests },
             })
         );
     }
-
-    console.log(`Created ${modifiers.length} modifiers`);
+    console.log(`Created ${allModifiers.length} modifiers`);
 }
 
 /**
- * Update menu items with modifier groups
+ * Determine portionSize or unitCount for a menu item
  */
-async function updateMenuItemsWithModifiers() {
-    console.log('Updating menu items with modifier groups...');
+function getItemModifierAttrs(item) {
+    const categoryId = item.categoryId;
+    const name = (item.name || '').toLowerCase();
 
-    const updates = [];
-    for (const [itemId, config] of Object.entries(MENU_ITEM_MODIFIERS)) {
-        const modifierGroups = config.modifierGroups.map(groupId => {
-            const group = MODIFIER_GROUPS.find(g => g.id === groupId);
-            const defaultSelections = config.defaultSelections[groupId] || [];
-
-            return {
-                groupId: groupId,
-                groupName: group.name,
-                required: group.required,
-                multiSelect: group.multiSelect,
-                min: group.min,
-                max: group.max,
-                defaultSelections: defaultSelections,
-            };
-        });
-
-        updates.push({
-            pk: `ITEM#${itemId}`,
-            sk: `ITEM#${itemId}`,
-            modifierGroups: modifierGroups,
-            updatedAt: new Date().toISOString(),
-        });
+    // Desserts (13) and Drinks (14) - no modifiers
+    if (categoryId === 13 || categoryId === 14) {
+        return { portionSize: null, unitCount: null };
     }
 
-    // Batch write menu item updates
-    const batches = [];
-    for (let i = 0; i < updates.length; i += 25) {
-        batches.push(updates.slice(i, i + 25));
+    // Family (12) - unitCount
+    if (categoryId === 12) {
+        if (name.includes('10 pack') || name.includes('10 tacos'))
+            return { portionSize: null, unitCount: 10 };
+        if (name.includes('dozen') || name.includes('12 '))
+            return { portionSize: null, unitCount: 12 };
+        if (name.includes('gallon') || name.includes('bag of'))
+            return { portionSize: null, unitCount: 1 };
+        return { portionSize: null, unitCount: 1 };
     }
 
-    for (const batch of batches) {
-        const putRequests = batch.map(item => ({ PutRequest: { Item: item } }));
-        await docClient.send(
-            new BatchWriteCommand({
-                RequestItems: {
-                    [TABLE_NAME]: putRequests,
-                },
-            })
-        );
+    // Breakfast (1) - portionSize: taco=sm, burrito/bowl/quesadilla=lg
+    if (categoryId === 1) {
+        if (
+            name.includes('taco') &&
+            !name.includes('burrito') &&
+            !name.includes('quesadilla')
+        ) {
+            return { portionSize: 'sm', unitCount: null };
+        }
+        return { portionSize: 'lg', unitCount: null };
     }
 
-    console.log(`Updated ${updates.length} menu items with modifier groups`);
+    // Lunch categories (2-11) - portionSize
+    const smPatterns = [
+        'taco',
+        'tostada',
+        'side',
+        'extra',
+        'taquito',
+        'tamale',
+        'enchilada',
+        'cookie',
+        'chips',
+    ];
+    const lgPatterns = [
+        'burrito',
+        'bowl',
+        'salad',
+        'nachos',
+        'quesadilla',
+        'plate',
+        'soup',
+        'frito',
+        'burger',
+    ];
+
+    if (smPatterns.some(p => name.includes(p)))
+        return { portionSize: 'sm', unitCount: null };
+    if (lgPatterns.some(p => name.includes(p)))
+        return { portionSize: 'lg', unitCount: null };
+
+    // Chips-n-Stuff, Dinners - default to lg
+    return { portionSize: 'lg', unitCount: null };
 }
 
 /**
- * Main execution function
+ * Update menu items with portionSize/unitCount, remove modifierGroups
+ */
+async function updateMenuItems() {
+    console.log('Updating menu items with portionSize/unitCount...');
+
+    const scanResult = await docClient.send(
+        new ScanCommand({
+            TableName: TABLE_NAME,
+            FilterExpression: 'begins_with(pk, :itemPrefix) AND pk = sk',
+            ExpressionAttributeValues: { ':itemPrefix': 'ITEM#' },
+        })
+    );
+
+    const items = scanResult.Items || [];
+    let updated = 0;
+    const now = new Date().toISOString();
+
+    for (const item of items) {
+        const { portionSize, unitCount } = getItemModifierAttrs(item);
+
+        const setParts = ['#updatedAt = :updatedAt'];
+        const exprNames = { '#updatedAt': 'updatedAt' };
+        const exprValues = { ':updatedAt': now };
+
+        if (portionSize !== undefined && portionSize !== null) {
+            setParts.push('#portionSize = :portionSize');
+            exprNames['#portionSize'] = 'portionSize';
+            exprValues[':portionSize'] = portionSize;
+        }
+        if (unitCount !== undefined && unitCount !== null) {
+            setParts.push('#unitCount = :unitCount');
+            exprNames['#unitCount'] = 'unitCount';
+            exprValues[':unitCount'] = unitCount;
+        }
+
+        const updateExpression = `SET ${setParts.join(', ')} REMOVE modifierGroups`;
+
+        await docClient.send(
+            new UpdateCommand({
+                TableName: TABLE_NAME,
+                Key: { pk: item.pk, sk: item.sk },
+                UpdateExpression: updateExpression,
+                ExpressionAttributeNames: exprNames,
+                ExpressionAttributeValues: exprValues,
+            })
+        );
+        updated++;
+    }
+
+    console.log(`Updated ${updated} menu items`);
+}
+
+/**
+ * Main execution
  */
 async function main() {
     try {
-        console.log('Starting modifier system seeding...');
+        console.log('Starting modifier system seeding (clean migration)...');
         console.log(`Using table: ${TABLE_NAME}`);
 
+        await deleteOldModifiers();
         await createModifierGroups();
         await createModifiers();
-        await updateMenuItemsWithModifiers();
+        await updateMenuItems();
 
-        console.log('Modifier system seeding completed successfully!');
-
-        // Print summary
-        console.log('\n=== SEEDING SUMMARY ===');
-        console.log(`Modifier Groups: ${MODIFIER_GROUPS.length}`);
+        console.log('\nModifier system seeding completed successfully!');
+        console.log('\n=== SUMMARY ===');
         console.log(
-            `Total Modifiers: ${Object.values(MODIFIERS).flat().length}`
+            `Modifier Groups: ${MODIFIER_GROUPS.length} (LUNCH, BREAKFAST, FAMILY)`
         );
+        console.log(`LUNCH modifiers: ${LUNCH_MODIFIERS.length}`);
+        console.log(`BREAKFAST modifiers: ${BREAKFAST_MODIFIERS.length}`);
         console.log(
-            `Menu Items Updated: ${Object.keys(MENU_ITEM_MODIFIERS).length}`
+            `FAMILY modifiers: ${FAMILY_MODIFIERS.length} (same as LUNCH)`
         );
-
-        console.log('\n=== MODIFIER GROUPS CREATED ===');
-        MODIFIER_GROUPS.forEach(group => {
-            console.log(
-                `- ${group.id}: ${group.name} (${MODIFIERS[group.id]?.length || 0} modifiers)`
-            );
-        });
     } catch (error) {
         console.error('Error during seeding:', error);
         process.exit(1);
     }
 }
 
-// Run the script if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
     main();
 }
 
 export {
     MODIFIER_GROUPS,
-    MODIFIERS,
-    MENU_ITEM_MODIFIERS,
+    LUNCH_MODIFIERS,
+    BREAKFAST_MODIFIERS,
+    FAMILY_MODIFIERS,
+    deleteOldModifiers,
     createModifierGroups,
     createModifiers,
-    updateMenuItemsWithModifiers,
+    updateMenuItems,
 };

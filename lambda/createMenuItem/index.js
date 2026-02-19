@@ -107,7 +107,10 @@ exports.handler = async event => {
             categoryName: categoryName,
             alt: body.alt || null,
             img: body.img || null,
-            modifierGroups: body.modifierGroups || [],
+            ...(body.portionSize && { portionSize: body.portionSize }),
+            ...(body.unitCount != null && {
+                unitCount: parseInt(body.unitCount),
+            }),
             createdAt: new Date().toISOString(),
         };
 

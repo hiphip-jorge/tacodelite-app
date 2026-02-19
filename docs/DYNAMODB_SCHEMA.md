@@ -121,18 +121,18 @@ This document describes the DynamoDB table structure and data models for the Tac
 
 **Primary Key Structure:**
 
-- **PK (Partition Key):** `MODIFIER_GROUP#{groupId}` (e.g., `MODIFIER_GROUP#SMALL_ADDONS`)
+- **PK (Partition Key):** `MODIFIER_GROUP#{groupId}` (e.g., `MODIFIER_GROUP#LUNCH`)
 - **SK (Sort Key):** `MODIFIER_GROUP#{groupId}`
 
 **Attributes:**
 
 ```json
 {
-    "pk": "MODIFIER_GROUP#SMALL_ADDONS",
-    "sk": "MODIFIER_GROUP#SMALL_ADDONS",
-    "id": "SMALL_ADDONS",
-    "name": "Small Portion Add-ons",
-    "description": "For tacos and smaller items",
+    "pk": "MODIFIER_GROUP#LUNCH",
+    "sk": "MODIFIER_GROUP#LUNCH",
+    "id": "LUNCH",
+    "name": "Lunch",
+    "description": "Add-ons for lunch items",
     "sortOrder": 1,
     "active": true,
     "createdAt": "2025-01-15T12:00:00Z",
@@ -140,44 +140,38 @@ This document describes the DynamoDB table structure and data models for the Tac
 }
 ```
 
-**Example Modifier Groups:**
+**Modifier Groups (3 total):**
 
-- `SMALL_ADDONS` - Small portion add-ons (for tacos)
-- `LARGE_ADDONS` - Large portion add-ons (for burritos, salads, nachos, plates)
-- `DRINK_SIZES` - Drink size options
-- `PREMIUM_PROTEINS` - Premium protein upgrades
-- `SAUCES` - Sauce options
+- `LUNCH` - Lunch items (tacos, burritos, salads, etc.); uses portionSize (sm/lg) for pricing
+- `BREAKFAST` - Breakfast items; uses portionSize (sm/lg) for pricing
+- `FAMILY` - Family packs (10 pack, dozen, etc.); uses unitCount × priceSm for pricing
 
-**Modifier Price Types:**
+**Category → Modifier Group Mapping:**
 
-- `addon` - Extra charge modifier (e.g., "Add Cheese +$0.50")
-- `included` - No charge modifier (e.g., "Lettuce" included in salad)
-- `removal` - Removal option (e.g., "No Onions" to remove default onions)
-
-**Default Selections:**
-
-- `defaultSelected: true` - Modifier is pre-selected for customers (can be unchecked)
-- `defaultSelected: false` - Modifier is not pre-selected (customer must choose)
-- `defaultSelections: []` - Array of modifier IDs that are pre-selected for specific menu items
+- categoryId 1 → BREAKFAST
+- categoryId 12 → FAMILY
+- categoryId 13, 14 → No modifiers (Desserts, Drinks)
+- categoryId 2–11 → LUNCH
 
 ### **6. Modifiers Table** (`tacodelite-app-staging`)
 
 **Primary Key Structure:**
 
-- **PK (Partition Key):** `MODIFIER#{groupId}` (e.g., `MODIFIER#SMALL_ADDONS`)
-- **SK (Sort Key):** `MODIFIER#{modifierId}` (e.g., `MODIFIER#LETTUCE_SM`)
+- **PK (Partition Key):** `MODIFIER#{groupId}` (e.g., `MODIFIER#LUNCH`)
+- **SK (Sort Key):** `MODIFIER#{modifierId}` (e.g., `MODIFIER#TOMATOES`)
 
 **Attributes:**
 
 ```json
 {
-    "pk": "MODIFIER#SMALL_ADDONS",
-    "sk": "MODIFIER#LETTUCE_SM",
-    "id": "LETTUCE_SM",
-    "name": "Lettuce",
-    "groupId": "SMALL_ADDONS",
-    "groupName": "Small Portion Add-ons",
-    "price": 0.5,
+    "pk": "MODIFIER#LUNCH",
+    "sk": "MODIFIER#TOMATOES",
+    "id": "TOMATOES",
+    "name": "Tomatoes",
+    "groupId": "LUNCH",
+    "groupName": "Lunch",
+    "priceSm": 0.5,
+    "priceLg": 0.75,
     "priceType": "addon",
     "defaultSelected": false,
     "sortOrder": 1,
@@ -187,7 +181,13 @@ This document describes the DynamoDB table structure and data models for the Tac
 }
 ```
 
-**Menu Item with Modifier Groups:**
+**Price Types:**
+
+- `addon` - Extra charge; uses priceSm or priceLg based on menu item portionSize (or unitCount × priceSm for Family)
+- `included` - No charge; priceSm and priceLg are 0
+- `removal` - Removal option; priceSm and priceLg are 0
+
+**Menu Item with portionSize/unitCount:**
 
 ```json
 {
@@ -196,18 +196,23 @@ This document describes the DynamoDB table structure and data models for the Tac
     "id": 1,
     "name": "Taco",
     "price": 3.5,
-    "modifierGroups": [
-        {
-            "groupId": "SMALL_ADDONS",
-            "groupName": "Small Portion Add-ons",
-            "required": false,
-            "multiSelect": true,
-            "min": 0,
-            "max": null,
-            "defaultSelections": []
-        }
-    ],
-    "categoryId": 1,
+    "portionSize": "sm",
+    "categoryId": 2,
+    "active": true
+}
+```
+
+**Family Item Example:**
+
+```json
+{
+    "pk": "ITEM#61",
+    "sk": "ITEM#61",
+    "id": 61,
+    "name": "10 pack of tacos",
+    "price": 18.99,
+    "unitCount": 10,
+    "categoryId": 12,
     "active": true
 }
 ```
