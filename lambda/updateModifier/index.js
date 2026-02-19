@@ -69,16 +69,29 @@ exports.handler = async event => {
             expressionAttributeValues[':name'] = body.name;
         }
 
-        if (body.priceSm !== undefined) {
-            updateExpressions.push('#priceSm = :priceSm');
+        const priceType = body.priceType;
+        const shouldUpdatePrices =
+            body.priceSm !== undefined ||
+            body.priceLg !== undefined ||
+            priceType === 'included' ||
+            priceType === 'removal';
+        if (shouldUpdatePrices) {
+            const effectivePriceSm =
+                priceType === 'included' || priceType === 'removal'
+                    ? 0
+                    : parseFloat(body.priceSm) || 0;
+            const effectivePriceLg =
+                priceType === 'included' || priceType === 'removal'
+                    ? 0
+                    : parseFloat(body.priceLg) || 0;
+            updateExpressions.push(
+                '#priceSm = :priceSm',
+                '#priceLg = :priceLg'
+            );
             expressionAttributeNames['#priceSm'] = 'priceSm';
-            expressionAttributeValues[':priceSm'] = parseFloat(body.priceSm);
-        }
-
-        if (body.priceLg !== undefined) {
-            updateExpressions.push('#priceLg = :priceLg');
             expressionAttributeNames['#priceLg'] = 'priceLg';
-            expressionAttributeValues[':priceLg'] = parseFloat(body.priceLg);
+            expressionAttributeValues[':priceSm'] = effectivePriceSm;
+            expressionAttributeValues[':priceLg'] = effectivePriceLg;
         }
 
         if (body.priceType !== undefined) {

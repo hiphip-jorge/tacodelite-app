@@ -14,7 +14,7 @@ A simplified modifier system supports add-ons for menu items. Modifier groups ar
 
 ### Modifiers
 
-Each modifier has `priceSm` and `priceLg`:
+Each modifier has `priceSm`, `priceLg`, and `priceType`:
 
 ```json
 {
@@ -26,6 +26,14 @@ Each modifier has `priceSm` and `priceLg`:
     "groupId": "LUNCH"
 }
 ```
+
+**Price Types:**
+
+- **addon** – Extra charge; uses priceSm/priceLg. Price fields are editable in admin.
+- **included** – No charge (e.g., lettuce, cheese). Prices forced to 0; fields disabled in admin.
+- **removal** – Removal option (e.g., "No Lettuce"). Prices forced to 0; fields disabled in admin.
+
+The backend enforces that `included` and `removal` modifiers always store priceSm and priceLg as 0.
 
 ### Menu Items
 
